@@ -20,7 +20,7 @@ const Navbar = () => {
               </a>
             </Link>
             <nav className="space-x-2 ml-6 hidden lg:block">
-              <Link href="/">
+              <Link href="/pricing">
                 <a className={s.link}>Pricing</a>
               </Link>
               <Link href="/account">

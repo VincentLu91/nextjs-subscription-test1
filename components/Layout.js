@@ -6,8 +6,8 @@ import Footer from './ui/Footer';
 export default function Layout({ children, meta: pageMeta }) {
   const router = useRouter();
   const meta = {
-    title: 'Next.js Subscription Starter',
-    description: 'Brought to you by Vercel, Stripe, and Supabase.',
+    title: 'aperture ai',
+    description: 'Create compelling visual content at scale.',
     cardImage: '/og.png',
     ...pageMeta
   };
@@ -24,7 +24,7 @@ export default function Layout({ children, meta: pageMeta }) {
         <meta content={meta.description} name="description" />
         <meta
           property="og:url"
-          content={`https://subscription-starter.vercel.app${router.asPath}`}
+          content={`https://subscription-starter.vercel.app${router.asPath}`} // CHANGE THIS
         />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={meta.title} />
