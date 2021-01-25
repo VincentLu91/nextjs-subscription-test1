@@ -1,6 +1,6 @@
 :root {
-  --primary: #000000;
-  --primary-2: #111;
+  --primary: #012345; /*colour of navbar and pricing plan grid, default #000000*/
+  --primary-2: #113; /*colour of footer, defaut: #111*/
   --secondary: #ffffff;
   --secondary-2: #f1f3f5;
   --hover: rgba(255, 255, 255, 0.075);
