@@ -5,6 +5,8 @@ import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
+import axios from "axios";
+import { Card } from "react-bootstrap";
 
 function ImageCard({ category, description, footer, children }) {
   return (
@@ -22,13 +24,15 @@ function ImageCard({ category, description, footer, children }) {
 }
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState()
+  const [cardData, setCardData] = useState([]);
+  const [visible, setVisible] = useState(5);
   const router = useRouter();
   const { userLoaded, user, session, userDetails, subscription } = useUser();
 
   useEffect(() => {
     if (!user) router.replace('/signin');
-  }, [user]);
+	allCardData();
+  }, [user], []);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);
@@ -41,17 +45,32 @@ export default function Dashboard() {
     setLoading(false);
   };
   
-  const generateImage = async () => {
-    //setLoading(true);
-    //const { url, error } = await postData({
-    //  url: 'https://services.demo.akoios.com/helloworld/hello',
-    //  token: session.access_token
-    //});
-    //if (error) return alert(error.message);
-    //window.location.assign(url);
-    //setLoading(false);
-	const res = await fetch('https://services.demo.akoios.com/helloworld/hello')
-	setImage(res.data)
+  const allCardData = async () => {
+      const response = await axios.get("https://randomuser.me/api/?results=35");
+      setCardData(response.data.results);
+  };
+  
+  const renderCard = (person, index) => {
+      return (
+        <Card style={{ width: "18rem" }}>
+          <Card.Img variant="top" src={person.picture.large} />
+          <Card.Body>
+            <Card.Title>
+              {person.name.first} {person.name.last}
+            </Card.Title>
+            <Card.Text>
+              <ul>
+                <li>{person.email}</li>
+                <li>{person.cell}</li>
+                <li>{person.gender}</li>
+              </ul>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      );
+  };
+  const loadMore = () => {
+      setVisible(visible + 5);
   };
 
   const subscriptionName = subscription && subscription.prices.products.name;
@@ -63,61 +82,16 @@ export default function Dashboard() {
       minimumFractionDigits: 0
     }).format(subscription.prices.unit_amount / 100);
 
-  return (
-    <section className="bg-black mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Welcome
-          </h1>
-          <p className="mt-5 text-xl text-accents-6 sm:text-center sm:text-2xl max-w-2xl m-auto">
-            Use the image generator below on any available category to create a unique image for your use.
-          </p>
-        </div>
-      </div>
-      <div className="p-4">
-        <ImageCard
-          category="Nature and Landscapes"
-          
-          footer={
-            <div className="flex items-start justify-between flex-col sm:flex-row sm:items-center">
-              <p className="pb-4 sm:pb-0">
-                Manage your subscription on Stripe.
-              </p>
-              <Button
-                variant="slim"
-                loading={loading}
-                disabled={loading || !subscription}
-                onClick={redirectToCustomerPortal}
-              >
-                Open customer portal
-              </Button>
-            </div>
-          }
-        >
-          <div className="text-xl mt-8 mb-4 font-semibold">
-            {!userLoaded ? (
-              <div className="h-12 mb-6">
-                <LoadingDots />
-              </div>
-            ) : subscriptionPrice ? (
-              <Button
-				onClick={generateImage}
-			  >
-				Generate
-			  </Button>
-            ) : (
-              <Link href="/">
-                <a>Choose your plan</a>
-              </Link>
-				
-			// try to Display data from API	
-            )}
-          </div>
-        </ImageCard>
-        
-        
-      </div>
-    </section>
-  );
+	return (
+	    <div className="App">
+	      <div className="wrapper">
+	        <div className="cards">
+	          {cardData.slice(0, visible).map(renderCard)}
+	        </div>
+	      </div>
+	      {visible < cardData.length && (
+	        <button onClick={loadMore}>Load 5 More</button>
+	      )}
+	    </div>
+	);
 }
