@@ -70,7 +70,7 @@ const SignIn = () => {
             </div>
           )}
 
-          {!showPasswordInput && (
+          {/*!showPasswordInput && ( // comment out the magic link
             <form onSubmit={handleSignin} className="flex flex-col space-y-4">
               <Input
                 type="email"
@@ -88,9 +88,9 @@ const SignIn = () => {
                 Send magic link
               </Button>
             </form>
-          )}
+          )*/}
 
-          {showPasswordInput && (
+          {!showPasswordInput && (
             <form onSubmit={handleSignin} className="flex flex-col space-y-4">
               <Input
                 type="email"
@@ -128,9 +128,9 @@ const SignIn = () => {
                 setMessage({});
               }}
             >
-              {`Or sign in with ${
+              {/*`Or sign in with ${ // comment out the magic link
                 showPasswordInput ? 'magic link' : 'password'
-              }.`}
+              }.`*/}
             </a>
           </span>
 
