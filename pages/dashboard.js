@@ -84,7 +84,7 @@ export default function Dashboard() {
 
 	return (
 	    <div className="App">
-		{subscriptionPrice > 0 ? // goal of this is to restrict content to subscribers.
+		{subscription ? // goal of this is to restrict content to subscribers.
 	      <div className="wrapper">
 	        <div className="cards">
 	          {cardData.slice(0, visible).map(renderCard)}
