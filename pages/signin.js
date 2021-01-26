@@ -46,8 +46,8 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      router.replace('/account');
+    if (user) { // originally account route
+      router.replace('/dashboard');
     }
   }, [user]);
 

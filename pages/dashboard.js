@@ -6,11 +6,11 @@ import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 
-function Card({ title, description, footer, children }) {
+function ImageCard({ category, description, footer, children }) {
   return (
     <div className="border border-accents-1	max-w-3xl w-full p rounded-md m-auto my-8">
       <div className="px-5 py-4">
-        <h3 className="text-2xl mb-1 font-medium">{title}</h3>
+        <h3 className="text-2xl mb-1 font-medium">{category}</h3>
         <p className="text-accents-5">{description}</p>
         {children}
       </div>
@@ -20,8 +20,9 @@ function Card({ title, description, footer, children }) {
     </div>
   );
 }
-export default function Account() {
+export default function Dashboard() {
   const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState()
   const router = useRouter();
   const { userLoaded, user, session, userDetails, subscription } = useUser();
 
@@ -39,6 +40,19 @@ export default function Account() {
     window.location.assign(url);
     setLoading(false);
   };
+  
+  const generateImage = async () => {
+    //setLoading(true);
+    //const { url, error } = await postData({
+    //  url: 'https://services.demo.akoios.com/helloworld/hello',
+    //  token: session.access_token
+    //});
+    //if (error) return alert(error.message);
+    //window.location.assign(url);
+    //setLoading(false);
+	const res = await fetch('https://services.demo.akoios.com/helloworld/hello')
+	setImage(res.data)
+  };
 
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
@@ -54,27 +68,21 @@ export default function Account() {
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Account
+            Welcome
           </h1>
           <p className="mt-5 text-xl text-accents-6 sm:text-center sm:text-2xl max-w-2xl m-auto">
-            We partnered with Stripe for a simplified billing.
+            Use the image generator below on any available category to create a unique image for your use.
           </p>
         </div>
       </div>
       <div className="p-4">
-        <Card
-          title="Your Plan"
-          description={
-            subscriptionName &&
-            `You are currently on the ${subscriptionName} plan.`
-          }
+        <ImageCard
+          category="Nature and Landscapes"
+          
           footer={
             <div className="flex items-start justify-between flex-col sm:flex-row sm:items-center">
               <p className="pb-4 sm:pb-0">
                 Manage your subscription on Stripe.
-              </p>
-              <p className="pb-4 sm:pb-0">
-                Go to your <Link href="/dashboard">dashboard</Link>.
               </p>
               <Button
                 variant="slim"
@@ -93,38 +101,22 @@ export default function Account() {
                 <LoadingDots />
               </div>
             ) : subscriptionPrice ? (
-              `${subscriptionPrice}/${subscription.prices.interval}`
+              <Button
+				onClick={generateImage}
+			  >
+				Generate
+			  </Button>
             ) : (
               <Link href="/">
                 <a>Choose your plan</a>
               </Link>
+				
+			// try to Display data from API	
             )}
           </div>
-        </Card>
-        <Card
-          title="Your Name"
-          description="Please enter your full name, or a display name you are comfortable with."
-          footer={<p>Please use 64 characters at maximum.</p>}
-        >
-          <div className="text-xl mt-8 mb-4 font-semibold">
-            {userDetails ? (
-              `${userDetails?.full_name ?? ''}`
-            ) : (
-              <div className="h-8 mb-6">
-                <LoadingDots />
-              </div>
-            )}
-          </div>
-        </Card>
-        <Card
-          title="Your Email"
-          description="Please enter the email address you want to use to login."
-          footer={<p>We will email you to verify the change.</p>}
-        >
-          <p className="text-xl mt-8 mb-4 font-semibold">
-            {user ? user.email : undefined}
-          </p>
-        </Card>
+        </ImageCard>
+        
+        
       </div>
     </section>
   );
