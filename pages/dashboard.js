@@ -84,14 +84,18 @@ export default function Dashboard() {
 
 	return (
 	    <div className="App">
+		{subscriptionPrice > 0 ?
 	      <div className="wrapper">
 	        <div className="cards">
 	          {cardData.slice(0, visible).map(renderCard)}
 	        </div>
 	      </div>
-	      {visible < cardData.length && (
+	      /*{visible < cardData.length && (
 	        <button onClick={loadMore}>Load 5 More</button>
-	      )}
+	      )}*/
+		  :
+		  <h1>You are not subscribed yet!</h1>
+	    }
 	    </div>
 	);
 }
