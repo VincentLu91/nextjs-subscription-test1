@@ -1,6 +1,5 @@
 import Head from 'next/head'
 const Cosmic = require('cosmicjs')
-//import Cosmic from 'cosmicjs'
 const api = Cosmic()
 // Set these values, found in Bucket > Settings after logging in at https://app.cosmicjs.com/login
 const bucket = api.bucket({
