@@ -8,30 +8,36 @@ import Button from '../components/ui/Button';
 import axios from "axios";
 import { Card } from "react-bootstrap";
 
-function ImageCard({ category, description, footer, children }) {
-  return (
-    <div className="border border-accents-1	max-w-3xl w-full p rounded-md m-auto my-8">
-      <div className="px-5 py-4">
-        <h3 className="text-2xl mb-1 font-medium">{category}</h3>
-        <p className="text-accents-5">{description}</p>
-        {children}
-      </div>
-      <div className="border-t border-accents-1 bg-primary-2 p-4 text-accents-3 rounded-b-md">
-        {footer}
-      </div>
-    </div>
-  );
+// import trainML's config code
+import config from "./api/config";
+
+const getImage = async () => {
+  try {
+    const resp = await axios.post(
+      `${config.api_address}${config.route_path}`,
+    );
+    console.log(resp.data);
+    return resp.data;
+  } catch (error) {
+    if (error.response) {
+      console.log(error.response.status);
+      console.log(error.response);
+    } else {
+      console.log(error);
+    }
+  }
 }
+
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
-  const [cardData, setCardData] = useState([]);
   const [visible, setVisible] = useState(5);
   const router = useRouter();
   const { userLoaded, user, session, userDetails, subscription } = useUser();
+  const [ganBase64, setGanBase64] = useState(null);
+  const [showImage, setShowImage] = useState(false);
 
   useEffect(() => {
     if (!user) router.replace('/signin');
-	allCardData();
   }, [user], []);
 
   const redirectToCustomerPortal = async () => {
@@ -44,34 +50,8 @@ export default function Dashboard() {
     window.location.assign(url);
     setLoading(false);
   };
-  
-  const allCardData = async () => {
-      const response = await axios.get("https://randomuser.me/api/?results=35");
-      setCardData(response.data.results);
-  };
-  
-  const renderCard = (person, index) => {
-      return (
-        <Card style={{ width: "18rem" }}>
-          <Card.Img variant="top" src={person.picture.large} />
-          <Card.Body>
-            <Card.Title>
-              {person.name.first} {person.name.last}
-            </Card.Title>
-            <Card.Text>
-              <ul>
-                <li>{person.email}</li>
-                <li>{person.cell}</li>
-                <li>{person.gender}</li>
-              </ul>
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      );
-  };
-  const loadMore = () => {
-      setVisible(visible + 5);
-  };
+
+  const displayContent = showImage && <img alt='uploaded' src={`data:image/png;base64,${ganBase64}`} />
 
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
@@ -85,14 +65,25 @@ export default function Dashboard() {
 	return (
 	    <div className="App">
 		{subscription ? // goal of this is to restrict content to subscribers.
-	      <div className="wrapper">
-	        <div className="cards">
-	          {cardData.slice(0, visible).map(renderCard)}
-	        </div>
-	      </div>
-	      /*{visible < cardData.length && (
-	        <button onClick={loadMore}>Load 5 More</button>
-	      )}*/
+      <div>
+      <Button
+        onClick={async () => {
+          const result = await getImage();
+          if (result) {
+            const ganImage = Object.entries(result)[0];
+            alert(ganImage[1]);
+            setGanBase64(ganImage[1]);
+            setShowImage(true);
+          }
+          else {
+            alert ("nothing generated");
+          }
+        }}
+      >
+        Get Image
+      </Button>
+      {displayContent}
+      </div>
 		  :
 		  <h1>You are not subscribed yet!</h1>
 	    }
