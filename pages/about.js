@@ -1,7 +1,36 @@
+import styles from '../styles/Home.module.css';
+import Image from 'next/image';
 const about = () => {
   return (
-    <div>
-      <h1>This is the about page</h1>
+    <div className={styles.container}>
+      <Image src="/random.png" alt="" width={600} height={400} />
+      <br />
+      <h2>Photorealistic content on demand</h2>
+      <p>
+        Whether you are a solopreneur running an eCommerce store straight from
+        your living room, or building a presence with a blog, or just trying to
+        build an online business. We completely understand that it can be hard
+        to stand out with visually aesthetic, on-brand content.
+      </p>
+      <p>
+        In order to stand out from a sea of comptetitors, you will need
+        compelling visual content to establish your credibility, and usually the
+        images will need to be high quality to attract leads.
+      </p>
+      <p>
+        An AI generated image system can help you achieve. We believe that this
+        system will help you save time and money to curate high quality images
+        on demand that will put you on par with established competitors so you
+        could put them on your website, social media, blog, and other marketing
+        materials.
+      </p>
+      <p>
+        Our vision is to enable any ambitious entrepreneur to hit the ground
+        running with efficient marketing processes no matter the amount of
+        resources they have, so they could focus their time and energy on other
+        value-producing functions, including product development and connecting
+        with audiences.
+      </p>
     </div>
   );
 };
