@@ -2,8 +2,10 @@ import Link from 'next/link';
 import s from './Navbar.module.css';
 import Logo from '../../icons/Logo';
 import { useUser } from '../../UserContext';
+import { useRouter } from 'next/router';
 
 const Navbar = () => {
+  const router = useRouter();
   const { user, signOut } = useUser();
 
   return (
@@ -31,11 +33,21 @@ const Navbar = () => {
 
           <div className="flex flex-1 justify-end space-x-8">
             {user ? (
-              <Link href="#">
-                <a className={s.link} onClick={() => signOut()}>
-                  Sign out
-                </a>
-              </Link>
+              <>
+                <Link href="#">
+                  <a
+                    className={s.link}
+                    onClick={() => router.push('/dashboard')}
+                  >
+                    Dashboard
+                  </a>
+                </Link>
+                <Link href="#">
+                  <a className={s.link} onClick={() => signOut()}>
+                    Sign out
+                  </a>
+                </Link>
+              </>
             ) : (
               <Link href="/signin">
                 <a className={s.link}>Sign in</a>
