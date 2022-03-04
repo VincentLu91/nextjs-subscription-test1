@@ -77,7 +77,7 @@ const index = () => {
       <br />
       <h1 className={styles.description}>
         Start bringing eye-popping visual content to your website and social
-        media, straight from your bedroom.
+        media, straight from your living room.
       </h1>
       <br />
       <br />
