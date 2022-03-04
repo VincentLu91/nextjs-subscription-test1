@@ -6,11 +6,15 @@ import Link from 'next/link';
 const index = () => {
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Let AI Generate Photos For You</h1>
-      <br />
-      <h1 className={styles.description}>
-        So you could use unique quality images to build your business
-      </h1>
+      <main>
+        <div className={styles['hero-image']}>
+          <h1 className={styles.title}>Let AI Generate Photos For You</h1>
+          <br />
+          <h1 className={styles.description}>
+            So you could use unique quality images to build your business
+          </h1>
+        </div>
+      </main>
       <br />
       <br />
       <br />
