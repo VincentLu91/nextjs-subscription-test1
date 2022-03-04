@@ -18,31 +18,31 @@
 }
 
 .feed {
-	display: flex;
-	align-items: center;
-	flex-direction: column;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 .post {
-	margin: 25px;
-	width: 500px;
-	height: 316px;
-	cursor: pointer;
-	text-align: center;
-	max-width: calc(100vw - 50px);
+  margin: 25px;
+  width: 500px;
+  height: 316px;
+  cursor: pointer;
+  text-align: center;
+  max-width: calc(100vw - 50px);
 }
 
 .mainImage {
-	width: 500px;
-	transition: 0.2s;
-	border-radius: 56px;
-	max-width: calc(100vw - 50px);
-	box-shadow: 0px 0px 2px black;
+  width: 500px;
+  transition: 0.2s;
+  border-radius: 56px;
+  max-width: calc(100vw - 50px);
+  box-shadow: 0px 0px 2px black;
 }
 
 .post:hover .mainImage {
-	width: 490px;
-	transition: 0.2s;
+  width: 490px;
+  transition: 0.2s;
 }
 
 .footer {
@@ -148,4 +148,25 @@
     width: 100%;
     flex-direction: column;
   }
+}
+
+/* test vertically align text next to image */
+.landing-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-align-image-left {
+  flex-basis: 40%;
+}
+
+.vertical-align-image-right {
+  flex-basis: 70%;
+  order: 2;
+}
+
+.vertical-align-text {
+  font-size: 20px;
+  padding-left: 20px;
 }
