@@ -62,7 +62,7 @@ export default function Dashboard() {
 
   // handle onChange event of the dropdown
   const handleChange = (e) => {
-    setLanguage(e.label);
+    setImageType(e.label);
     console.log('Image Type selected: ', e.value);
   };
 
