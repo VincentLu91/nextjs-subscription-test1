@@ -12,21 +12,6 @@ import Select from 'react-select';
 // import trainML's config code
 import config from './api/config';
 
-const getImage = async () => {
-  try {
-    const resp = await axios.post(`${config.api_address}${config.route_path}`);
-    console.log(resp.data);
-    return resp.data;
-  } catch (error) {
-    if (error.response) {
-      console.log(error.response.status);
-      console.log(error.response);
-    } else {
-      console.log(error);
-    }
-  }
-};
-
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
@@ -34,7 +19,25 @@ export default function Dashboard() {
   const { userLoaded, user, session, userDetails, subscription } = useUser();
   const [ganBase64, setGanBase64] = useState(null);
   const [showImage, setShowImage] = useState(false);
-  const [imageType, setImageType] = useState(null);
+  const [imageLabel, setImageLabel] = useState(null);
+  const [imageAPI, setImageAPI] = useState(null);
+
+  const getImage = async () => {
+    try {
+      const resp = await axios.post(
+        `${imageAPI.api_address}${imageAPI.route_path}`
+      );
+      console.log(resp.data);
+      return resp.data;
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.status);
+        console.log(error.response);
+      } else {
+        console.log(error);
+      }
+    }
+  };
 
   useEffect(
     () => {
@@ -55,15 +58,17 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  const imageTypes = [
+  /*const imageTypes = [
     { value: 'face1', label: 'Face1' },
     { value: 'face2', label: 'Face2' }
-  ];
+  ];*/
 
   // handle onChange event of the dropdown
   const handleChange = (e) => {
-    setImageType(e.label);
-    console.log('Image Type selected: ', e.value);
+    setImageLabel(e.label);
+    console.log('Image Type selected: ', e.label);
+    setImageAPI(e.value);
+    console.log('Image API selected: ', e.value);
   };
 
   const displayContent = showImage && (
@@ -85,8 +90,8 @@ export default function Dashboard() {
         <div>
           <Select
             placeholder="Select Option"
-            value={imageTypes.find((obj) => obj.value === imageType)} // set selected value
-            options={imageTypes} // set list of the data
+            value={config.find((obj) => obj.value === imageLabel)} // set selected value
+            options={config} // set list of the data
             onChange={handleChange} // assign onChange function
           />
           <Button
@@ -104,8 +109,8 @@ export default function Dashboard() {
           >
             Get Image
           </Button>
-          {displayContent}
-          {/*imageType && displayContent*/}
+          {/*displayContent*/}
+          {imageLabel && displayContent}
         </div>
       ) : (
         <h1>You are not subscribed yet!</h1>
