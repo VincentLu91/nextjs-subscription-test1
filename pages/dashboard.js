@@ -8,6 +8,7 @@ import Button from '../components/ui/Button';
 import axios from 'axios';
 import { Card } from 'react-bootstrap';
 import Select from 'react-select';
+import styles from '../styles/Home.module.css';
 
 // import trainML's config code
 import contentTypes from './api/contentTypes';
@@ -85,7 +86,7 @@ export default function Dashboard() {
   return (
     <div className="App">
       {subscription ? ( // goal of this is to restrict content to subscribers.
-        <div>
+        <div className={styles['get-image-button']}>
           <Select
             placeholder="Select Option"
             value={contentTypes.find((obj) => obj.value === contentLabel)} // set selected value
