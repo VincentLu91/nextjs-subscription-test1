@@ -1,4 +1,4 @@
-const config = [
+const contentTypes = [
   {
     value: {
       api_address: 'https://cc30dad5-dc5e-48e9-adbc-a593462f74e9.trainml.cloud',
@@ -15,4 +15,4 @@ const config = [
   }
 ];
 
-export default config;
+export default contentTypes;

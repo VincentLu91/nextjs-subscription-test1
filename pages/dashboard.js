@@ -10,7 +10,7 @@ import { Card } from 'react-bootstrap';
 import Select from 'react-select';
 
 // import trainML's config code
-import config from './api/config';
+import contentTypes from './api/contentTypes';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -19,13 +19,16 @@ export default function Dashboard() {
   const { userLoaded, user, session, userDetails, subscription } = useUser();
   const [ganBase64, setGanBase64] = useState(null);
   const [showImage, setShowImage] = useState(false);
-  const [imageLabel, setImageLabel] = useState(null);
-  const [imageAPI, setImageAPI] = useState(null);
+  const [contentLabel, setContentLabel] = useState(null);
+  const [contentAPI, setContentAPI] = useState(null);
 
   const getImage = async () => {
+    if (!contentAPI) {
+      return;
+    }
     try {
       const resp = await axios.post(
-        `${imageAPI.api_address}${imageAPI.route_path}`
+        `${contentAPI.api_address}${contentAPI.route_path}`
       );
       console.log(resp.data);
       return resp.data;
@@ -58,16 +61,11 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  /*const imageTypes = [
-    { value: 'face1', label: 'Face1' },
-    { value: 'face2', label: 'Face2' }
-  ];*/
-
   // handle onChange event of the dropdown
   const handleChange = (e) => {
-    setImageLabel(e.label);
+    setContentLabel(e.label);
     console.log('Image Type selected: ', e.label);
-    setImageAPI(e.value);
+    setContentAPI(e.value);
     console.log('Image API selected: ', e.value);
   };
 
@@ -90,8 +88,8 @@ export default function Dashboard() {
         <div>
           <Select
             placeholder="Select Option"
-            value={config.find((obj) => obj.value === imageLabel)} // set selected value
-            options={config} // set list of the data
+            value={contentTypes.find((obj) => obj.value === contentLabel)} // set selected value
+            options={contentTypes} // set list of the data
             onChange={handleChange} // assign onChange function
           />
           <Button
@@ -110,7 +108,7 @@ export default function Dashboard() {
             Get Image
           </Button>
           {/*displayContent*/}
-          {imageLabel && displayContent}
+          {contentLabel && displayContent}
         </div>
       ) : (
         <h1>You are not subscribed yet!</h1>
