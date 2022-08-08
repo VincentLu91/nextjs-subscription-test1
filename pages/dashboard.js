@@ -98,11 +98,11 @@ export default function Dashboard() {
               const result = await getImage();
               if (result) {
                 const ganImage = Object.entries(result)[0];
-                alert(ganImage[1]);
+                //alert(ganImage[1]);
                 setGanBase64(ganImage[1]);
                 setShowImage(true);
               } else {
-                alert('nothing generated');
+                //alert('nothing generated');
               }
             }}
           >
