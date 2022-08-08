@@ -1,7 +1,7 @@
 const contentTypes = [
   {
     value: {
-      api_address: 'https://cc30dad5-dc5e-48e9-adbc-a593462f74e9.trainml.cloud',
+      api_address: 'https://aa680ae2-7c5d-456e-9253-458483097698.trainml.cloud',
       route_path: '/generate'
     },
     label: 'Face1'
