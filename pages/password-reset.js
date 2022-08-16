@@ -49,7 +49,7 @@ function PasswordReset() {
           return;
         }
 
-        //   now we will change the password
+        //   now we will change the password.
         const { error } = await supabase.auth.api.updateUser(accessToken, {
           password: password
         });
