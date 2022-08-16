@@ -18,8 +18,7 @@ function reset() {
         {
           //redirectTo: 'http://localhost:3000/password-reset' //// this will redirect to us at password-reset page,
           //// you can also set your own page for it.
-          redirectTo:
-            'https://nextjs-subscription-test1.vercel.app/password-reset' /// this will redirect to us at password-reset page,
+          redirectTo: `${window.location.origin}/password-reset` /// this will redirect to us at password-reset page,
         }
       );
 
