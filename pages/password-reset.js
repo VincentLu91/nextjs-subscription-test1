@@ -50,7 +50,8 @@ function PasswordReset() {
         }
 
         //   now we will change the password.
-        const { error } = await supabase.auth.api.updateUser(accessToken, {
+        const { error } = await supabase.auth.api.update(accessToken, {
+          // not updateUser()
           password: password
         });
 
