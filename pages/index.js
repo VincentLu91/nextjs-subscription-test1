@@ -53,7 +53,7 @@ const index = () => {
 
       <div className={styles['landing-page-container']}>
         <div className={styles['vertical-align-image-left']}>
-          <Image src="/random.png" alt="" width={300} height={400} />
+          <Image src="/girlface.png" alt="" width={400} height={400} />
         </div>
         <div className={styles['vertical-align-text']}>
           <h1>
@@ -64,7 +64,7 @@ const index = () => {
       <br />
       <div className={styles['landing-page-container']}>
         <div className={styles['vertical-align-image-right']}>
-          <Image src="/random.png" alt="" width={300} height={400} />
+          <Image src="/guyface.png" alt="" width={300} height={400} />
         </div>
         <div className={styles['vertical-align-text']}>
           <h1>
@@ -76,8 +76,8 @@ const index = () => {
       <br />
       <br />
       <h1 className={styles.description}>
-        Start bringing eye-popping visual content to your website and social
-        media, straight from your living room.
+        Start bringing visual content to your website and social media, straight
+        from your living room.
       </h1>
       <br />
       <br />
