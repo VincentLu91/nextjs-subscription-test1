@@ -6,7 +6,7 @@ import Footer from './ui/Footer';
 export default function Layout({ children, meta: pageMeta }) {
   const router = useRouter();
   const meta = {
-    title: 'aperture ai',
+    title: 'AutoStock ai',
     description: 'Create compelling visual content at scale.',
     cardImage: '/og.png',
     ...pageMeta
