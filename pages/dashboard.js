@@ -18,13 +18,12 @@ export default function Dashboard() {
   const [visible, setVisible] = useState(5);
   const router = useRouter();
   const { userLoaded, user, session, userDetails, subscription } = useUser();
-  const [ganBase64, setGanBase64] = useState(null);
+  const [imageLink, setImageLink] = useState(null);
   const [showImage, setShowImage] = useState(false);
-  const [contentLabel, setContentLabel] = useState(null);
-  const [contentAPI, setContentAPI] = useState(null);
+  const [prompt, setPrompt] = useState(null);
 
   const getImage = async (prompt) => {
-    const resp = await axios.get('/api/predictions?prompt=' + prompt);
+    const resp = await axios.get('/api/imagepredictions?prompt=' + prompt);
     alert('Resp data is: ', resp.data);
     return resp.data;
   };
@@ -48,17 +47,15 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  // handle onChange event of the dropdown
+  // handle onChange event of the text input (no longer dropdown)
   const handleChange = (e) => {
-    setContentLabel(e.label);
-    console.log('Image Type selected: ', e.label);
-    setContentAPI(e.value);
-    console.log('Image API selected: ', e.value);
+    setPrompt(e.target.value);
+    console.log('Prompt: ', e.target.value);
   };
 
   const displayContent = showImage && (
     //<img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
-    <img alt="uploaded" src={ganBase64} />
+    <img alt="uploaded" src={imageLink} />
   );
 
   const subscriptionName = subscription && subscription.prices.products.name;
@@ -74,30 +71,31 @@ export default function Dashboard() {
     <div className="App">
       {subscription ? ( // goal of this is to restrict content to subscribers.
         <div className={styles['get-image-button']}>
-          <Select
-            placeholder="Select Option"
-            value={contentTypes.find((obj) => obj.value === contentLabel)} // set selected value
-            options={contentTypes} // set list of the data
-            onChange={handleChange} // assign onChange function
+          <input
+            type="text"
+            id="prompt"
+            name="prompt"
+            onChange={handleChange}
+            value={prompt}
           />
           <Button
             onClick={async () => {
-              const result = await getImage('a photo of a skating rink');
-              if (result) {
-                //const ganImage = Object.entries(result)[0];
-                //alert(ganImage[1]);
-                setGanBase64(result);
-                setShowImage(true);
+              if (prompt.trim() == '') {
+                alert('Please enter a prompt');
               } else {
-                //alert('nothing generated');
+                const result = await getImage(prompt);
+                if (result) {
+                  setImageLink(result);
+                  setShowImage(true);
+                } else {
+                  alert('nothing generated');
+                }
               }
-              alert('result is: ', result);
             }}
           >
             Get Image
           </Button>
-          {/*displayContent*/}
-          {contentLabel && displayContent}
+          {displayContent}
         </div>
       ) : (
         <h1>You are not subscribed yet!</h1>
