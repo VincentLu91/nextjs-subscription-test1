@@ -23,24 +23,10 @@ export default function Dashboard() {
   const [contentLabel, setContentLabel] = useState(null);
   const [contentAPI, setContentAPI] = useState(null);
 
-  const getImage = async () => {
-    if (!contentAPI) {
-      return;
-    }
-    try {
-      const resp = await axios.post(
-        `${contentAPI.api_address}${contentAPI.route_path}`
-      );
-      console.log(resp.data);
-      return resp.data;
-    } catch (error) {
-      if (error.response) {
-        console.log(error.response.status);
-        console.log(error.response);
-      } else {
-        console.log(error);
-      }
-    }
+  const getImage = async (prompt) => {
+    const resp = await axios.get('/api/predictions?prompt=' + prompt);
+    alert('Resp data is: ', resp.data);
+    return resp.data;
   };
 
   useEffect(
@@ -71,7 +57,8 @@ export default function Dashboard() {
   };
 
   const displayContent = showImage && (
-    <img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
+    //<img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
+    <img alt="uploaded" src={ganBase64} />
   );
 
   const subscriptionName = subscription && subscription.prices.products.name;
@@ -95,15 +82,16 @@ export default function Dashboard() {
           />
           <Button
             onClick={async () => {
-              const result = await getImage();
+              const result = await getImage('a photo of a skating rink');
               if (result) {
-                const ganImage = Object.entries(result)[0];
+                //const ganImage = Object.entries(result)[0];
                 //alert(ganImage[1]);
-                setGanBase64(ganImage[1]);
+                setGanBase64(result);
                 setShowImage(true);
               } else {
                 //alert('nothing generated');
               }
+              alert('result is: ', result);
             }}
           >
             Get Image
