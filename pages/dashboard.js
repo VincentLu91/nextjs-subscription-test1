@@ -59,10 +59,10 @@ export default function Dashboard() {
         key={index}
         className={styles['box']}
       >
-        <Card.Img variant="top" src={card} />
+        <Card.Img variant="top" src={card.image} />
         <Card.Body>
-          <Card.Title>Title</Card.Title>
-          <Card.Text>text</Card.Text>
+          <Card.Title>{card.title}</Card.Title>
+          <Card.Text>{card.text}</Card.Text>
           <Button variant="primary">Go somewhere</Button>
         </Card.Body>
       </Card>
@@ -100,7 +100,10 @@ export default function Dashboard() {
                   // 2 is a placeholder, later I plan to generate 16 images
                   const result = await getImage(prompt);
                   if (result) {
-                    setImageList((current) => [...current, result]);
+                    setImageList((current) => [
+                      ...current,
+                      { image: result, title: 'a title', text: 'a text' } // placeholder keys
+                    ]);
                   } else {
                     alert('nothing generated');
                   }
