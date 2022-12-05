@@ -12,6 +12,7 @@ import styles from '../styles/Home.module.css';
 
 // import trainML's config code
 import contentTypes from './api/contentTypes';
+import { saveAs } from 'file-saver';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -62,10 +63,16 @@ export default function Dashboard() {
         <Card.Img variant="top" src={image.url} />
         <Card.Body>
           <Card.Text>{image.text}</Card.Text>
-          <Button variant="primary">Go somewhere</Button>
+          <Button variant="primary" onClick={() => download(image.url)}>
+            Download
+          </Button>
         </Card.Body>
       </Card>
     );
+  };
+
+  const download = (url) => {
+    saveAs(url, 'image');
   };
 
   const subscriptionName = subscription && subscription.prices.products.name;
