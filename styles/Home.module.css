@@ -190,3 +190,8 @@
   align-items: center;
   color: black; /* otherwise the text prompt is white color */
 }
+
+/* for styling cards when displaying a grid of images */
+.box {
+  margin: 20px;
+}
