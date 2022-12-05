@@ -18,13 +18,12 @@ export default function Dashboard() {
   const [visible, setVisible] = useState(5);
   const router = useRouter();
   const { userLoaded, user, session, userDetails, subscription } = useUser();
-  const [imageLink, setImageLink] = useState(null);
-  const [showImage, setShowImage] = useState(false);
   const [prompt, setPrompt] = useState(null);
+  const [imageList, setImageList] = useState([]);
 
   const getImage = async (prompt) => {
     const resp = await axios.get('/api/imagepredictions?prompt=' + prompt);
-    alert('Resp data is: ', resp.data);
+    //alert('Resp data is: ', resp.data);
     return resp.data;
   };
 
@@ -53,49 +52,6 @@ export default function Dashboard() {
     console.log('Prompt: ', e.target.value);
   };
 
-  const displayContent = showImage && (
-    //<img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
-    <img alt="uploaded" src={imageLink} />
-  );
-
-  const cardInfo = [
-    {
-      image:
-        'https://cars.usnews.com/static/images/Auto/izmo/i159614938/2022_tesla_model_s_angularfront.jpg',
-      title: 'Tesla Model S',
-      text: 'Model S'
-    },
-    {
-      image: 'https://images.hgmsites.net/hug/tesla-model-x_100777013_h.jpg',
-      title: 'Tesla Model X',
-      text: 'Model X'
-    },
-    {
-      image:
-        'https://www.motortrend.com/uploads/izmo/tesla/roadster/2022/roadster.png',
-      title: 'Tesla Roader',
-      text: 'Roader'
-    },
-    {
-      image:
-        'https://www.mad4wheels.com/img/free-car-images/mobile/18317/lucid-air-2021-597667.jpg',
-      title: '2021 Lucid Air',
-      text: 'Lucid Air'
-    },
-    {
-      image:
-        'https://www.mad4wheels.com/img/free-car-images/mobile/18317/lucid-air-2021-597667.jpg',
-      title: '2021 Lucid Air',
-      text: 'Lucid Air'
-    },
-    {
-      image:
-        'https://www.mad4wheels.com/img/free-car-images/mobile/18317/lucid-air-2021-597667.jpg',
-      title: '2021 Lucid Air',
-      text: 'Lucid Air'
-    }
-  ];
-
   const renderCard = (card, index) => {
     return (
       <Card
@@ -103,10 +59,10 @@ export default function Dashboard() {
         key={index}
         className={styles['box']}
       >
-        <Card.Img variant="top" src={card.image} />
+        <Card.Img variant="top" src={card} />
         <Card.Body>
-          <Card.Title>{card.title}</Card.Title>
-          <Card.Text>{card.text}</Card.Text>
+          <Card.Title>Title</Card.Title>
+          <Card.Text>text</Card.Text>
           <Button variant="primary">Go somewhere</Button>
         </Card.Body>
       </Card>
@@ -138,20 +94,23 @@ export default function Dashboard() {
               if (prompt.trim() == '') {
                 alert('Please enter a prompt');
               } else {
-                const result = await getImage(prompt);
-                if (result) {
-                  setImageLink(result);
-                  setShowImage(true);
-                } else {
-                  alert('nothing generated');
+                setImageList([]); // when generation begins, list of images is empty
+                let i = 0;
+                for (i = 0; i < 2; i++) {
+                  // 2 is a placeholder, later I plan to generate 16 images
+                  const result = await getImage(prompt);
+                  if (result) {
+                    setImageList((current) => [...current, result]);
+                  } else {
+                    alert('nothing generated');
+                  }
                 }
               }
             }}
           >
             Get Image
           </Button>
-          {displayContent}
-          <div className={styles['grid']}>{cardInfo.map(renderCard)}</div>
+          <div className={styles['grid']}>{imageList.map(renderCard)}</div>
         </div>
       ) : (
         <h1>You are not subscribed yet!</h1>
