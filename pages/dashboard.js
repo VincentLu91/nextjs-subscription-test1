@@ -21,6 +21,7 @@ export default function Dashboard() {
   const { userLoaded, user, session, userDetails, subscription } = useUser();
   const [prompt, setPrompt] = useState(null);
   const [imageList, setImageList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getImage = async (prompt) => {
     const resp = await axios.get('/api/imagepredictions?prompt=' + prompt);
@@ -103,6 +104,7 @@ export default function Dashboard() {
               } else {
                 setImageList([]); // when generation begins, list of images is empty
                 let i = 0;
+                setIsLoading(true);
                 for (i = 0; i < 2; i++) {
                   // 2 is a placeholder, later I plan to generate 16 images
                   const result = await getImage(prompt);
@@ -115,11 +117,14 @@ export default function Dashboard() {
                     alert('nothing generated');
                   }
                 }
+                setIsLoading(false);
               }
             }}
           >
             Generate Image
           </Button>
+          <br></br>
+          {isLoading && <LoadingDots />}
           <div className={styles['grid']}>{imageList.map(renderCard)}</div>
         </div>
       ) : (
