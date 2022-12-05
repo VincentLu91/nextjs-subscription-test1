@@ -52,17 +52,16 @@ export default function Dashboard() {
     console.log('Prompt: ', e.target.value);
   };
 
-  const renderCard = (card, index) => {
+  const renderCard = (image, index) => {
     return (
       <Card
         style={{ width: '10rem', backgroundColor: 'orange' }} // the smaller the width, the more columns of images displayed
         key={index}
         className={styles['box']}
       >
-        <Card.Img variant="top" src={card.image} />
+        <Card.Img variant="top" src={image.url} />
         <Card.Body>
-          <Card.Title>{card.title}</Card.Title>
-          <Card.Text>{card.text}</Card.Text>
+          <Card.Text>{image.text}</Card.Text>
           <Button variant="primary">Go somewhere</Button>
         </Card.Body>
       </Card>
@@ -89,6 +88,7 @@ export default function Dashboard() {
             onChange={handleChange}
             value={prompt}
           />
+          <br></br>
           <Button
             onClick={async () => {
               if (prompt.trim() == '') {
@@ -102,7 +102,7 @@ export default function Dashboard() {
                   if (result) {
                     setImageList((current) => [
                       ...current,
-                      { image: result, title: 'a title', text: 'a text' } // placeholder keys
+                      { url: result, text: '' } // placeholder text is empty for optional caption generation
                     ]);
                   } else {
                     alert('nothing generated');
@@ -111,7 +111,7 @@ export default function Dashboard() {
               }
             }}
           >
-            Get Image
+            Generate Image
           </Button>
           <div className={styles['grid']}>{imageList.map(renderCard)}</div>
         </div>
