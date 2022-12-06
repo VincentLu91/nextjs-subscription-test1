@@ -10,6 +10,9 @@ export const UserContextProvider = (props) => {
   const [userDetails, setUserDetails] = useState(null);
   const [subscription, setSubscription] = useState(null);
 
+  const [imageLink, setImageLink] = useState(null);
+  const [imageList, setImageList] = useState([]);
+
   useEffect(() => {
     const session = supabase.auth.session();
     setSession(session);
@@ -62,7 +65,11 @@ export const UserContextProvider = (props) => {
       setUserDetails(null);
       setSubscription(null);
       return supabase.auth.signOut();
-    }
+    },
+    imageLink,
+    setImageLink,
+    imageList,
+    setImageList
   };
   return <UserContext.Provider value={value} {...props} />;
 };

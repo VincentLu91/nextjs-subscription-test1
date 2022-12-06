@@ -43,6 +43,14 @@ const Navbar = () => {
                   </a>
                 </Link>
                 <Link href="#">
+                  <a
+                    className={s.link}
+                    onClick={() => router.push('/view-content')}
+                  >
+                    View Content
+                  </a>
+                </Link>
+                <Link href="#">
                   <a className={s.link} onClick={() => signOut()}>
                     Sign out
                   </a>

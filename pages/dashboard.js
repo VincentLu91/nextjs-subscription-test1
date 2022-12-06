@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
@@ -12,15 +12,22 @@ import styles from '../styles/Home.module.css';
 
 // import trainML's config code
 import contentTypes from './api/contentTypes';
-import { saveAs } from 'file-saver';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const router = useRouter();
-  const { userLoaded, user, session, userDetails, subscription } = useUser();
+  const {
+    userLoaded,
+    user,
+    session,
+    userDetails,
+    subscription,
+    setImageLink,
+    imageList,
+    setImageList
+  } = useUser();
   const [prompt, setPrompt] = useState(null);
-  const [imageList, setImageList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const getImage = async (prompt) => {
@@ -54,6 +61,11 @@ export default function Dashboard() {
     console.log('Prompt: ', e.target.value);
   };
 
+  const viewGeneratedContent = (url) => {
+    setImageLink(url);
+    router.push('/view-content');
+  };
+
   const renderCard = (image, index) => {
     return (
       <Card
@@ -64,16 +76,15 @@ export default function Dashboard() {
         <Card.Img variant="top" src={image.url} />
         <Card.Body>
           <Card.Text>{image.text}</Card.Text>
-          <Button variant="primary" onClick={() => download(image.url)}>
-            Download
+          <Button
+            variant="primary"
+            onClick={() => viewGeneratedContent(image.url)}
+          >
+            View Image
           </Button>
         </Card.Body>
       </Card>
     );
-  };
-
-  const download = (url) => {
-    saveAs(url, 'image');
   };
 
   const subscriptionName = subscription && subscription.prices.products.name;
