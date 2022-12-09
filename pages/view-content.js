@@ -13,6 +13,7 @@ import styles from '../styles/Home.module.css';
 // import trainML's config code
 import contentTypes from './api/contentTypes';
 import { saveAs } from 'file-saver';
+import { Configuration, OpenAIApi } from 'openai';
 
 export default function ViewContent() {
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,7 @@ export default function ViewContent() {
     imageLink
   } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const [prompt, setPrompt] = useState(null);
 
   useEffect(
     () => {
@@ -67,6 +69,24 @@ export default function ViewContent() {
     saveAs(url, 'image');
   };
 
+  const generateCaptions = async () => {
+    const configuration = new Configuration({
+      //apiKey: process.env.OPENAI_API_KEY
+      apiKey: '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'
+    });
+    const openai = new OpenAIApi(configuration);
+    const response = await openai.createCompletion({
+      model: 'text-davinci-003',
+      prompt: 'Write about Burger King',
+      temperature: 0,
+      max_tokens: 200
+    });
+    //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+    const rawCaption = JSON.stringify(response.data['choices'][0]['text']);
+    console.log(rawCaption);
+    setPrompt(JSON.parse(rawCaption).trim());
+  };
+
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
     subscription &&
@@ -82,6 +102,19 @@ export default function ViewContent() {
         <div className={styles['get-image-button']}>
           {isLoading && <LoadingDots />}
           {displayContent}
+          <Button variant="primary" onClick={() => generateCaptions()}>
+            Generate Caption
+          </Button>
+          <textarea
+            type="text"
+            id="prompt"
+            name="prompt"
+            onChange={handleChange}
+            value={prompt}
+            cols="80"
+            rows="15"
+            placeholder="Caption generating or you could type it yourself..."
+          />
         </div>
       ) : (
         <h1>You are not subscribed yet!</h1>
