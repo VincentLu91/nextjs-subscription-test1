@@ -76,7 +76,7 @@ export default function ViewContent() {
   };
 
   const generateCaptions = async (prompt) => {
-    if (prompt.trim() == '' || prompt == null) {
+    if (prompt == null || prompt.trim() == '') {
       setCaption("You haven't entered anything!");
     } else {
       const configuration = new Configuration({
