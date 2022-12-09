@@ -29,6 +29,7 @@ export default function ViewContent() {
   } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState(null);
+  const [caption, setCaption] = useState(null);
 
   useEffect(
     () => {
@@ -52,6 +53,11 @@ export default function ViewContent() {
   // handle onChange event of the text input (no longer dropdown)
   const handleChange = (e) => {
     setPrompt(e.target.value);
+    console.log('Prompt: ', e.target.value);
+  };
+
+  const handleChangeCaption = (e) => {
+    setCaption(e.target.value);
     console.log('Prompt: ', e.target.value);
   };
 
@@ -84,7 +90,7 @@ export default function ViewContent() {
     //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
     const rawCaption = JSON.stringify(response.data['choices'][0]['text']);
     console.log(rawCaption);
-    setPrompt(JSON.parse(rawCaption).trim());
+    setCaption(JSON.parse(rawCaption).trim());
   };
 
   const subscriptionName = subscription && subscription.prices.products.name;
@@ -107,10 +113,10 @@ export default function ViewContent() {
           </Button>
           <textarea
             type="text"
-            id="prompt"
-            name="prompt"
-            onChange={handleChange}
-            value={prompt}
+            id="caption"
+            name="caption"
+            onChange={handleChangeCaption}
+            value={caption}
             cols="80"
             rows="15"
             placeholder="Caption generating or you could type it yourself..."
