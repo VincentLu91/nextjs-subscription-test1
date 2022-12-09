@@ -110,7 +110,7 @@ export default function Dashboard() {
           <br></br>
           <Button
             onClick={async () => {
-              if (prompt.trim() == '') {
+              if (prompt.trim() == '' || prompt == null) {
                 alert('Please enter a prompt');
               } else {
                 setImageList([]); // when generation begins, list of images is empty

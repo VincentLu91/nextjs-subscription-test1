@@ -58,7 +58,7 @@ export default function ViewContent() {
 
   const handleChangeCaption = (e) => {
     setCaption(e.target.value);
-    console.log('Prompt: ', e.target.value);
+    console.log('Caption: ', e.target.value);
   };
 
   const displayContent = imageLink && (
@@ -75,22 +75,26 @@ export default function ViewContent() {
     saveAs(url, 'image');
   };
 
-  const generateCaptions = async () => {
-    const configuration = new Configuration({
-      //apiKey: process.env.OPENAI_API_KEY
-      apiKey: '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'
-    });
-    const openai = new OpenAIApi(configuration);
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: 'Write about Burger King',
-      temperature: 0,
-      max_tokens: 200
-    });
-    //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
-    const rawCaption = JSON.stringify(response.data['choices'][0]['text']);
-    console.log(rawCaption);
-    setCaption(JSON.parse(rawCaption).trim());
+  const generateCaptions = async (prompt) => {
+    if (prompt.trim() == '' || prompt == null) {
+      setCaption("You haven't entered anything!");
+    } else {
+      const configuration = new Configuration({
+        //apiKey: process.env.OPENAI_API_KEY
+        apiKey: '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'
+      });
+      const openai = new OpenAIApi(configuration);
+      const response = await openai.createCompletion({
+        model: 'text-davinci-003',
+        prompt: prompt,
+        temperature: 0,
+        max_tokens: 200
+      });
+      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+      const rawCaption = JSON.stringify(response.data['choices'][0]['text']);
+      console.log(rawCaption);
+      setCaption(JSON.parse(rawCaption).trim());
+    }
   };
 
   const subscriptionName = subscription && subscription.prices.products.name;
@@ -108,7 +112,14 @@ export default function ViewContent() {
         <div className={styles['get-image-button']}>
           {isLoading && <LoadingDots />}
           {displayContent}
-          <Button variant="primary" onClick={() => generateCaptions()}>
+          <input
+            type="text"
+            id="prompt"
+            name="prompt"
+            onChange={handleChange}
+            value={prompt}
+          />
+          <Button variant="primary" onClick={() => generateCaptions(prompt)}>
             Generate Caption
           </Button>
           <textarea
