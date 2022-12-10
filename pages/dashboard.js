@@ -109,6 +109,10 @@ export default function Dashboard() {
 
   return (
     <div className="App">
+      <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
+        Go Ahead...Generate Images
+      </h1>
+      <br></br>
       {subscription ? ( // goal of this is to restrict content to subscribers.
         <div className={styles['get-image-button']}>
           <input
@@ -118,8 +122,8 @@ export default function Dashboard() {
             onChange={handleChange}
             value={contentPrompt}
             defaultValue={contentPrompt}
-            placeholder="Generate image of your product"
-            style={{ width: '370px' }}
+            placeholder="Enter text to generate image of your product/brand"
+            style={{ width: '420px' }}
           />
           <br></br>
           <Button

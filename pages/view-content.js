@@ -107,6 +107,10 @@ export default function ViewContent() {
 
   return (
     <div className="App">
+      <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
+        View Content and Generate Captions
+      </h1>
+      <br></br>
       {subscription ? ( // goal of this is to restrict content to subscribers.
         <div className={styles['display-image']}>
           {isLoading && <LoadingDots />}
@@ -116,6 +120,7 @@ export default function ViewContent() {
               first!
             </p>
           )}
+          <br></br>
           <input
             type="text"
             id="prompt"
@@ -125,9 +130,11 @@ export default function ViewContent() {
             placeholder="Describe caption you want generated"
             style={{ width: '370px' }}
           />
+          <br></br>
           <Button variant="primary" onClick={() => generateCaptions(prompt)}>
             Generate Caption
           </Button>
+          <br></br>
           <textarea
             type="text"
             id="caption"
