@@ -80,7 +80,7 @@ export default function Dashboard() {
             variant="primary"
             onClick={() => viewGeneratedContent(image.url)}
           >
-            View Image
+            View Content
           </Button>
         </Card.Body>
       </Card>
@@ -106,6 +106,8 @@ export default function Dashboard() {
             name="prompt"
             onChange={handleChange}
             value={prompt}
+            placeholder="Generate image of your product"
+            style={{ width: '370px' }}
           />
           <br></br>
           <Button

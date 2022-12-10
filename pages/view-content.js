@@ -63,7 +63,7 @@ export default function ViewContent() {
 
   const displayContent = imageLink && (
     //<img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
-    <div>
+    <div className={styles['display-image']}>
       <img alt="uploaded" src={imageLink} />
       <Button variant="primary" onClick={() => download(imageLink)}>
         Download
@@ -109,7 +109,7 @@ export default function ViewContent() {
   return (
     <div className="App">
       {subscription ? ( // goal of this is to restrict content to subscribers.
-        <div className={styles['get-image-button']}>
+        <div className={styles['display-image']}>
           {isLoading && <LoadingDots />}
           {displayContent}
           <input
@@ -118,6 +118,8 @@ export default function ViewContent() {
             name="prompt"
             onChange={handleChange}
             value={prompt}
+            placeholder="Describe caption you want generated"
+            style={{ width: '370px' }}
           />
           <Button variant="primary" onClick={() => generateCaptions(prompt)}>
             Generate Caption
