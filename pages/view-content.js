@@ -80,8 +80,7 @@ export default function ViewContent() {
       setCaption("You haven't entered anything!");
     } else {
       const configuration = new Configuration({
-        //apiKey: process.env.OPENAI_API_KEY
-        apiKey: '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'
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY
       });
       const openai = new OpenAIApi(configuration);
       const response = await openai.createCompletion({
