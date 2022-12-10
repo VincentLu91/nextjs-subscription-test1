@@ -12,6 +12,8 @@ export const UserContextProvider = (props) => {
 
   const [imageLink, setImageLink] = useState(null);
   const [imageList, setImageList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [contentPrompt, setcontentPrompt] = useState(null);
 
   useEffect(() => {
     const session = supabase.auth.session();
@@ -69,7 +71,11 @@ export const UserContextProvider = (props) => {
     imageLink,
     setImageLink,
     imageList,
-    setImageList
+    setImageList,
+    isLoading,
+    setIsLoading,
+    contentPrompt,
+    setcontentPrompt
   };
   return <UserContext.Provider value={value} {...props} />;
 };

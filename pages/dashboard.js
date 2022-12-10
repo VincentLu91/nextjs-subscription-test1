@@ -25,13 +25,17 @@ export default function Dashboard() {
     subscription,
     setImageLink,
     imageList,
-    setImageList
+    setImageList,
+    isLoading,
+    setIsLoading,
+    contentPrompt,
+    setcontentPrompt
   } = useUser();
-  const [prompt, setPrompt] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const getImage = async (prompt) => {
-    const resp = await axios.get('/api/imagepredictions?prompt=' + prompt);
+  const getImage = async (contentPrompt) => {
+    const resp = await axios.get(
+      '/api/imagepredictions?prompt=' + contentPrompt
+    );
     //alert('Resp data is: ', resp.data);
     return resp.data;
   };
@@ -57,9 +61,16 @@ export default function Dashboard() {
 
   // handle onChange event of the text input (no longer dropdown)
   const handleChange = (e) => {
-    setPrompt(e.target.value);
-    console.log('Prompt: ', e.target.value);
+    setcontentPrompt(e.target.value);
+    console.log('contentPrompt: ', e.target.value);
   };
+
+  const loadingWithContentPrompt = isLoading && (
+    <div className={styles['white-text']}>
+      <p>Loading...</p>
+      <LoadingDots />
+    </div>
+  );
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
@@ -102,25 +113,26 @@ export default function Dashboard() {
         <div className={styles['get-image-button']}>
           <input
             type="text"
-            id="prompt"
-            name="prompt"
+            id="contentPrompt"
+            name="contentPrompt"
             onChange={handleChange}
-            value={prompt}
+            value={contentPrompt}
+            defaultValue={contentPrompt}
             placeholder="Generate image of your product"
             style={{ width: '370px' }}
           />
           <br></br>
           <Button
             onClick={async () => {
-              if (prompt == null || prompt.trim() == '') {
-                alert('Please enter a prompt');
+              if (contentPrompt == null || contentPrompt.trim() == '') {
+                alert('Please enter a contentPrompt');
               } else {
                 setImageList([]); // when generation begins, list of images is empty
                 let i = 0;
                 setIsLoading(true);
                 for (i = 0; i < 2; i++) {
                   // 2 is a placeholder, later I plan to generate 16 images
-                  const result = await getImage(prompt);
+                  const result = await getImage(contentPrompt);
                   if (result) {
                     setImageList((current) => [
                       ...current,
@@ -137,7 +149,7 @@ export default function Dashboard() {
             Generate Image
           </Button>
           <br></br>
-          {isLoading && <LoadingDots />}
+          {loadingWithContentPrompt}
           <div className={styles['grid']}>{imageList.map(renderCard)}</div>
         </div>
       ) : (
