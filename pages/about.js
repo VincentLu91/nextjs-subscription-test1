@@ -3,7 +3,12 @@ import Image from 'next/image';
 const about = () => {
   return (
     <div className={styles.container}>
-      <Image src="/random.png" alt="" width={600} height={400} />
+      <Image
+        src="https://replicate.delivery/pbxt/aIsoESA0Hd60I9haMNuNRfvL3vCW4nYyk2RYxCHCzexhRZIQA/out-0.png"
+        alt=""
+        width={600}
+        height={600}
+      />
       <br />
       <h2 style={{ fontFamily: 'Menlo', fontSize: 30 }}>
         Photorealistic content on demand

@@ -54,7 +54,7 @@ const index = () => {
       <div className={styles['landing-page-container']}>
         <div className={styles['vertical-align-image-left']}>
           <Image
-            src="https://replicate.delivery/pbxt/7ceXKeWl7zoykkYmW8wUmHO9ffH4Apjs06LWYeoU0FYLVKDBC/out-0.png"
+            src="https://replicate.delivery/pbxt/eaIJTMsJefGNWoitWiAPtxFlcRS9vm2Kpp7XmHkRrR16N0QgA/out-0.png"
             alt=""
             width={400}
             height={400}
@@ -69,17 +69,12 @@ const index = () => {
       <br />
       <div className={styles['landing-page-container']}>
         <div className={styles['vertical-align-image-right']}>
-          <Image
-            src="https://replicate.delivery/pbxt/aIsoESA0Hd60I9haMNuNRfvL3vCW4nYyk2RYxCHCzexhRZIQA/out-0.png"
-            alt=""
-            width={400}
-            height={400}
-          />
+          <Image src="/GPT3_Screenshot.png" alt="" width={400} height={400} />
         </div>
         <div className={styles['vertical-align-text']}>
           <h1>
-            Access any quality images without spending thousands of dollars or
-            hours.
+            Generate any captions you want, whenever you want, for your images.
+            No more writer's block.
           </h1>
         </div>
       </div>
