@@ -66,7 +66,7 @@ export default function ViewContent() {
     <div className={styles['display-image']}>
       <img alt="uploaded" src={imageLink} />
       <Button variant="primary" onClick={() => download(imageLink)}>
-        Download
+        Download Content
       </Button>
     </div>
   );
@@ -110,7 +110,12 @@ export default function ViewContent() {
       {subscription ? ( // goal of this is to restrict content to subscribers.
         <div className={styles['display-image']}>
           {isLoading && <LoadingDots />}
-          {displayContent}
+          {displayContent || (
+            <p className={styles['white-text']}>
+              You do not have image! Go back to Dashboard and select an image
+              first!
+            </p>
+          )}
           <input
             type="text"
             id="prompt"

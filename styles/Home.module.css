@@ -201,6 +201,10 @@
   color: black; /* otherwise the text prompt is white color */
 }
 
+.white-text {
+  color: white;
+}
+
 /* for styling cards when displaying a grid of images */
 .box {
   margin: 20px;
