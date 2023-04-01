@@ -84,7 +84,7 @@ export default function ProductNameList() {
           <br></br>
           {instanceList.map((instance) => (
             <ul className="text-4xl text-white sm:text-center sm:text-2xl">
-              {instance}
+              {instance} -
               <button onClick={() => deleteInstance(instance)}>Delete</button>
             </ul>
           ))}
