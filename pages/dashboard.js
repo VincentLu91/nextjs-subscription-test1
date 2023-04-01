@@ -9,6 +9,7 @@ import axios from 'axios';
 import { Card } from 'react-bootstrap';
 import Select from 'react-select';
 import styles from '../styles/Home.module.css';
+import { supabase } from '../utils/initSupabase';
 
 // import trainML's config code
 import contentTypes from './api/contentTypes';
@@ -33,8 +34,22 @@ export default function Dashboard() {
   } = useUser();
 
   const getImage = async (contentPrompt) => {
+    let version;
+    const prevModelInfo = await supabase
+      .from('ai-models')
+      .select('id, created_at, model_version, user_auth_id')
+      .eq('user_auth_id', user.identities[0].id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (prevModelInfo.data[0].model_version != null) {
+      version = prevModelInfo.data[0].model_version;
+    } else {
+      version =
+        'd98c28497f972c7a6a90ee4f9052aab8ede8be5768a6ef42c6c7af5e42bd7608';
+    }
+    console.log('version: ', version);
     const resp = await axios.get(
-      '/api/imagepredictions?prompt=' + contentPrompt
+      '/api/imagepredictions?prompt=' + contentPrompt + '&version=' + version
     );
     //alert('Resp data is: ', resp.data);
     return resp.data;
@@ -113,6 +128,9 @@ export default function Dashboard() {
         Go Ahead...Generate Images
       </h1>
       <br></br>
+      <Button onClick={() => router.push('/productnamelist')}>
+        View List of Products
+      </Button>
       {subscription ? ( // goal of this is to restrict content to subscribers.
         <div className={styles['get-image-button']}>
           <input
@@ -120,8 +138,7 @@ export default function Dashboard() {
             id="contentPrompt"
             name="contentPrompt"
             onChange={handleChange}
-            value={contentPrompt}
-            defaultValue={contentPrompt}
+            value={contentPrompt || ''}
             placeholder="Enter text to generate image of your product/brand"
             style={{ width: '420px' }}
           />

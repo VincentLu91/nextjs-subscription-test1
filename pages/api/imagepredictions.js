@@ -1,13 +1,12 @@
 import axios from 'axios';
 export default async function handler(req, res) {
-  const { prompt } = req.query;
+  const { prompt, version } = req.query;
   // first, make an api call to GENERATE a prediction (HTTP method is POST):
   const resp = await axios.post(
     // send prediction to dashboard but it takes time to generate image
     'https://api.replicate.com/v1/predictions',
     {
-      version:
-        'd98c28497f972c7a6a90ee4f9052aab8ede8be5768a6ef42c6c7af5e42bd7608',
+      version,
       input: {
         prompt
       }

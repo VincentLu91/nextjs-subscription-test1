@@ -15,8 +15,22 @@ export const UserContextProvider = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
 
-  useEffect(() => {
-    const session = supabase.auth.session();
+  const [zipFiles, setZipFiles] = useState([]);
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [zipFileName, setZipFileName] = useState(null);
+  const [instancePrompt, setInstancePrompt] = useState(null);
+  const [classPrompt, setClassPrompt] = useState(null);
+  const [trainingID, setTrainingID] = useState(null);
+  const [isTraining, setIsTraining] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [trainingText, setTrainingText] = useState(
+    'Upload zip file and begin training.'
+  );
+
+  useEffect(async () => {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
     setSession(session);
     setUser(session?.user ?? null);
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -61,7 +75,7 @@ export const UserContextProvider = (props) => {
     userDetails,
     userLoaded,
     subscription,
-    signIn: (options) => supabase.auth.signIn(options),
+    signIn: (options) => supabase.auth.signInWithPassword(options),
     signUp: (options) => supabase.auth.signUp(options),
     signOut: () => {
       setUserDetails(null);
@@ -75,7 +89,25 @@ export const UserContextProvider = (props) => {
     isLoading,
     setIsLoading,
     contentPrompt,
-    setcontentPrompt
+    setcontentPrompt,
+    zipFiles,
+    setZipFiles,
+    isUploaded,
+    setIsUploaded,
+    zipFileName,
+    setZipFileName,
+    instancePrompt,
+    setInstancePrompt,
+    classPrompt,
+    setClassPrompt,
+    trainingID,
+    setTrainingID,
+    isTraining,
+    setIsTraining,
+    status,
+    setStatus,
+    trainingText,
+    setTrainingText
   };
   return <UserContext.Provider value={value} {...props} />;
 };
