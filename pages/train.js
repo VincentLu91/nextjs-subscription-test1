@@ -206,8 +206,10 @@ export default function Train() {
   };
 
   useEffect(() => {
-    deleteIncompleteModels();
-  }, []);
+    if (!isTraining) {
+      deleteIncompleteModels();
+    }
+  }, [isTraining]);
 
   const trainModel = async (instancePrompt, classPrompt) => {
     if (instanceList.includes(instancePrompt)) {
