@@ -4,9 +4,6 @@ import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import { supabase } from '../utils/initSupabase';
 
-// import trainML's config code
-import contentTypes from './api/contentTypes';
-
 export default function ProductNameList() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);

@@ -1,18 +1,13 @@
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
 import { Card } from 'react-bootstrap';
-import Select from 'react-select';
 import styles from '../styles/Home.module.css';
 import { supabase } from '../utils/initSupabase';
-
-// import trainML's config code
-import contentTypes from './api/contentTypes';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);

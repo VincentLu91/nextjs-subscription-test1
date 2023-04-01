@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useContext, useRef } from 'react';
 import { postData } from '../utils/helpers';
@@ -7,7 +6,6 @@ import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
 import { Card, Form, Container, Row, Col } from 'react-bootstrap';
-import Select from 'react-select';
 import styles from '../styles/Home.module.css';
 
 import { supabase } from '../utils/initSupabase';
