@@ -292,7 +292,7 @@ export default function Train() {
         //console.log('trainingStatus: ', trainingStatus.data.status);
         if (trainingStatus.data.status === 'succeeded') {
           clearInterval(interval.current);
-          setIsTraining(false);
+          
           //setTrainingText('Training completed!');
           // update the record with the model_version
           console.log('success');
@@ -307,6 +307,7 @@ export default function Train() {
           if (trainingStatusResponse.error)
             console.log(trainingStatusResponse.error);
           if (trainingStatusResponse.data) {
+            setIsTraining(false);
             console.log(trainingStatusResponse.data[0]);
           }
         }
