@@ -198,6 +198,7 @@ export default function Train() {
   // next, implement deleting any models without model_versions i.e., user closes window while training
   const deleteIncompleteModels = async () => {
     console.log('delete incomplete model.....');
+    console.log("********user***********", user, isTraining)
     await supabase
       .from('ai-models')
       .delete()
