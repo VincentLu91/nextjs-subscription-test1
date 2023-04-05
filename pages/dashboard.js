@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
@@ -8,6 +8,8 @@ import axios from 'axios';
 import { Card } from 'react-bootstrap';
 import styles from '../styles/Home.module.css';
 import { supabase } from '../utils/initSupabase';
+
+const ATTEMPTS = 2
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,10 @@ export default function Dashboard() {
     setcontentPrompt
   } = useUser();
 
-  const getImage = async (contentPrompt) => {
+  const interval = useRef();
+  const [predictions, setPredictions] = useState({}); // { 0 : { get: 'url', cancel: "url", status: 'succeeded'}}
+
+  const getImage = async (attempt, contentPrompt) => {
     let version;
     const prevModelInfo = await supabase
       .from('ai-models')
@@ -46,9 +51,53 @@ export default function Dashboard() {
     const resp = await axios.get(
       '/api/imagepredictions?prompt=' + contentPrompt + '&version=' + version
     );
-    //alert('Resp data is: ', resp.data);
+    setPredictions(state => ({ ...state, [attempt] : resp.data }));
+    console.log('Resp data is: ', resp.data);
     return resp.data;
   };
+
+  const getImageResults = async (attempt, url) => {
+    const output = await axios.get('/api/imageresults?url=' + url);
+     if (output.data.status === 'succeeded') {
+        const result = output.data.output[0];
+         if (result) {
+           setImageList((current) => [
+             ...current,
+             { url: result, text: '' } // placeholder text is empty for optional caption generation
+           ]);           
+         } else {
+           alert('nothing generated');
+         }
+        setPredictions(state => ({ ...state, [attempt] : { ...state[attempt], status: 'succeeded' }}))
+     }
+    console.log('output data is: ', output);    
+  };
+
+  useEffect(() => {
+    if (Object.values(predictions).every(item => item.status === 'succeeded')) {
+      clearInterval(interval.current);
+      setIsLoading(false);
+    }
+  }, [predictions])
+
+  useEffect(() => {
+    // [ [0, {get: 'sss.com' , cancel: 'ssswe.com', status: 'training'}],  ]
+    const predictionAry = Object.entries(predictions).filter(
+      ([attempt, item]) => item.status !== 'succeeded'
+    );
+
+    if (predictionAry.length > 0) {
+      interval.current = setInterval(() => {
+        predictionAry.forEach(([attempt, item]) => {
+          getImageResults(attempt, item.get);
+        });
+      }, 3000);
+    }
+    // at every 2 seconds, an 'interval' is created via calling setInterval().
+    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
+    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
+    return () => clearInterval(interval.current);
+  }, [predictions]);
 
   useEffect(
     () => {
@@ -143,22 +192,14 @@ export default function Dashboard() {
               if (contentPrompt == null || contentPrompt.trim() == '') {
                 alert('Please enter a contentPrompt');
               } else {
+                clearInterval(interval.current)
+                setPredictions({});
                 setImageList([]); // when generation begins, list of images is empty
-                let i = 0;
                 setIsLoading(true);
-                for (i = 0; i < 2; i++) {
+                for (let i = 0; i < ATTEMPTS; i++) {
                   // 2 is a placeholder, later I plan to generate 16 images
-                  const result = await getImage(contentPrompt);
-                  if (result) {
-                    setImageList((current) => [
-                      ...current,
-                      { url: result, text: '' } // placeholder text is empty for optional caption generation
-                    ]);
-                  } else {
-                    alert('nothing generated');
-                  }
+                  getImage(i, contentPrompt);
                 }
-                setIsLoading(false);
               }
             }}
           >
