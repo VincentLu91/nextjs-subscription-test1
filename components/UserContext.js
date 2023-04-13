@@ -26,6 +26,12 @@ export const UserContextProvider = (props) => {
   const [trainingText, setTrainingText] = useState(
     'Upload zip file and begin training.'
   );
+  const [modelName, setModelName] = useState(null);
+  const [modelVersion, setModelVersion] = useState(null);
+
+  const [instanceList, setInstanceList] = useState([]);
+  const [predictions, setPredictions] = useState({}); // { 0 : { get: 'url', cancel: "url", status: 'succeeded'}}
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
 
   useEffect(async () => {
     const {
@@ -107,10 +113,20 @@ export const UserContextProvider = (props) => {
     status,
     setStatus,
     trainingText,
-    setTrainingText
+    setTrainingText,
+    modelName,
+    setModelName,
+    modelVersion,
+    setModelVersion,
+    instanceList,
+    setInstanceList,
+    predictions,
+    setPredictions,
+    isGeneratingImages,
+    setIsGeneratingImages
   };
   return <UserContext.Provider value={value} {...props} />;
-};
+};;
 
 export const useUser = () => {
   const context = useContext(UserContext);
