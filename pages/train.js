@@ -133,7 +133,7 @@ export default function Train() {
 
     const { data, error } = await supabase.storage
       .from('images')
-      .upload(user.id + '/' + uuidv4(), file);
+      .upload(user.id + '/' + uuidv4() + '.zip', file); // add .zip extension otherwise training will err our
 
     if (data) {
       setIsUploaded(true);
@@ -198,7 +198,7 @@ export default function Train() {
   // next, implement deleting any models without model_versions i.e., user closes window while training
   const deleteIncompleteModels = async () => {
     console.log('delete incomplete model.....');
-    console.log("********user***********", user, isTraining)
+    console.log('********user***********', user, isTraining);
     await supabase
       .from('ai-models')
       .delete()
@@ -212,16 +212,16 @@ export default function Train() {
     }
   }, [isTraining]);
 
-  const trainModel = async (instancePrompt, classPrompt) => {
+  const trainModel = async (instancePrompt) => {
     if (instanceList.includes(instancePrompt)) {
       alert('please select a distinct name');
       return;
     }
     let trainerVersion =
-      'cd3f925f7ab21afaef7d45224790eedbb837eeac40d22e8fefe015489ab644aa';
+      //'cd3f925f7ab21afaef7d45224790eedbb837eeac40d22e8fefe015489ab644aa';
+      // https://replicate.com/stability-ai/sdxl/versions
+      '7ca7f0d3a51cd993449541539270971d38a24d9a0d42f073caf25190d41346d7';
     if (instancePrompt == null || instancePrompt.trim() == '') {
-      alert("You haven't entered anything!");
-    } else if (classPrompt == null || classPrompt.trim() == '') {
       alert("You haven't entered anything!");
     } else {
       // check for the latest model version, if none, use default
@@ -243,7 +243,7 @@ export default function Train() {
         .from('ai-models')
         .insert({
           instance_prompt: instancePrompt,
-          class_prompt: classPrompt,
+          //class_prompt: classPrompt,
           user_auth_id: user.identities[0].id, // this references the authentication data, NOT `users` table
           instance_data: CDNURL + user.identities[0].id + '/' + zipFileName
         })
@@ -256,10 +256,10 @@ export default function Train() {
         // start making the call to Replicate API to train the model to save model_version
         const resp = axios
           .get(
-            '/api/trainImageGen?instance_prompt=a%20photo%20of%20a%20' +
+            '/api/trainImageGen?instance_prompt=' +
               instancePrompt +
-              '&class_prompt=a%20photo%20of%20a%20' +
-              classPrompt +
+              //'&class_prompt=a%20photo%20of%20a%20' +
+              //classPrompt +
               '&instance_data=' +
               CDNURL +
               user.identities[0].id +
@@ -292,13 +292,26 @@ export default function Train() {
         //console.log('trainingStatus: ', trainingStatus.data.status);
         if (trainingStatus.data.status === 'succeeded') {
           clearInterval(interval.current);
-          
+
           //setTrainingText('Training completed!');
           // update the record with the model_version
           console.log('success');
+          // version is something like
+          // vincentlu91/sdxl-tuning:eb6a135512a977d328ecfd5e615afc509ebc605816154a6c8a0b0be39cf2e0cc
+          const inputString = trainingStatus.data.output.version;
+          const delimiter = ':';
+          const parts = inputString.split(delimiter);
+          const result = '';
+          if (parts.length > 1) {
+            //result = parts[1];
+            console.log(parts[1]); // Output: eb6a135512a977d328ecfd5e615afc509ebc605816154a6c8a0b0be39cf2e0cc
+          } else {
+            console.log('Delimiter not found in the string.');
+          }
+          // now store the version number
           const trainingStatusResponse = await supabase
             .from('ai-models')
-            .update({ model_version: trainingStatus.data.version })
+            .update({ model_version: parts[1] })
             .eq(
               'instance_data',
               CDNURL + user.identities[0].id + '/' + zipFileName
@@ -425,9 +438,7 @@ export default function Train() {
                       />
                       <br></br>
                       {console.log('zipFileName: ', zipFileName)}
-                      <Button
-                        onClick={() => trainModel(instancePrompt, classPrompt)}
-                      >
+                      <Button onClick={() => trainModel(instancePrompt)}>
                         Train Model
                       </Button>
                     </div>

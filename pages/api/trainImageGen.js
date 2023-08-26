@@ -2,24 +2,29 @@ import axios from 'axios';
 export default async function handler(req, res) {
   const {
     instance_prompt,
-    class_prompt,
+    //class_prompt,
     instance_data,
     trainer_version
   } = req.query;
   try {
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
-      'https://dreambooth-api-experimental.replicate.com/v1/trainings',
+      //'https://dreambooth-api-experimental.replicate.com/v1/trainings',
+      'https://api.replicate.com/v1/models/stability-ai/sdxl/versions/' +
+        trainer_version +
+        '/trainings',
       {
+        destination: 'vincentlu91/sdxl-tuning',
         input: {
-          instance_prompt,
-          class_prompt,
-          instance_data,
-          max_train_steps: 10 //2000
-        },
-        model: 'vincentlu91/vincelubooth',
-        trainer_version,
-        webhook_completed: 'https://example.com/dreambooth-webhook'
+          token_string: instance_prompt,
+          caption_prefix: 'a photo of ' + instance_prompt,
+          //class_prompt,
+          input_images: instance_data
+          //max_train_steps: 10 //2000
+        }
+        //model: 'vincentlu91/vincelubooth',
+        //trainer_version,
+        //webhook_completed: 'https://example.com/dreambooth-webhook'
       },
       {
         headers: {

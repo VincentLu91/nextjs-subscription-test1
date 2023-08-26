@@ -3,8 +3,8 @@ export default async function handler(req, res) {
   const { training_id } = req.query;
   try {
     const resp = await axios.get(
-      'https://dreambooth-api-experimental.replicate.com/v1/trainings/' +
-        training_id,
+      //'https://dreambooth-api-experimental.replicate.com/v1/trainings/' +
+      'https://api.replicate.com/v1/trainings/' + training_id,
       {
         headers: {
           Authorization: 'Token ebb9f6477f7b0b106b3e7140c141cb35431ba8ce'
