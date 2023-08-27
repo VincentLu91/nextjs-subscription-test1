@@ -86,7 +86,7 @@ export default function ViewContent() {
       const response = await openai.createCompletion({
         model: 'text-davinci-003',
         prompt: prompt,
-        temperature: 0,
+        temperature: 0.5, // change the temperature between 0 and 1 for creativity of responses
         max_tokens: 200
       });
       //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
