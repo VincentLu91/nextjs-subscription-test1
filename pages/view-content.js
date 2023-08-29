@@ -74,7 +74,7 @@ export default function ViewContent() {
   const download = (url) => {
     saveAs(url, 'image');
   };
-
+  // the below is not used for now, since I'm using Cohere.
   const generateCaptions = async (prompt) => {
     if (prompt == null || prompt.trim() == '') {
       setCaption("You haven't entered anything!");
@@ -93,6 +93,19 @@ export default function ViewContent() {
       const rawCaption = JSON.stringify(response.data['choices'][0]['text']);
       console.log(rawCaption);
       setCaption(JSON.parse(rawCaption).trim());
+    }
+  };
+
+  const generateCaptionsCohere = async (prompt) => {
+    if (prompt == null || prompt.trim() == '') {
+      setCaption("You haven't entered anything!");
+    } else {
+      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+      const rawCaption = await axios.post(
+        '/api/socialCaptions?prompt=' + prompt
+      );
+      console.log(rawCaption['data']);
+      setCaption(rawCaption['data'].trim());
     }
   };
 
@@ -131,7 +144,10 @@ export default function ViewContent() {
             style={{ width: '370px' }}
           />
           <br></br>
-          <Button variant="primary" onClick={() => generateCaptions(prompt)}>
+          <Button
+            variant="primary"
+            onClick={() => generateCaptionsCohere(prompt)}
+          >
             Generate Caption
           </Button>
           <br></br>
