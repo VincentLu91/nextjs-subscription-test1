@@ -141,7 +141,7 @@ export default function ViewContent() {
             onChange={handleChange}
             value={prompt}
             placeholder="Describe caption you want generated"
-            style={{ width: '370px' }}
+            style={{ width: '600px' }}
           />
           <br></br>
           <Button
