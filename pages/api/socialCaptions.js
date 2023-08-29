@@ -3,7 +3,7 @@ import cohere from 'cohere-ai';
 export default async function handler(req, res) {
   const { prompt } = req.query;
   try {
-    cohere.init('q9pUdf7PjyyKMPM1Hk2Jhtv4tXJZY41dzEZ19Nuy'); // This is your trial API key
+    cohere.init(process.env.NEXT_COHERE_API_KEY); // This is your trial API key
     (async () => {
       const resp = await cohere.generate({
         model: 'command',
