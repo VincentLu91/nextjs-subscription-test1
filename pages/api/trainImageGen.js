@@ -2,7 +2,7 @@ import axios from 'axios';
 export default async function handler(req, res) {
   const {
     instance_prompt,
-    //class_prompt,
+    class_prompt,
     instance_data,
     trainer_version
   } = req.query;

@@ -212,7 +212,7 @@ export default function Train() {
     }
   }, [isTraining]);
 
-  const trainModel = async (instancePrompt) => {
+  const trainModel = async (instancePrompt, classPrompt) => {
     if (instanceList.includes(instancePrompt)) {
       alert('please select a distinct name');
       return;
@@ -222,6 +222,8 @@ export default function Train() {
       // https://replicate.com/stability-ai/sdxl/versions
       '7ca7f0d3a51cd993449541539270971d38a24d9a0d42f073caf25190d41346d7';
     if (instancePrompt == null || instancePrompt.trim() == '') {
+      alert("You haven't entered anything!");
+    } else if (classPrompt == null || classPrompt.trim() == '') {
       alert("You haven't entered anything!");
     } else {
       // check for the latest model version, if none, use default
@@ -243,7 +245,7 @@ export default function Train() {
         .from('ai-models')
         .insert({
           instance_prompt: instancePrompt,
-          //class_prompt: classPrompt,
+          class_prompt: classPrompt,
           user_auth_id: user.identities[0].id, // this references the authentication data, NOT `users` table
           instance_data: CDNURL + user.identities[0].id + '/' + zipFileName
         })
@@ -258,8 +260,8 @@ export default function Train() {
           .get(
             '/api/trainImageGen?instance_prompt=' +
               instancePrompt +
-              //'&class_prompt=a%20photo%20of%20a%20' +
-              //classPrompt +
+              '&class_prompt=a%20photo%20of%20a%20' +
+              classPrompt +
               '&instance_data=' +
               CDNURL +
               user.identities[0].id +
@@ -438,7 +440,9 @@ export default function Train() {
                       />
                       <br></br>
                       {console.log('zipFileName: ', zipFileName)}
-                      <Button onClick={() => trainModel(instancePrompt)}>
+                      <Button
+                        onClick={() => trainModel(instancePrompt, classPrompt)}
+                      >
                         Train Model
                       </Button>
                     </div>
