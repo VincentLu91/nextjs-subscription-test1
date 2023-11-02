@@ -67,7 +67,6 @@ export default function Dashboard2() {
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
         contentPrompt +
-        '&version=7ca7f0d3a51cd993449541539270971d38a24d9a0d42f073caf25190d41346d7' +
         '&image=' +
         zipFileName +
         '&mask=' +
@@ -130,7 +129,6 @@ export default function Dashboard2() {
     if (
       Object.values(predictions).every((item) => item.status === 'succeeded')
     ) {
-      clearInterval(intervalMask.current);
       clearInterval(intervalImage.current);
       setMaskUrl(null);
       setMask(null);
@@ -140,28 +138,27 @@ export default function Dashboard2() {
   }, [predictions]);
 
   useEffect(() => {
-    if (maskUrl && predictions) {
+    if (maskUrl) {
       console.log('maskUrl is: ', maskUrl);
       intervalMask.current = setInterval(() => {
         getMaskResults();
       }, 3000);
-
-      const predictionAry = Object.entries(predictions).filter(
-        ([attempt, item]) => item.status !== 'succeeded'
-      );
-      if (predictionAry.length > 0) {
-        intervalImage.current = setInterval(() => {
-          predictionAry.forEach(([attempt, item]) => {
-            getImageResults(attempt, item.get);
-          });
-        }, 3000);
-      }
     }
-    return () => {
-      // Clear both intervals in the cleanup function
-      clearInterval(intervalMask.current);
-      clearInterval(intervalImage.current);
-    };
+    return () => clearInterval(intervalMask.current);
+  }, [maskUrl]);
+
+  useEffect(() => {
+    const predictionAry = Object.entries(predictions).filter(
+      ([attempt, item]) => item.status !== 'succeeded'
+    );
+    if (predictionAry.length > 0) {
+      intervalImage.current = setInterval(() => {
+        predictionAry.forEach(([attempt, item]) => {
+          getImageResults(attempt, item.get);
+        });
+      }, 3000);
+    }
+    return () => clearInterval(intervalImage.current);
   }, [maskUrl, predictions]);
 
   useEffect(() => {
