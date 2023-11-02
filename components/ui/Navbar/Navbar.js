@@ -43,6 +43,14 @@ const Navbar = () => {
                   </a>
                 </Link>
                 <Link href="#">
+                  <a
+                    className={s.link}
+                    onClick={() => router.push('/dashboard2')}
+                  >
+                    Dashboard2
+                  </a>
+                </Link>
+                <Link href="#">
                   <a className={s.link} onClick={() => router.push('/train')}>
                     Train
                   </a>
