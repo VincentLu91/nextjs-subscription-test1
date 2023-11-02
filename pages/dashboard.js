@@ -246,28 +246,26 @@ export default function Dashboard() {
               style={{ width: '420px' }}
             />
             <br></br>
-            <Button
-              onClick={async () => {
-                if (isGeneratingImages) {
-                  alert('It is already training');
-                  return;
-                }
-                if (contentPrompt == null || contentPrompt.trim() == '') {
-                  alert('Please enter a contentPrompt');
-                } else {
-                  clearInterval(interval.current);
-                  setPredictions({});
-                  setImageList([]); // when generation begins, list of images is empty
-                  setIsLoading(true);
-                  for (let i = 0; i < ATTEMPTS; i++) {
-                    // 2 is a placeholder, later I plan to generate 16 images
-                    getImage(i, contentPrompt);
+            {!isGeneratingImages && (
+              <Button
+                onClick={async () => {
+                  if (contentPrompt == null || contentPrompt.trim() == '') {
+                    alert('Please enter a contentPrompt');
+                  } else {
+                    clearInterval(interval.current);
+                    setPredictions({});
+                    setImageList([]); // when generation begins, list of images is empty
+                    setIsLoading(true);
+                    for (let i = 0; i < ATTEMPTS; i++) {
+                      // 2 is a placeholder, later I plan to generate 16 images
+                      getImage(i, contentPrompt);
+                    }
                   }
-                }
-              }}
-            >
-              Generate Image
-            </Button>
+                }}
+              >
+                Generate Image
+              </Button>
+            )}
             <br></br>
             {loadingWithContentPrompt}
             <div className={styles['grid']}>{imageList.map(renderCard)}</div>

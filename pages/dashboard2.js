@@ -63,7 +63,6 @@ export default function Dashboard2() {
 
   const getImage = async (attempt, contentPrompt) => {
     console.log('version: ', modelVersion);
-    setIsGeneratingImages(true);
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
         contentPrompt +
@@ -78,6 +77,7 @@ export default function Dashboard2() {
   };
 
   const getMask = async () => {
+    setIsGeneratingImages(true);
     const resp = await axios.get(
       '/api/groundedSam/?image=' +
         zipFileName +
@@ -254,7 +254,7 @@ export default function Dashboard2() {
           {isGeneratingImages ? (
             <p style={{ color: 'white' }}>Generating</p>
           ) : (
-            <p>Please generate</p>
+            <p style={{ color: 'white' }}>Please generate</p>
           )}
 
           <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
@@ -296,34 +296,32 @@ export default function Dashboard2() {
             style={{ width: '420px' }}
           />
           <br></br>
-          <Button
-            onClick={async () => {
-              if (isGeneratingImages) {
-                alert('It is already training');
-                return;
-              }
-              if (
-                contentPrompt == null ||
-                contentPrompt.trim() == '' ||
-                maskPrompt == null ||
-                maskPrompt.trim() == '' ||
-                negativeMaskPrompt == null ||
-                negativeMaskPrompt.trim() == ''
-              ) {
-                alert('Please enter all prompts');
-              } else {
-                clearInterval(intervalMask.current);
-                clearInterval(intervalImage.current);
-                setPredictions({});
-                setImageList([]); // when generation begins, list of images is empty
-                setIsLoading(true);
-                // generate mask before images
-                getMask();
-              }
-            }}
-          >
-            Generate Image
-          </Button>
+          {!isGeneratingImages && (
+            <Button
+              onClick={async () => {
+                if (
+                  contentPrompt == null ||
+                  contentPrompt.trim() == '' ||
+                  maskPrompt == null ||
+                  maskPrompt.trim() == '' ||
+                  negativeMaskPrompt == null ||
+                  negativeMaskPrompt.trim() == ''
+                ) {
+                  alert('Please enter all prompts');
+                } else {
+                  clearInterval(intervalMask.current);
+                  clearInterval(intervalImage.current);
+                  setPredictions({});
+                  setImageList([]); // when generation begins, list of images is empty
+                  setIsLoading(true);
+                  // generate mask before images
+                  getMask();
+                }
+              }}
+            >
+              Generate Image
+            </Button>
+          )}
           <br></br>
           {loadingWithContentPrompt}
           <div className={styles['grid']}>{imageList.map(renderCard)}</div>
