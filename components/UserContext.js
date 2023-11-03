@@ -12,8 +12,11 @@ export const UserContextProvider = (props) => {
 
   const [imageLink, setImageLink] = useState(null);
   const [imageList, setImageList] = useState([]);
+  const [backgroundImageList, setBackgroundImageList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMaskedLoading, setIsMaskedLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
+  const [backgroundPrompt, setBackgroundPrompt] = useState(null);
 
   const [zipFiles, setZipFiles] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
@@ -35,7 +38,11 @@ export const UserContextProvider = (props) => {
 
   const [instanceList, setInstanceList] = useState([]);
   const [predictions, setPredictions] = useState({}); // { 0 : { get: 'url', cancel: "url", status: 'succeeded'}}
+  const [backgroundImagePredictions, setBackgroundImagePredictions] = useState(
+    {}
+  );
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [isGeneratingMasks, setIsGeneratingMasks] = useState(false);
 
   useEffect(async () => {
     const {
@@ -130,6 +137,16 @@ export const UserContextProvider = (props) => {
     setMaskPrompt,
     negativeMaskPrompt,
     setNegativeMaskPrompt,
+    backgroundPrompt,
+    setBackgroundPrompt,
+    isMaskedLoading,
+    setIsMaskedLoading,
+    isGeneratingMasks,
+    setIsGeneratingMasks,
+    backgroundImageList,
+    setBackgroundImageList,
+    backgroundImagePredictions,
+    setBackgroundImagePredictions,
     instanceList,
     setInstanceList,
     predictions,

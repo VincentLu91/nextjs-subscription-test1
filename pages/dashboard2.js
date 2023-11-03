@@ -27,12 +27,12 @@ export default function Dashboard2() {
     userDetails,
     subscription,
     setImageLink,
-    imageList,
-    setImageList,
-    isLoading,
-    setIsLoading,
-    contentPrompt,
-    setcontentPrompt,
+    backgroundImageList,
+    setBackgroundImageList,
+    isMaskedLoading,
+    setIsMaskedLoading,
+    backgroundPrompt,
+    setBackgroundPrompt,
     setTrainingText,
     modelName,
     setModelName,
@@ -52,32 +52,35 @@ export default function Dashboard2() {
     setMaskPrompt,
     negativeMaskPrompt,
     setNegativeMaskPrompt,
-    predictions,
-    setPredictions,
-    isGeneratingImages,
-    setIsGeneratingImages
+    backgroundImagePredictions,
+    setBackgroundImagePredictions,
+    isGeneratingMasks,
+    setIsGeneratingMasks
   } = useUser();
 
   const intervalMask = useRef();
   const intervalImage = useRef();
 
-  const getImage = async (attempt, contentPrompt) => {
+  const getImage = async (attempt, backgroundPrompt) => {
     console.log('version: ', modelVersion);
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
-        contentPrompt +
+        backgroundPrompt +
         '&image=' +
         zipFileName +
         '&mask=' +
         mask
     );
-    setPredictions((state) => ({ ...state, [attempt]: resp.data }));
+    setBackgroundImagePredictions((state) => ({
+      ...state,
+      [attempt]: resp.data
+    }));
     console.log('Resp data is: ', resp.data);
     return resp.data;
   };
 
   const getMask = async () => {
-    setIsGeneratingImages(true);
+    setIsGeneratingMasks(true);
     const resp = await axios.get(
       '/api/groundedSam/?image=' +
         zipFileName +
@@ -96,14 +99,14 @@ export default function Dashboard2() {
     if (output.data.status === 'succeeded') {
       const result = output.data.output[0];
       if (result) {
-        setImageList((current) => [
+        setBackgroundImageList((current) => [
           ...current,
           { url: result, text: '' } // placeholder text is empty for optional caption generation
         ]);
       } else {
         alert('nothing generated');
       }
-      setPredictions((state) => ({
+      setBackgroundImagePredictions((state) => ({
         ...state,
         [attempt]: { ...state[attempt], status: 'succeeded' }
       }));
@@ -127,15 +130,17 @@ export default function Dashboard2() {
 
   useEffect(() => {
     if (
-      Object.values(predictions).every((item) => item.status === 'succeeded')
+      Object.values(backgroundImagePredictions).every(
+        (item) => item.status === 'succeeded'
+      )
     ) {
       clearInterval(intervalImage.current);
       setMaskUrl(null);
       setMask(null);
-      setIsLoading(false);
-      setIsGeneratingImages(false);
+      setIsMaskedLoading(false);
+      setIsGeneratingMasks(false);
     }
-  }, [predictions]);
+  }, [backgroundImagePredictions]);
 
   useEffect(() => {
     if (maskUrl) {
@@ -148,7 +153,7 @@ export default function Dashboard2() {
   }, [maskUrl]);
 
   useEffect(() => {
-    const predictionAry = Object.entries(predictions).filter(
+    const predictionAry = Object.entries(backgroundImagePredictions).filter(
       ([attempt, item]) => item.status !== 'succeeded'
     );
     if (predictionAry.length > 0) {
@@ -159,7 +164,7 @@ export default function Dashboard2() {
       }, 3000);
     }
     return () => clearInterval(intervalImage.current);
-  }, [maskUrl, predictions]);
+  }, [maskUrl, backgroundImagePredictions]);
 
   useEffect(() => {
     console.log('mask is: ', mask);
@@ -167,7 +172,7 @@ export default function Dashboard2() {
       console.log('mask is not empty. Mask is: ', mask);
       for (let i = 0; i < ATTEMPTS; i++) {
         // 2 is a placeholder, later I plan to generate 16 images
-        getImage(i, contentPrompt);
+        getImage(i, backgroundPrompt);
       }
     }
   }, [mask]);
@@ -193,8 +198,8 @@ export default function Dashboard2() {
 
   // handle onChange event of the text input (no longer dropdown)
   const handleChange = (e) => {
-    setcontentPrompt(e.target.value);
-    console.log('contentPrompt: ', e.target.value);
+    setBackgroundPrompt(e.target.value);
+    console.log('backgroundPrompt: ', e.target.value);
   };
   const handleMaskPrompt = (e) => {
     setMaskPrompt(e.target.value);
@@ -205,7 +210,7 @@ export default function Dashboard2() {
     console.log('negativeMaskPrompt: ', e.target.value);
   };
 
-  const loadingWithContentPrompt = isLoading && (
+  const loadingWithBackgroundPrompt = isMaskedLoading && (
     <div className={styles['white-text']}>
       <p>Loading...</p>
       <LoadingDots />
@@ -251,7 +256,7 @@ export default function Dashboard2() {
     if (subscription) {
       return (
         <div className={styles['get-image-button']}>
-          {isGeneratingImages ? (
+          {isGeneratingMasks ? (
             <p style={{ color: 'white' }}>Generating</p>
           ) : (
             <p style={{ color: 'white' }}>Please generate</p>
@@ -288,20 +293,20 @@ export default function Dashboard2() {
 
           <input
             type="text"
-            id="contentPrompt"
-            name="contentPrompt"
+            id="backgroundPrompt"
+            name="backgroundPrompt"
             onChange={handleChange}
-            value={contentPrompt || ''}
+            value={backgroundPrompt || ''}
             placeholder="Enter text to generate image of your product/brand"
             style={{ width: '420px' }}
           />
           <br></br>
-          {!isGeneratingImages && (
+          {!isGeneratingMasks && (
             <Button
               onClick={async () => {
                 if (
-                  contentPrompt == null ||
-                  contentPrompt.trim() == '' ||
+                  backgroundPrompt == null ||
+                  backgroundPrompt.trim() == '' ||
                   maskPrompt == null ||
                   maskPrompt.trim() == '' ||
                   negativeMaskPrompt == null ||
@@ -311,9 +316,9 @@ export default function Dashboard2() {
                 } else {
                   clearInterval(intervalMask.current);
                   clearInterval(intervalImage.current);
-                  setPredictions({});
-                  setImageList([]); // when generation begins, list of images is empty
-                  setIsLoading(true);
+                  setBackgroundImagePredictions({});
+                  setBackgroundImageList([]); // when generation begins, list of images is empty
+                  setIsMaskedLoading(true);
                   // generate mask before images
                   getMask();
                 }
@@ -323,8 +328,10 @@ export default function Dashboard2() {
             </Button>
           )}
           <br></br>
-          {loadingWithContentPrompt}
-          <div className={styles['grid']}>{imageList.map(renderCard)}</div>
+          {loadingWithBackgroundPrompt}
+          <div className={styles['grid']}>
+            {backgroundImageList.map(renderCard)}
+          </div>
         </div>
       );
     } else {
@@ -415,6 +422,7 @@ export default function Dashboard2() {
       <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
         Go Ahead...Generate Images
       </h1>
+      {console.log('isGeneratingMasks is: ', isGeneratingMasks)}
       <br></br>
       {subscribedAndModelChosen()}
     </div>
