@@ -22,6 +22,7 @@ export default function Dashboard2() {
   const router = useRouter();
   const {
     userLoaded,
+    isLoadingUser,
     user,
     session,
     userDetails,
@@ -106,6 +107,7 @@ export default function Dashboard2() {
       } else {
         alert('nothing generated');
       }
+      console.log('results', result);
       setBackgroundImagePredictions((state) => ({
         ...state,
         [attempt]: { ...state[attempt], status: 'succeeded' }
@@ -113,6 +115,8 @@ export default function Dashboard2() {
     }
     console.log('output data is: ', output);
   };
+
+  //console.log('image list', backgroundImageList, backgroundImagePredictions);
 
   const getMaskResults = async () => {
     const output = await axios.get('/api/imageresults?url=' + maskUrl);
@@ -129,15 +133,14 @@ export default function Dashboard2() {
   };
 
   useEffect(() => {
-    if (
-      Object.values(backgroundImagePredictions).every(
-        (item) => item.status === 'succeeded'
-      )
-    ) {
+    const list = Object.values(backgroundImagePredictions);
+    if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
+      console.log('background ', backgroundImagePredictions);
       clearInterval(intervalImage.current);
       setMaskUrl(null);
       setMask(null);
       setIsMaskedLoading(false);
+      console.log('changing back masked loading');
       setIsGeneratingMasks(false);
     }
   }, [backgroundImagePredictions]);
@@ -177,13 +180,9 @@ export default function Dashboard2() {
     }
   }, [mask]);
 
-  useEffect(
-    () => {
-      if (!user) router.replace('/signin');
-    },
-    [user],
-    []
-  );
+  useEffect(() => {
+    if (!isLoadingUser && !user) router.replace('/signin');
+  }, [user]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);

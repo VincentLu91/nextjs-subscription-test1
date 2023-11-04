@@ -27,6 +27,7 @@ export default function Train() {
     user,
     session,
     userDetails,
+    isLoadingUser,
     subscription,
     zipFiles,
     setZipFiles,
@@ -55,13 +56,9 @@ export default function Train() {
   //{ current: "processing" } etc...
   // the difference between useRef and state variables is that changing values doesn't re-render components
 
-  useEffect(
-    () => {
-      if (!user) router.replace('/signin');
-    },
-    [user],
-    []
-  );
+  useEffect(() => {
+    if (!isLoadingUser && !user) router.replace('/signin');
+  }, [user]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);

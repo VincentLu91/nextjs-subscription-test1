@@ -24,6 +24,7 @@ export default function ViewContent() {
     user,
     session,
     userDetails,
+    isLoadingUser,
     subscription,
     imageLink
   } = useUser();
@@ -31,13 +32,9 @@ export default function ViewContent() {
   const [prompt, setPrompt] = useState(null);
   const [caption, setCaption] = useState(null);
 
-  useEffect(
-    () => {
-      if (!user) router.replace('/signin');
-    },
-    [user],
-    []
-  );
+  useEffect(() => {
+    if (!isLoadingUser && !user) router.replace('/signin');
+  }, [user]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);

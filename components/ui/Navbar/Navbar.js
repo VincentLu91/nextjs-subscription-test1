@@ -34,31 +34,33 @@ const Navbar = () => {
           <div className="flex flex-1 justify-end space-x-8">
             {user ? (
               <>
-                <Link href="#">
+                <Link href="/dashboard">
                   <a
                     className={s.link}
-                    onClick={() => router.push('/dashboard')}
+                    //onClick={() => router.push('/dashboard')}
                   >
                     Dashboard
                   </a>
                 </Link>
-                <Link href="#">
+                <Link href="/dashboard2">
                   <a
                     className={s.link}
-                    onClick={() => router.push('/dashboard2')}
+                    //onClick={() => router.push('/dashboard2')}
                   >
                     Dashboard2
                   </a>
                 </Link>
-                <Link href="#">
-                  <a className={s.link} onClick={() => router.push('/train')}>
+                <Link href="/train">
+                  <a className={s.link} 
+                  //onClick={() => router.push('/train')}
+                  >
                     Train
                   </a>
                 </Link>
-                <Link href="#">
+                <Link href="/view-content">
                   <a
                     className={s.link}
-                    onClick={() => router.push('/view-content')}
+                    //onClick={() => router.push('/view-content')}
                   >
                     View Content
                   </a>

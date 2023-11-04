@@ -5,6 +5,7 @@ export const UserContext = createContext();
 
 export const UserContextProvider = (props) => {
   const [userLoaded, setUserLoaded] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
@@ -54,6 +55,7 @@ export const UserContextProvider = (props) => {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setIsLoadingUser(false);
       }
     );
 
@@ -91,6 +93,7 @@ export const UserContextProvider = (props) => {
     user,
     userDetails,
     userLoaded,
+    isLoadingUser,
     subscription,
     signIn: (options) => supabase.auth.signInWithPassword(options),
     signUp: (options) => supabase.auth.signUp(options),
