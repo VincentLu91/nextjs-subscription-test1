@@ -84,9 +84,8 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (
-      Object.values(predictions).every((item) => item.status === 'succeeded')
-    ) {
+    const list = Object.values(predictions);
+    if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
       clearInterval(interval.current);
       setIsLoading(false);
       setIsGeneratingImages(false);
