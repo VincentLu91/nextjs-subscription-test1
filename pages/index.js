@@ -88,8 +88,8 @@ const index = () => {
       <br />
       <h2>
         Try for free{' '}
-        <Link href="/signup">
-          <a style={{ color: 'red' }}>Today</a>
+        <Link href="/signup" style={{ color: 'red' }}>
+          Today
         </Link>
       </h2>
       <br />

@@ -16,17 +16,17 @@ const Navbar = () => {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex justify-between align-center flex-row py-4 md:py-6 relative">
           <div className="flex flex-1 items-center">
-            <Link href="/">
-              <a className={s.logo} aria-label="Logo">
-                <Logo />
-              </a>
+            <Link href="/" className={s.logo} aria-label="Logo">
+
+              <Logo />
+
             </Link>
             <nav className="space-x-2 ml-6 hidden lg:block">
-              <Link href="/pricing">
-                <a className={s.link}>Pricing</a>
+              <Link href="/pricing" className={s.link}>
+                Pricing
               </Link>
-              <Link href="/account">
-                <a className={s.link}>Account</a>
+              <Link href="/account" className={s.link}>
+                Account
               </Link>
             </nav>
           </div>
@@ -34,46 +34,47 @@ const Navbar = () => {
           <div className="flex flex-1 justify-end space-x-8">
             {user ? (
               <>
-                <Link href="/dashboard">
-                  <a
-                    className={s.link}
-                    //onClick={() => router.push('/dashboard')}
-                  >
+                <Link
+                  href="/dashboard"
+                  //onClick={() => router.push('/dashboard')}
+                  className={s.link}>
+                  
                     Dashboard
-                  </a>
+                  
                 </Link>
-                <Link href="/dashboard2">
-                  <a
-                    className={s.link}
-                    //onClick={() => router.push('/dashboard2')}
-                  >
+                <Link
+                  href="/dashboard2"
+                  //onClick={() => router.push('/dashboard2')}
+                  className={s.link}>
+                  
                     Dashboard2
-                  </a>
+                  
                 </Link>
-                <Link href="/train">
-                  <a className={s.link} 
+                <Link
+                  href="/train"
                   //onClick={() => router.push('/train')}
-                  >
+                  className={s.link}>
+                  
                     Train
-                  </a>
+                  
                 </Link>
-                <Link href="/view-content">
-                  <a
-                    className={s.link}
-                    //onClick={() => router.push('/view-content')}
-                  >
+                <Link
+                  href="/view-content"
+                  //onClick={() => router.push('/view-content')}
+                  className={s.link}>
+                  
                     View Content
-                  </a>
+                  
                 </Link>
-                <Link href="#">
-                  <a className={s.link} onClick={() => signOut()}>
+                <Link href="#" className={s.link} onClick={() => signOut()}>
+                  
                     Sign out
-                  </a>
+                  
                 </Link>
               </>
             ) : (
-              <Link href="/signin">
-                <a className={s.link}>Sign in</a>
+              <Link href="/signin" className={s.link}>
+                Sign in
               </Link>
             )}
           </div>

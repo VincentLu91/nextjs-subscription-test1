@@ -4,6 +4,15 @@ module.exports = {
     defaultLocale: 'en-US'
   },
   images: {
-    domains: ['cdn.sanity.io', 'replicate.delivery']
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io'
+      },
+      {
+        protocol: 'https',
+        hostname: 'replicate.delivery'
+      }
+    ]
   }
 };

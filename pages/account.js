@@ -96,7 +96,7 @@ export default function Account() {
               `${subscriptionPrice}/${subscription.prices.interval}`
             ) : (
               <Link href="/">
-                <a>Choose your plan</a>
+                Choose your plan
               </Link>
             )}
           </div>
