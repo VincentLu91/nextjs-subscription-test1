@@ -45,8 +45,8 @@ export default function Dashboard2() {
     setMaskUrl,
     imageFile,
     setImageFile,
-    isUploaded,
-    setIsUploaded,
+    isImageUploaded,
+    setIsImageUploaded,
     imageFileName,
     setImageFileName,
     maskPrompt,
@@ -264,8 +264,8 @@ export default function Dashboard2() {
           <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
             <Form.Control
               type="file"
-              //accept="image/png, image/jpeg"
-              accept="*"
+              accept="image/png, image/jpeg"
+              //accept="*"
               onChange={(e) => uploadFile(e)}
             />
           </Form.Group>
@@ -309,9 +309,10 @@ export default function Dashboard2() {
                   maskPrompt == null ||
                   maskPrompt.trim() == '' ||
                   negativeMaskPrompt == null ||
-                  negativeMaskPrompt.trim() == ''
+                  negativeMaskPrompt.trim() == '' ||
+                  isImageUploaded == false
                 ) {
-                  alert('Please enter all prompts');
+                  alert('Please enter all prompts and upload your image!');
                 } else {
                   clearInterval(intervalMask.current);
                   clearInterval(intervalImage.current);
@@ -339,7 +340,7 @@ export default function Dashboard2() {
   }
 
   async function getFiles() {
-    console.log('isUploaded: ', isUploaded);
+    console.log('isImageUploaded: ', isImageUploaded);
     const { data, error } = await supabase.storage
       .from('images')
       .list(user?.id + '/', {
@@ -368,21 +369,16 @@ export default function Dashboard2() {
   }
 
   useEffect(() => {
-    if (user && isUploaded) {
+    if (user && isImageUploaded) {
       getFiles();
     }
-  }, [user, isUploaded]);
+  }, [user, isImageUploaded]);
 
   async function uploadFile(e) {
     let file = e.target.files[0];
     console.log('file: ', file);
     if (file == undefined) {
       return; // don't upload an empty file!
-    }
-
-    if (imageFile) {
-      deleteFile(imageFileName);
-      setIsUploaded(false);
     }
 
     // userid: Cooper
@@ -395,24 +391,10 @@ export default function Dashboard2() {
       .upload(user.id + '/' + uuidv4() + '.png', file); // add .png extension otherwise storage will complain
 
     if (data) {
-      setIsUploaded(true);
+      setIsImageUploaded(true);
       getFiles();
     } else {
       console.log(error);
-    }
-  }
-
-  async function deleteFile(imageFileName) {
-    const { error } = await supabase.storage
-      .from('images')
-      .remove([user.id + '/' + imageFileName]);
-
-    if (error) {
-      alert(error);
-    } else {
-      //getFiles();
-      setIsUploaded(false);
-      setImageFile([]);
     }
   }
 

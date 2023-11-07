@@ -21,6 +21,7 @@ export const UserContextProvider = (props) => {
 
   const [zipFiles, setZipFiles] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
+  const [isImageUploaded, setIsImageUploaded] = useState(false);
   const [zipFileName, setZipFileName] = useState(null);
   const [imageFile, setImageFile] = useState([]);
   const [imageFileName, setImageFileName] = useState([]);
@@ -116,6 +117,8 @@ export const UserContextProvider = (props) => {
     setZipFiles,
     isUploaded,
     setIsUploaded,
+    isImageUploaded,
+    setIsImageUploaded,
     zipFileName,
     setZipFileName,
     imageFile,
