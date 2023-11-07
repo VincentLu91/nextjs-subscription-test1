@@ -43,12 +43,12 @@ export default function Dashboard2() {
     setMask,
     maskUrl,
     setMaskUrl,
-    zipFiles,
-    setZipFiles,
+    imageFile,
+    setImageFile,
     isUploaded,
     setIsUploaded,
-    zipFileName,
-    setZipFileName,
+    imageFileName,
+    setImageFileName,
     maskPrompt,
     setMaskPrompt,
     negativeMaskPrompt,
@@ -68,7 +68,7 @@ export default function Dashboard2() {
       '/api/modifyImage?prompt=' +
         backgroundPrompt +
         '&image=' +
-        zipFileName +
+        imageFileName +
         '&mask=' +
         mask
     );
@@ -84,7 +84,7 @@ export default function Dashboard2() {
     setIsGeneratingMasks(true);
     const resp = await axios.get(
       '/api/groundedSam/?image=' +
-        zipFileName +
+        imageFileName +
         '&mask_prompt=' +
         maskPrompt +
         '&negative_mask_prompt=' +
@@ -354,8 +354,8 @@ export default function Dashboard2() {
     // to load image1: CDNURL.com/subscribeToCooperCodes.png -> hosted image
 
     if (data != null) {
-      setZipFiles(data);
-      setZipFileName(CDNURL + user.identities[0].id + '/' + data[0].name);
+      setImageFile(data);
+      setImageFileName(CDNURL + user.identities[0].id + '/' + data[0].name);
       console.log('data: ', data);
       console.log(
         'name of the img file is: ',
@@ -380,8 +380,8 @@ export default function Dashboard2() {
       return; // don't upload an empty file!
     }
 
-    if (zipFiles) {
-      deleteFile(zipFileName);
+    if (imageFile) {
+      deleteFile(imageFileName);
       setIsUploaded(false);
     }
 
@@ -402,17 +402,17 @@ export default function Dashboard2() {
     }
   }
 
-  async function deleteFile(zipFileName) {
+  async function deleteFile(imageFileName) {
     const { error } = await supabase.storage
       .from('images')
-      .remove([user.id + '/' + zipFileName]);
+      .remove([user.id + '/' + imageFileName]);
 
     if (error) {
       alert(error);
     } else {
       //getFiles();
       setIsUploaded(false);
-      setZipFiles([]);
+      setImageFile([]);
     }
   }
 

@@ -22,6 +22,8 @@ export const UserContextProvider = (props) => {
   const [zipFiles, setZipFiles] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
   const [zipFileName, setZipFileName] = useState(null);
+  const [imageFile, setImageFile] = useState([]);
+  const [imageFileName, setImageFileName] = useState([]);
   const [instancePrompt, setInstancePrompt] = useState(null);
   const [classPrompt, setClassPrompt] = useState(null);
   const [trainingID, setTrainingID] = useState(null);
@@ -116,6 +118,10 @@ export const UserContextProvider = (props) => {
     setIsUploaded,
     zipFileName,
     setZipFileName,
+    imageFile,
+    setImageFile,
+    imageFileName,
+    setImageFileName,
     instancePrompt,
     setInstancePrompt,
     classPrompt,
