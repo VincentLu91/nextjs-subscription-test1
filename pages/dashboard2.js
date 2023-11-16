@@ -308,8 +308,8 @@ export default function Dashboard2() {
                   backgroundPrompt.trim() == '' ||
                   maskPrompt == null ||
                   maskPrompt.trim() == '' ||
-                  negativeMaskPrompt == null ||
-                  negativeMaskPrompt.trim() == '' ||
+                  //negativeMaskPrompt == null ||
+                  //negativeMaskPrompt.trim() == '' ||
                   isImageUploaded == false
                 ) {
                   alert('Please enter all prompts and upload your image!');

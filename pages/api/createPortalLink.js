@@ -7,7 +7,10 @@ const createPortalLink = async (req, res) => {
   if (req.method === 'POST') {
     const token = req.headers.token;
     try {
-      const { data: user, error } = await supabaseAdmin.auth.api.getUser(token);
+      const {
+        data: { user },
+        error
+      } = await supabaseAdmin.auth.getUser(token);
       if (error) throw error;
 
       const customer = await createOrRetrieveCustomer({

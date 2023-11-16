@@ -22,16 +22,18 @@ export default function Pricing({ products }) {
       router.push('/account');
       return;
     }
-    const { sessionId, error: apiError } = await postData({
+    const { sessionId, url, error: apiError } = await postData({
       url: '/api/createCheckoutSession',
       data: { price },
       token: session.access_token
     });
     if (apiError) return alert(apiError.message);
     const stripe = await getStripe();
-    const { error: stripeError } = stripe.redirectToCheckout({ sessionId });
-    if (stripeError) alert(error.message);
-    setLoading(false);
+    console.log(sessionId, url)
+    window.location.href = url
+    //const { error: stripeError } = stripe.redirectToCheckout({ sessionId });
+    //if (stripeError) alert(error.message);
+    //setLoading(false);
   };
 
   if (!products.length)

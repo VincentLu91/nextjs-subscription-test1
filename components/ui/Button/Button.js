@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import React, { forwardRef, useRef } from 'react';
-import mergeRefs from 'react-merge-refs';
+import { mergeRefs } from 'react-merge-refs';
 import { useButton } from 'react-aria';
 import s from './Button.module.css';
 import LoadingDots from '../LoadingDots';

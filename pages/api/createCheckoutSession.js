@@ -9,8 +9,9 @@ const createCheckoutSession = async (req, res) => {
     const { price, quantity = 1, metadata = {} } = req.body;
 
     try {
-      const { data: user, error } = await supabaseAdmin.auth.api.getUser(token);
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
       if (error) throw error;
+
 
       const customer = await createOrRetrieveCustomer({
         uuid: user.id,
@@ -30,14 +31,14 @@ const createCheckoutSession = async (req, res) => {
         mode: 'subscription',
         allow_promotion_codes: true,
         subscription_data: {
-          trial_from_plan: true,
+          trial_from_plan: true, // todo is this ok?
           metadata
         },
         success_url: `${getURL()}/account`,
         cancel_url: `${getURL()}/`
       });
 
-      return res.status(200).json({ sessionId: session.id });
+      return res.status(200).json({ sessionId: session.id, url: session.url });
     } catch (err) {
       console.log(err);
       res

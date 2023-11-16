@@ -13,7 +13,6 @@ import styles from '../styles/Home.module.css';
 // import trainML's config code
 import contentTypes from './api/contentTypes';
 import { saveAs } from 'file-saver';
-import { Configuration, OpenAIApi } from 'openai';
 
 export default function ViewContent() {
   const [loading, setLoading] = useState(false);
@@ -29,8 +28,8 @@ export default function ViewContent() {
     imageLink
   } = useUser();
   const [isLoading, setIsLoading] = useState(false);
-  const [prompt, setPrompt] = useState(null);
-  const [caption, setCaption] = useState(null);
+  const [prompt, setPrompt] = useState('');
+  const [caption, setCaption] = useState('');
 
   useEffect(() => {
     if (!isLoadingUser && !user) router.replace('/signin');
@@ -71,27 +70,6 @@ export default function ViewContent() {
   const download = (url) => {
     saveAs(url, 'image');
   };
-  // the below is not used for now, since I'm using Cohere.
-  const generateCaptions = async (prompt) => {
-    if (prompt == null || prompt.trim() == '') {
-      setCaption("You haven't entered anything!");
-    } else {
-      const configuration = new Configuration({
-        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY
-      });
-      const openai = new OpenAIApi(configuration);
-      const response = await openai.createCompletion({
-        model: 'text-davinci-003',
-        prompt: prompt,
-        temperature: 0.5, // change the temperature between 0 and 1 for creativity of responses
-        max_tokens: 200
-      });
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
-      const rawCaption = JSON.stringify(response.data['choices'][0]['text']);
-      console.log(rawCaption);
-      setCaption(JSON.parse(rawCaption).trim());
-    }
-  };
 
   const generateCaptionsCohere = async (prompt) => {
     if (prompt == null || prompt.trim() == '') {
@@ -101,8 +79,10 @@ export default function ViewContent() {
       const rawCaption = await axios.post(
         '/api/socialCaptions?prompt=' + prompt
       );
-      console.log(rawCaption['data']);
-      setCaption(rawCaption['data'].trim());
+      console.log('raw caption', rawCaption);
+      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
+      console.log(rawCaption.data.text);
+      setCaption(rawCaption.data.text.trim());
     }
   };
 
