@@ -13,14 +13,11 @@ function reset() {
     const notification = toast.loading('Sending Email....');
 
     try {
-      const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-        email,
-        {
-          //redirectTo: 'http://localhost:3000/password-reset' //// this will redirect to us at password-reset page,
-          //// you can also set your own page for it.
-          redirectTo: `${window.location.origin}/password-reset` /// this will redirect to us at password-reset page,
-        }
-      );
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        //redirectTo: 'http://localhost:3000/password-reset' //// this will redirect to us at password-reset page,
+        //// you can also set your own page for it.
+        redirectTo: `${window.location.origin}/password-reset` /// this will redirect to us at password-reset page,
+      });
 
       if (error) {
         toast.error(error.message, {
