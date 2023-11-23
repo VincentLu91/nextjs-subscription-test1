@@ -1767,10 +1767,10 @@
   resolved "https://registry.npmjs.org/@sindresorhus/is/-/is-5.6.0.tgz"
   integrity sha512-TV7t8GKYaJWsn00tFDqBw8+Uqmr8A0fRU1tvTQhyZzGv0sJCGRQL3JGMI3ucuKo3XIZdUP+Lx7/gh2t3lewy7g==
 
-"@stripe/stripe-js@^2.1.11":
-  version "2.1.11"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-2.1.11.tgz"
-  integrity sha512-GRyInO+VPMjjgUzVPKpDtz+5s8JKssJ99uhWBGo09yxDQBb+bhkm6PxmVa8C+qsSd30JFO1Z+pgIJ0AMmmZJKg==
+"@stripe/stripe-js@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-2.2.0.tgz"
+  integrity sha512-YyXQbsXvnNRJ6MofFhCLIQ4W7UpfkfSOQhjIaHEiCMBv3IBxhzugXiYNNzceGTK/7DL31v7HtTnkJ+FI+6AIow==
 
 "@supabase/functions-js@^2.1.5":
   version "2.1.5"
@@ -1793,10 +1793,10 @@
   dependencies:
     whatwg-url "^5.0.0"
 
-"@supabase/postgrest-js@^1.8.5":
-  version "1.8.5"
-  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.8.5.tgz"
-  integrity sha512-XvoqN5e5Z4TsQOYWLQYLW0HIlZtFSzwAcwiuToaSBSTpLOGCg4NaZ7au5GfBzCQJZdZPY5vk5FvwthfDsQK/Jw==
+"@supabase/postgrest-js@^1.8.6":
+  version "1.9.0"
+  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.9.0.tgz"
+  integrity sha512-axP6cU69jDrLbfihJKQ6vU27tklD0gzb9idkMN363MtTXeJVt5DQNT3JnJ58JVNBdL74hgm26rAsFNvHk+tnSw==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
@@ -1817,15 +1817,15 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.38.4":
-  version "2.38.4"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.38.4.tgz"
-  integrity sha512-bYwxm/GosvRqOMIv6YP7qUTZWi/trgHtDWUEZDEmyRHW24d0JYIb1GOt6RaO2hsWlecn88DAJIpjoNbprocgRA==
+"@supabase/supabase-js@^2.38.5":
+  version "2.38.5"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.38.5.tgz"
+  integrity sha512-QTXld3AfwAJgeOGyOKsCcT7AjC3jJxN02iHy299Fw+qKX0lJ1tVVhMGlga101C1stUCvgzjcypmMSGiZ2oeKsw==
   dependencies:
     "@supabase/functions-js" "^2.1.5"
     "@supabase/gotrue-js" "^2.56.0"
     "@supabase/node-fetch" "^2.6.14"
-    "@supabase/postgrest-js" "^1.8.5"
+    "@supabase/postgrest-js" "^1.8.6"
     "@supabase/realtime-js" "^2.8.4"
     "@supabase/storage-js" "^2.5.4"
 
@@ -2359,10 +2359,10 @@ clsx@^1.1.1:
   resolved "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
   integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
 
-cohere-ai@^7.4.0:
-  version "7.4.0"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.4.0.tgz"
-  integrity sha512-j3PFxmvoB4eTe8JSRf6mr4uwrarHIIe+DFwmDd4OU5KUHeRy71sCkiub4+kvZmx/r4zL5Vt7fwQn/AOvX/scAw==
+cohere-ai@^7.4.1:
+  version "7.4.1"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.4.1.tgz"
+  integrity sha512-fHdvwPmo7yVXc/U7v0bUQL+tcOZ0dPo4tku4w+X7SXYt4xxZLmPX/g3efaGZvhuCsMY/N3GVC9gz1U9P0BEluQ==
   dependencies:
     "@types/qs" "6.9.8"
     "@types/url-join" "4.0.1"
@@ -3809,10 +3809,10 @@ npm-bundled@^3.0.0:
   dependencies:
     npm-normalize-package-bin "^3.0.0"
 
-npm-check-updates@^16.14.9:
-  version "16.14.9"
-  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-16.14.9.tgz"
-  integrity sha512-fuW43NcJ7DMRTDUunFvJeZaQxbrremIwekkdayd/AHwCUfr2TLvDAek24lKTCB0L6JL2VnzGaV6OW8LXVqUT0w==
+npm-check-updates@^16.14.11:
+  version "16.14.11"
+  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-16.14.11.tgz"
+  integrity sha512-0MMWGbGci22Pu77bR9jRsy5qgxdQSJVqNtSyyFeubDPtbcU36z4gjEDITu26PMabFWPNkAoVfKF31M3uKUvzFg==
   dependencies:
     chalk "^5.3.0"
     cli-table3 "^0.6.3"
