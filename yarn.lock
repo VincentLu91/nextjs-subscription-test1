@@ -1817,10 +1817,10 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.38.5":
-  version "2.38.5"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.38.5.tgz"
-  integrity sha512-QTXld3AfwAJgeOGyOKsCcT7AjC3jJxN02iHy299Fw+qKX0lJ1tVVhMGlga101C1stUCvgzjcypmMSGiZ2oeKsw==
+"@supabase/supabase-js@^2.39.0":
+  version "2.39.0"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.39.0.tgz"
+  integrity sha512-cYfnwWRW5rYBbPT/BNIejtRT9ULdD9PnIExQV28PZpqcqm3PLwS4f3pY7WGB01Da63VYdvktZPKuYvreqsj/Zg==
   dependencies:
     "@supabase/functions-js" "^2.1.5"
     "@supabase/gotrue-js" "^2.56.0"
@@ -2359,10 +2359,10 @@ clsx@^1.1.1:
   resolved "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
   integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
 
-cohere-ai@^7.4.1:
-  version "7.4.1"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.4.1.tgz"
-  integrity sha512-fHdvwPmo7yVXc/U7v0bUQL+tcOZ0dPo4tku4w+X7SXYt4xxZLmPX/g3efaGZvhuCsMY/N3GVC9gz1U9P0BEluQ==
+cohere-ai@^7.4.3:
+  version "7.4.3"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.4.3.tgz"
+  integrity sha512-bMX0AiEoz6sUzseqBSp9hf5BacZYhJ+H5Dj1fdDMuw6Eq62JYrFED+F8SnI69XL2pVX0dapNNCVvA9MBLLrpxg==
   dependencies:
     "@types/qs" "6.9.8"
     "@types/url-join" "4.0.1"
