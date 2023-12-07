@@ -24,7 +24,7 @@ export default function Layout({ children, meta: pageMeta }) {
         <meta content={meta.description} name="description" />
         <meta
           property="og:url"
-          content={`https://subscription-starter.vercel.app${router.asPath}`} // CHANGE THIS
+          content={`https://nextjs-subscription-test1-vincentlu91.vercel.app${router.asPath}`} // CHANGE THIS
         />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={meta.title} />
