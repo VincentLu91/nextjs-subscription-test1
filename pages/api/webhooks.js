@@ -62,6 +62,7 @@ const webhookHandler = async (req, res) => {
 
     if (relevantEvents.has(event.type)) {
       try {
+        console.log('event.type is: ', event.type);
         switch (event.type) {
           case 'product.created':
           case 'product.updated':
