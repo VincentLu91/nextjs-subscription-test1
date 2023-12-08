@@ -1,3 +1,4 @@
+import getRawBody from 'raw-body';
 import { stripe } from '../../utils/initStripe';
 import {
   upsertProductRecord,
@@ -41,8 +42,10 @@ const relevantEvents = new Set([
 ]);
 
 const webhookHandler = async (req, res) => {
+  console.log('hihihihihihihi');
   if (req.method === 'POST') {
-    const buf = await buffer(req);
+    //const buf = await buffer(req);
+    const buf = await getRawBody(req);
     const sig = req.headers['stripe-signature'];
     const webhookSecret =
       process.env.STRIPE_WEBHOOK_SECRET_LIVE ??
@@ -71,6 +74,7 @@ const webhookHandler = async (req, res) => {
           case 'customer.subscription.created':
           case 'customer.subscription.updated':
           case 'customer.subscription.deleted':
+            console.log('attempting update');
             await manageSubscriptionStatusChange(
               event.data.object.id,
               event.data.object.customer,
