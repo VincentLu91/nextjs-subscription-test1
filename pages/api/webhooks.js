@@ -1,4 +1,3 @@
-import getRawBody from 'raw-body';
 import { stripe } from '../../utils/initStripe';
 import {
   upsertProductRecord,
@@ -44,7 +43,6 @@ const relevantEvents = new Set([
 const webhookHandler = async (req, res) => {
   if (req.method === 'POST') {
     const buf = await buffer(req);
-    //const buf = await getRawBody(req);
     const sig = req.headers['stripe-signature'];
     const webhookSecret =
       process.env.STRIPE_WEBHOOK_SECRET_LIVE ??
