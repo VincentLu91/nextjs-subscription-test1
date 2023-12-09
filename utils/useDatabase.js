@@ -103,7 +103,6 @@ const manageSubscriptionStatusChange = async (
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method']
   });
-  console.log('subscription object is: ', subscription);
   // Upsert the latest status of the subscription object.
   const subscriptionData = {
     id: subscription.id,

@@ -42,7 +42,6 @@ const relevantEvents = new Set([
 ]);
 
 const webhookHandler = async (req, res) => {
-  console.log('hihihihihihihi');
   if (req.method === 'POST') {
     //const buf = await buffer(req);
     const buf = await getRawBody(req);
@@ -62,7 +61,6 @@ const webhookHandler = async (req, res) => {
 
     if (relevantEvents.has(event.type)) {
       try {
-        console.log('event.type is: ', event.type);
         switch (event.type) {
           case 'product.created':
           case 'product.updated':
@@ -97,8 +95,7 @@ const webhookHandler = async (req, res) => {
         }
       } catch (error) {
         console.log(error);
-        //return res.json({ error: 'Webhook handler failed. View logs.' });
-        return res.json(error);
+        return res.json({ error: 'Webhook handler failed. View logs.' });
       }
     }
 
