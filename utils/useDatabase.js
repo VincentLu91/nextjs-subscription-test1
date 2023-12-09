@@ -131,9 +131,17 @@ const manageSubscriptionStatusChange = async (
       : null
   };
 
+  // the commented code below was the original implementation of updating
+  // subscriptions using Supabase's Javascript 1.0 SDK
+  /*const { error } = await supabaseAdmin
+    .from('subscriptions')
+    .insert([subscriptionData], { upsert: true });*/
+
+  // the code below replaces the code above, using the Javascript 2.0 SDK
   const { error } = await supabaseAdmin
     .from('subscriptions')
-    .insert([subscriptionData], { upsert: true });
+    .upsert(subscriptionData)
+    .select();
   if (error) throw error;
   console.log(
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
