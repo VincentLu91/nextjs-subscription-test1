@@ -11,12 +11,12 @@
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.0.2",
-    "@stripe/stripe-js": "^2.2.1",
-    "@supabase/supabase-js": "^2.39.0",
+    "@stripe/stripe-js": "^2.2.2",
+    "@supabase/supabase-js": "^2.39.1",
     "@swc/helpers": "^0.5.3",
     "axios": "^1.6.2",
     "classnames": "^2.3.2",
-    "cohere-ai": "^7.6.1",
+    "cohere-ai": "^7.6.2",
     "file-saver": "^2.0.5",
     "next": "^14.0.4",
     "npm-check-updates": "^16.14.12",
@@ -29,7 +29,7 @@
     "react-select": "^5.8.0",
     "stripe": "^14.9.0",
     "swr": "2.2.4",
-    "tailwindcss": "^3.3.6",
+    "tailwindcss": "^3.4.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
