@@ -15,7 +15,7 @@ export const UserContextProvider = (props) => {
   const [imageList, setImageList] = useState([]);
   const [backgroundImageList, setBackgroundImageList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMaskedLoading, setIsMaskedLoading] = useState(false);
+  const [isBGImagesLoading, setisBGImagesLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
   const [backgroundPrompt, setBackgroundPrompt] = useState(null);
 
@@ -35,10 +35,6 @@ export const UserContextProvider = (props) => {
   );
   const [modelName, setModelName] = useState(null);
   const [modelVersion, setModelVersion] = useState(null);
-  const [mask, setMask] = useState(null);
-  const [maskUrl, setMaskUrl] = useState(null);
-  const [maskPrompt, setMaskPrompt] = useState(null);
-  const [negativeMaskPrompt, setNegativeMaskPrompt] = useState(null);
 
   const [instanceList, setInstanceList] = useState([]);
   const [predictions, setPredictions] = useState({}); // { 0 : { get: 'url', cancel: "url", status: 'succeeded'}}
@@ -46,7 +42,7 @@ export const UserContextProvider = (props) => {
     {}
   );
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
-  const [isGeneratingMasks, setIsGeneratingMasks] = useState(false);
+  const [isGeneratingBGImages, setisGeneratingBGImages] = useState(false);
 
   useEffect(async () => {
     const {
@@ -141,20 +137,12 @@ export const UserContextProvider = (props) => {
     setModelName,
     modelVersion,
     setModelVersion,
-    mask,
-    setMask,
-    maskUrl,
-    setMaskUrl,
-    maskPrompt,
-    setMaskPrompt,
-    negativeMaskPrompt,
-    setNegativeMaskPrompt,
     backgroundPrompt,
     setBackgroundPrompt,
-    isMaskedLoading,
-    setIsMaskedLoading,
-    isGeneratingMasks,
-    setIsGeneratingMasks,
+    isBGImagesLoading,
+    setisBGImagesLoading,
+    isGeneratingBGImages,
+    setisGeneratingBGImages,
     backgroundImageList,
     setBackgroundImageList,
     backgroundImagePredictions,

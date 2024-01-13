@@ -30,8 +30,8 @@ export default function Dashboard2() {
     setImageLink,
     backgroundImageList,
     setBackgroundImageList,
-    isMaskedLoading,
-    setIsMaskedLoading,
+    isBGImagesLoading,
+    setisBGImagesLoading,
     backgroundPrompt,
     setBackgroundPrompt,
     setTrainingText,
@@ -39,38 +39,23 @@ export default function Dashboard2() {
     setModelName,
     modelVersion,
     setModelVersion,
-    mask,
-    setMask,
-    maskUrl,
-    setMaskUrl,
     imageFile,
     setImageFile,
     isImageUploaded,
     setIsImageUploaded,
     imageFileName,
     setImageFileName,
-    maskPrompt,
-    setMaskPrompt,
-    negativeMaskPrompt,
-    setNegativeMaskPrompt,
     backgroundImagePredictions,
     setBackgroundImagePredictions,
-    isGeneratingMasks,
-    setIsGeneratingMasks
+    isGeneratingBGImages,
+    setisGeneratingBGImages
   } = useUser();
 
-  const intervalMask = useRef();
   const intervalImage = useRef();
 
   const getImage = async (attempt, backgroundPrompt) => {
-    console.log('version: ', modelVersion);
     const resp = await axios.get(
-      '/api/modifyImage?prompt=' +
-        backgroundPrompt +
-        '&image=' +
-        imageFileName +
-        '&mask=' +
-        mask
+      '/api/modifyImage?prompt=' + backgroundPrompt + '&image=' + imageFileName
     );
     setBackgroundImagePredictions((state) => ({
       ...state,
@@ -80,25 +65,10 @@ export default function Dashboard2() {
     return resp.data;
   };
 
-  const getMask = async () => {
-    setIsGeneratingMasks(true);
-    const resp = await axios.get(
-      '/api/groundedSam/?image=' +
-        imageFileName +
-        '&mask_prompt=' +
-        maskPrompt +
-        '&negative_mask_prompt=' +
-        negativeMaskPrompt
-    );
-    console.log('getMask id is: ', resp.data.id);
-    setMaskUrl('https://api.replicate.com/v1/predictions/' + resp.data.id);
-    return resp.data;
-  };
-
   const getImageResults = async (attempt, url) => {
     const output = await axios.get('/api/imageresults?url=' + url);
     if (output.data.status === 'succeeded') {
-      const result = output.data.output[0];
+      const result = output.data.output.image;
       if (result) {
         setBackgroundImageList((current) => [
           ...current,
@@ -116,44 +86,15 @@ export default function Dashboard2() {
     console.log('output data is: ', output);
   };
 
-  //console.log('image list', backgroundImageList, backgroundImagePredictions);
-
-  const getMaskResults = async () => {
-    const output = await axios.get('/api/imageresults?url=' + maskUrl);
-    console.log('does this even run!?');
-    if (output.data.status === 'succeeded') {
-      const result = output.data.output[3]; // this array has 4 masking images, we take the third one.
-      if (result) {
-        console.log('Masking result URL is: ', result);
-        setMask(result);
-      } else {
-        alert('nothing generated');
-      }
-    }
-  };
-
   useEffect(() => {
     const list = Object.values(backgroundImagePredictions);
     if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
       console.log('background ', backgroundImagePredictions);
       clearInterval(intervalImage.current);
-      setMaskUrl(null);
-      setMask(null);
-      setIsMaskedLoading(false);
-      console.log('changing back masked loading');
-      setIsGeneratingMasks(false);
+      setisBGImagesLoading(false);
+      setisGeneratingBGImages(false);
     }
   }, [backgroundImagePredictions]);
-
-  useEffect(() => {
-    if (maskUrl) {
-      console.log('maskUrl is: ', maskUrl);
-      intervalMask.current = setInterval(() => {
-        getMaskResults();
-      }, 3000);
-    }
-    return () => clearInterval(intervalMask.current);
-  }, [maskUrl]);
 
   useEffect(() => {
     const predictionAry = Object.entries(backgroundImagePredictions).filter(
@@ -167,18 +108,7 @@ export default function Dashboard2() {
       }, 3000);
     }
     return () => clearInterval(intervalImage.current);
-  }, [maskUrl, backgroundImagePredictions]);
-
-  useEffect(() => {
-    console.log('mask is: ', mask);
-    if (mask) {
-      console.log('mask is not empty. Mask is: ', mask);
-      for (let i = 0; i < ATTEMPTS; i++) {
-        // 2 is a placeholder, later I plan to generate 16 images
-        getImage(i, backgroundPrompt);
-      }
-    }
-  }, [mask]);
+  }, [backgroundImagePredictions]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) router.replace('/signin');
@@ -200,16 +130,8 @@ export default function Dashboard2() {
     setBackgroundPrompt(e.target.value);
     console.log('backgroundPrompt: ', e.target.value);
   };
-  const handleMaskPrompt = (e) => {
-    setMaskPrompt(e.target.value);
-    console.log('maskPrompt: ', e.target.value);
-  };
-  const handleNegativeMaskPrompt = (e) => {
-    setNegativeMaskPrompt(e.target.value);
-    console.log('negativeMaskPrompt: ', e.target.value);
-  };
 
-  const loadingWithBackgroundPrompt = isMaskedLoading && (
+  const loadingWithBackgroundPrompt = isBGImagesLoading && (
     <div className={styles['white-text']}>
       <p>Loading...</p>
       <LoadingDots />
@@ -255,7 +177,7 @@ export default function Dashboard2() {
     if (subscription) {
       return (
         <div className={styles['get-image-button']}>
-          {isGeneratingMasks ? (
+          {isGeneratingBGImages ? (
             <p style={{ color: 'white' }}>Generating</p>
           ) : (
             <p style={{ color: 'white' }}>Please generate</p>
@@ -272,26 +194,6 @@ export default function Dashboard2() {
 
           <input
             type="text"
-            id="maskPrompt"
-            name="maskPrompt"
-            onChange={handleMaskPrompt}
-            value={maskPrompt || ''}
-            placeholder="Enter mask prompt"
-            style={{ width: '420px' }}
-          />
-
-          <input
-            type="text"
-            id="negativeMaskPrompt"
-            name="negativeMaskPrompt"
-            onChange={handleNegativeMaskPrompt}
-            value={negativeMaskPrompt || ''}
-            placeholder="Enter negative mask prompt"
-            style={{ width: '420px' }}
-          />
-
-          <input
-            type="text"
             id="backgroundPrompt"
             name="backgroundPrompt"
             onChange={handleChange}
@@ -300,27 +202,24 @@ export default function Dashboard2() {
             style={{ width: '420px' }}
           />
           <br></br>
-          {!isGeneratingMasks && (
+          {!isGeneratingBGImages && (
             <Button
               onClick={async () => {
                 if (
                   backgroundPrompt == null ||
                   backgroundPrompt.trim() == '' ||
-                  maskPrompt == null ||
-                  maskPrompt.trim() == '' ||
-                  //negativeMaskPrompt == null ||
-                  //negativeMaskPrompt.trim() == '' ||
                   isImageUploaded == false
                 ) {
                   alert('Please enter all prompts and upload your image!');
                 } else {
-                  clearInterval(intervalMask.current);
                   clearInterval(intervalImage.current);
                   setBackgroundImagePredictions({});
                   setBackgroundImageList([]); // when generation begins, list of images is empty
-                  setIsMaskedLoading(true);
-                  // generate mask before images
-                  getMask();
+                  setisBGImagesLoading(true); // change this. seriously
+                  for (let i = 0; i < ATTEMPTS; i++) {
+                    // 2 is a placeholder, later I plan to generate 16 images
+                    getImage(i, backgroundPrompt);
+                  }
                 }
               }}
             >
@@ -403,7 +302,7 @@ export default function Dashboard2() {
       <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
         Go Ahead...Generate Images
       </h1>
-      {console.log('isGeneratingMasks is: ', isGeneratingMasks)}
+      {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
       <br></br>
       {subscribedAndModelChosen()}
     </div>
