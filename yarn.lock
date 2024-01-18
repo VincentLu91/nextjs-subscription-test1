@@ -2334,10 +2334,10 @@ clsx@^2.0.0:
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.0.0.tgz"
   integrity sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==
 
-cohere-ai@^7.6.2:
-  version "7.6.2"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.6.2.tgz"
-  integrity sha512-0cMY8IniquZb7nnQBaLrWacxugNjFNbZQHsn0cJJ5rCZ0LT9OZu0fbKqtoAkcBqkdc9yAFZh5gWnW4ksNhHtpg==
+cohere-ai@^7.7.1:
+  version "7.7.1"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.7.1.tgz"
+  integrity sha512-ZiS+kvF7bevDaPI2IixubO4AY9N/MGBmqgvgu+B3cZ2itvRTAlVO/f2opRHdPvOfBdQocmMYb/bxuB/208LK4A==
   dependencies:
     form-data "4.0.0"
     js-base64 "3.7.2"
@@ -4303,10 +4303,10 @@ postcss@8.4.31:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-prettier@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.npmjs.org/prettier/-/prettier-3.2.3.tgz"
-  integrity sha512-QNhUTBq+mqt1oH1dTfY3phOKNhcDdJkfttHI6u0kj7M2+c+7fmNKlgh2GhnHiqMcbxJ+a0j2igz/2jfl9QKLuw==
+prettier@^3.2.4:
+  version "3.2.4"
+  resolved "https://registry.npmjs.org/prettier/-/prettier-3.2.4.tgz"
+  integrity sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==
 
 proc-log@^3.0.0:
   version "3.0.0"
@@ -4453,10 +4453,10 @@ react-aria@^3.31.1:
     "@react-aria/visually-hidden" "^3.8.8"
     "@react-types/shared" "^3.22.0"
 
-react-bootstrap@^2.9.2:
-  version "2.9.2"
-  resolved "https://registry.npmjs.org/react-bootstrap/-/react-bootstrap-2.9.2.tgz"
-  integrity sha512-a36B+EHsAI/aH+ZhXNILBFnqscE3zr10dWmjBmfhIb2QR7KSXJiGzYd6Faf/25G8G7/CP9TCL2B0WhUBOD2UBQ==
+react-bootstrap@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.npmjs.org/react-bootstrap/-/react-bootstrap-2.10.0.tgz"
+  integrity sha512-87gRP69VAfeU2yKgp8RI3HvzhPNrnYIV2QNranYXataz3ef+k7OhvKGGdxQLQfUsQ2RTmlY66tn4pdFrZ94hNg==
   dependencies:
     "@babel/runtime" "^7.22.5"
     "@restart/hooks" "^0.4.9"
