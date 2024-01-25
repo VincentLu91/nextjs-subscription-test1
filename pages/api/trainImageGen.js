@@ -1,11 +1,7 @@
 import axios from 'axios';
 export default async function handler(req, res) {
-  const {
-    instance_prompt,
-    class_prompt,
-    instance_data,
-    trainer_version
-  } = req.query;
+  const { instance_prompt, class_prompt, instance_data, trainer_version } =
+    req.query;
   try {
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
