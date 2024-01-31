@@ -2334,10 +2334,10 @@ clsx@^2.0.0:
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.0.0.tgz"
   integrity sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==
 
-cohere-ai@^7.7.3:
-  version "7.7.3"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.7.3.tgz"
-  integrity sha512-g6PF/sDusd/RJ+KgWPg+pMq8dO97Le3JcvgS+xV5j/Fr4By5psy/D87OdlHlfnhmQ/40gr2D7wgrOtb3Os/I4Q==
+cohere-ai@^7.7.4:
+  version "7.7.4"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.7.4.tgz"
+  integrity sha512-WSaHGG6y4QiubjM4rWt8Cl1+Ougo9tclnqTzLouFWPiA5CXnN4qlF4q1Rl4zo7ztJzdBSsCj5K7GtvVDko4TuQ==
   dependencies:
     form-data "4.0.0"
     js-base64 "3.7.2"
