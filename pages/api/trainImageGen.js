@@ -15,6 +15,7 @@ export default async function handler(req, res) {
           token_string: instance_prompt,
           caption_prefix: 'a photo of ' + instance_prompt,
           //class_prompt,
+          refine: 'base_image_refiner',
           input_images: instance_data
           //max_train_steps: 10 //2000
         }
