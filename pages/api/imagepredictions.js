@@ -8,7 +8,9 @@ export default async function handler(req, res) {
     {
       version,
       input: {
-        prompt
+        prompt,
+        negative_prompt:
+          '(fruits, deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4), (deformed, distorted, disfigured:1.3), poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, mutation, mutated, ugly, disgusting, amputation'
       }
     },
     {
