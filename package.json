@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.0.2",
     "@stripe/stripe-js": "^3.0.3",
-    "@supabase/supabase-js": "^2.39.6",
+    "@supabase/supabase-js": "^2.39.7",
     "@swc/helpers": "^0.5.6",
     "axios": "^1.6.7",
     "classnames": "^2.5.1",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "postcss": "^8.4.35",
     "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-preset-env": "^9.3.0",
+    "postcss-preset-env": "^9.4.0",
     "prettier": "^3.2.5"
   },
   "prettier": {
