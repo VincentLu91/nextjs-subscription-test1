@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
@@ -30,6 +30,10 @@ export default function ViewContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [caption, setCaption] = useState('');
+  const [captionObject, setCaptionObject] = useState(null);
+  const [captionStatus, setCaptionStatus] = useState(null);
+
+  const interval = useRef();
 
   useEffect(() => {
     if (!isLoadingUser && !user) router.replace('/signin');
@@ -71,7 +75,7 @@ export default function ViewContent() {
     saveAs(url, 'image');
   };
 
-  const generateCaptionsCohere = async (prompt) => {
+  /*const generateCaptionsCohere = async (prompt) => {
     if (prompt == null || prompt.trim() == '') {
       setCaption("You haven't entered anything!");
     } else {
@@ -84,7 +88,61 @@ export default function ViewContent() {
       console.log(rawCaption.data.text);
       setCaption(rawCaption.data.text.trim());
     }
+  };*/
+
+  const generateCaptionsReplicate = async (prompt, imageLink) => {
+    if (prompt == null || prompt.trim() == '' || !imageLink) {
+      setCaption("You haven't entered anything!");
+    } else {
+      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+      const rawCaption = await axios.post(
+        '/api/imageCaption?prompt=' + prompt + '&imageLink=' + imageLink
+      );
+      console.log('raw caption', rawCaption);
+      setCaptionObject(rawCaption);
+      setCaptionStatus(rawCaption.data.status); // should be "starting"
+      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
+      //console.log(rawCaption.data.text);
+      //setCaption(rawCaption.data.text.trim());
+    }
   };
+
+  const getCaptionResults = async (url) => {
+    const output = await axios.get('/api/imageresults?url=' + url);
+    if (output.data.status === 'succeeded') {
+      setCaptionStatus(output.data.status); // should be "succeeded"
+      const result = output.data.output;
+      if (result) {
+        console.log('caption result: ', result); // this prints array of words
+        const joinedCaption = result.join('');
+        const joinedCaptionWithoutQuotes = joinedCaption.slice(1, -1);
+        console.log(joinedCaptionWithoutQuotes);
+        setCaption(joinedCaptionWithoutQuotes);
+        setCaptionStatus(null);
+      } else {
+        alert('nothing generated');
+      }
+      /*setPredictions((state) => ({
+        ...state,
+        [attempt]: { ...state[attempt], status: 'succeeded' }
+      }));*/
+    }
+    //console.log('output data is: ', output);
+  };
+
+  useEffect(() => {
+    if (captionStatus) {
+      interval.current = setInterval(() => {
+        console.log(captionStatus);
+        getCaptionResults(captionObject.data.urls.get);
+      }, 3000);
+    }
+    // at every 2 seconds, an 'interval' is created via calling setInterval().
+    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
+    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
+    return () => clearInterval(interval.current);
+    // why is the useEffect running continuously, even though it's finished?
+  }, [captionStatus]);
 
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
@@ -123,7 +181,7 @@ export default function ViewContent() {
           <br></br>
           <Button
             variant="primary"
-            onClick={() => generateCaptionsCohere(prompt)}
+            onClick={() => generateCaptionsReplicate(prompt, imageLink)}
           >
             Generate Caption
           </Button>
