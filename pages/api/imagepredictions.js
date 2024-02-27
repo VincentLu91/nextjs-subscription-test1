@@ -1,6 +1,6 @@
 import axios from 'axios';
 export default async function handler(req, res) {
-  const { prompt, version } = req.query;
+  const { contentPrompt, imageStyle, version } = req.query;
   // first, make an api call to GENERATE a prediction (HTTP method is POST):
   const resp = await axios.post(
     // send prediction to dashboard but it takes time to generate image
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     {
       version,
       input: {
-        prompt,
+        prompt: contentPrompt + ' image style: ' + imageStyle,
         negative_prompt:
           '(fruits, deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4), (deformed, distorted, disfigured:1.3), poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, mutation, mutated, ugly, disgusting, amputation'
       }

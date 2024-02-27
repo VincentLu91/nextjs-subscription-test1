@@ -20,6 +20,7 @@ const ATTEMPTS = 2;
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
+  const [imageStyle, setImageStyle] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -49,12 +50,19 @@ export default function Dashboard() {
 
   const interval = useRef();
 
+  const imageStyles = [
+    { value: 'lifestyle', label: 'Lifestyle' },
+    { value: 'grayscale', label: 'Grayscale' }
+  ];
+
   const getImage = async (attempt, contentPrompt) => {
     console.log('version: ', modelVersion);
     setIsGeneratingImages(true);
     const resp = await axios.get(
-      '/api/imagepredictions?prompt=' +
+      '/api/imagepredictions?contentPrompt=' +
         contentPrompt +
+        '&imageStyle=' +
+        imageStyle +
         '&version=' +
         modelVersion
     );
@@ -142,6 +150,11 @@ export default function Dashboard() {
     console.log('Model name selected: ', e.label);
     setModelVersion(e.value);
     console.log('Model version selected: ', e.value);
+  };
+
+  const selectImageStyle = (e) => {
+    setImageStyle(e.label);
+    console.log('Image style selected: ', e.label);
   };
 
   const getInstancePrompts = async () => {
@@ -234,7 +247,11 @@ export default function Dashboard() {
                 onChange={handleSelectChange} // assign onChange function
               />
             )}
-
+            <Select
+              placeholder="Select image style"
+              options={imageStyles} // set list of the data
+              onChange={selectImageStyle} // assign onChange function
+            />
             <input
               type="text"
               id="contentPrompt"
@@ -248,8 +265,12 @@ export default function Dashboard() {
             {!isGeneratingImages && (
               <Button
                 onClick={async () => {
-                  if (contentPrompt == null || contentPrompt.trim() == '') {
-                    alert('Please enter a contentPrompt');
+                  if (
+                    contentPrompt == null ||
+                    contentPrompt.trim() == '' ||
+                    !imageStyle
+                  ) {
+                    alert('Please complete all fields');
                   } else {
                     clearInterval(interval.current);
                     setPredictions({});
