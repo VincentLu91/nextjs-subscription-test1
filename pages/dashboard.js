@@ -56,11 +56,27 @@ export default function Dashboard() {
   ];
 
   const getImage = async (attempt, contentPrompt) => {
+    let productIdentifier = '';
+    if (modelName) {
+      const classInstance = await supabase
+        .from('ai-models')
+        .select('class_prompt')
+        .eq('instance_prompt', modelName);
+      console.log('classInstance: ', classInstance.data[0].class_prompt);
+      productIdentifier =
+        'For context, the product is the ' +
+        modelName +
+        ' ' +
+        classInstance.data[0].class_prompt;
+    }
+
     console.log('version: ', modelVersion);
     setIsGeneratingImages(true);
     const resp = await axios.get(
       '/api/imagepredictions?contentPrompt=' +
         contentPrompt +
+        ' ' +
+        productIdentifier +
         '&imageStyle=' +
         imageStyle +
         '&version=' +
