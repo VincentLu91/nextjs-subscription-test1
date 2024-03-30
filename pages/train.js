@@ -112,9 +112,6 @@ export default function Train() {
   }
 
   async function uploadImages() {
-    // references:
-    // https://www.youtube.com/watch?v=b-9Hw03yzTs
-    // https://dev.to/jaydeepkhachariya/how-make-zip-of-images-and-download-it-using-react-js-in-3-easy-steps-lkb
     console.log('Images: ', uploadedImages);
     // Add Images to the zip file
     for (let i = 0; i < uploadedImages.length; i++) {
