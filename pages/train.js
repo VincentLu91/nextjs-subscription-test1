@@ -10,6 +10,8 @@ import styles from '../styles/Home.module.css';
 
 import { supabase } from '../utils/initSupabase';
 import { v4 as uuidv4 } from 'uuid';
+import Image from 'next/image';
+import JSZip from 'jszip';
 
 // https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/062f6e29-5681-46f1-a4c4-48e60a441e4d/71894cfe-50dc-46fd-a31d-429671fba93e
 
@@ -49,6 +51,111 @@ export default function Train() {
     setTrainingText
   } = useUser();
   const [instanceList, setInstanceList] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const zip = new JSZip(); // instance of JSZip
+
+  function selectFiles() {
+    fileInputRef.current.click();
+  }
+
+  function onFileSelect(event) {
+    const files = event.target.files;
+    if (files.length === 0) return;
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].type.split('/')[0] !== 'image') continue;
+      if (!uploadedImages.some((e) => e.name == files[i].name)) {
+        setUploadedImages((prevImages) => [
+          ...prevImages,
+          {
+            name: files[i].name,
+            url: URL.createObjectURL(files[i])
+          }
+        ]);
+      }
+    }
+  }
+
+  function deleteImage(index) {
+    setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  }
+
+  function onDragOver(event) {
+    event.preventDefault();
+    setIsDragging(true);
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  function onDragLeave(event) {
+    event.preventDefault();
+    setIsDragging(false);
+  }
+
+  function onDrop(event) {
+    event.preventDefault();
+    setIsDragging(false);
+    const files = event.dataTransfer.files;
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].type.split('/')[0] !== 'image') continue;
+      if (!uploadedImages.some((e) => e.name == files[i].name)) {
+        setUploadedImages((prevImages) => [
+          ...prevImages,
+          {
+            name: files[i].name,
+            url: URL.createObjectURL(files[i])
+          }
+        ]);
+      }
+    }
+  }
+
+  async function uploadImages() {
+    console.log('Images: ', uploadedImages);
+    // Add Images to the zip file
+    for (let i = 0; i < uploadedImages.length; i++) {
+      const response = await fetch(uploadedImages[i].url);
+      const blob = await response.blob();
+      console.log(blob);
+      zip.file(uploadedImages[i].name.split('/').pop(), blob);
+
+      if (i == uploadedImages.length - 1) {
+        // Generate the zip file
+        const zipData = await zip.generateAsync({
+          type: 'blob',
+          streamFiles: true
+        });
+        console.log(zipData);
+        // Create a download link for the zip file
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(zipData);
+        console.log('link.href is: ', link.href);
+        // this IS the actual zip file url ^^. Consider saving that as a state variable
+        // to upload to the supabase storage.
+        //link.download = 'snapcial-ai.zip';
+        //link.click();
+        // Upload the zip file to Supabase storage
+        if (zipFiles) {
+          deleteFile(zipFileName);
+          setIsUploaded(false);
+        }
+        const { data, error } = await supabase.storage
+          .from('images')
+          .upload(user.id + '/' + uuidv4() + '.zip', zipData, {
+            contentType: 'application/zip',
+            cacheControl: '3600' // optional cache control
+          });
+
+        if (data) {
+          setIsUploaded(true);
+          getFiles();
+        } else {
+          console.log(error);
+        }
+      }
+    }
+  }
 
   const interval = useRef();
   //{ current: undefined }
@@ -234,10 +341,7 @@ export default function Train() {
       // assign the model_version for training, so long as it exists, otherwise keep the initialized value
       /*if (prevModelInfo.data[0].model_version != null) {
         trainerVersion = prevModelInfo.data[0].model_version;
-      }*/ console.log(
-        'trainerVersion: ',
-        trainerVersion
-      ); // // I think dreambooth model version only allows versions from replicate dreambooth, not MY dreambooth
+      }*/ console.log('trainerVersion: ', trainerVersion); // // I think dreambooth model version only allows versions from replicate dreambooth, not MY dreambooth
       const trainingInfo = await supabase
         .from('ai-models')
         .insert({
@@ -389,6 +493,63 @@ export default function Train() {
                   onChange={(e) => uploadFile(e)}
                 />
               </Form.Group>
+              <div className={styles['image-card']}>
+                <div className={styles['image-top']}>
+                  <p>Drag & Drop image uploading</p>
+                </div>
+                <div
+                  className={styles['drag-area']}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                >
+                  {isDragging ? (
+                    <span className={styles['select']}>Drop files here</span>
+                  ) : (
+                    <>
+                      Drag & Drop image here or{' '}
+                      <span
+                        className={styles['select']}
+                        role="button"
+                        onClick={selectFiles}
+                      >
+                        Browse
+                      </span>
+                    </>
+                  )}
+
+                  <input
+                    name="file"
+                    type="file"
+                    className={styles['file']}
+                    multiple
+                    ref={fileInputRef}
+                    onChange={onFileSelect}
+                  ></input>
+                </div>
+                <div className={styles['image-container']}>
+                  {uploadedImages.map((images, index) => (
+                    <div className={styles['image']} key={index}>
+                      <span
+                        className={styles['delete']}
+                        onClick={() => deleteImage(index)}
+                      >
+                        &times;
+                      </span>
+                      <Image
+                        src={images.url}
+                        alt={images.name}
+                        width={300}
+                        height={200}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <button type="button" onClick={uploadImages}>
+                  Upload
+                </button>
+              </div>
               {/* 
               to get an image: CDNURL + user.id + "/" + image.name
               images: [image1, image2, image3]

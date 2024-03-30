@@ -96,8 +96,15 @@
   border-radius: 5px;
   padding: 0.75rem;
   font-size: 1.1rem;
-  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-    Bitstream Vera Sans Mono, Courier New, monospace;
+  font-family:
+    Menlo,
+    Monaco,
+    Lucida Console,
+    Liberation Mono,
+    DejaVu Sans Mono,
+    Bitstream Vera Sans Mono,
+    Courier New,
+    monospace;
 }
 
 .grid {
@@ -118,7 +125,9 @@
   text-decoration: none;
   border: 1px solid #eaeaea;
   border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .card:hover,
@@ -208,4 +217,105 @@
 /* for styling cards when displaying a grid of images */
 .box {
   margin: 20px;
+}
+
+.image-card {
+  padding: 10px;
+  box-shadow: 0 0 5px #ffdfdf;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.image-card .image-top {
+  text-align: center;
+}
+
+.image-card p {
+  font-weight: bold;
+  color: #0086fe;
+}
+
+.image-card button {
+  outline: 0;
+  border: 0;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 400;
+  padding: 8px 13px;
+  width: 100%;
+  background: #0086fe;
+}
+
+.image-card .drag-area {
+  height: 150px;
+  border-radius: 5px;
+  border: 2px dashed #0086fe;
+  color: #0086fe;
+  background: #f4f3f9;
+  display: flex;
+  justify-content: center;
+  align-items: none;
+  user-select: none;
+  -webkit-user-select: none;
+  margin-top: 10px;
+}
+
+.image-card .drag-area .visible {
+  font-size: 18px;
+}
+
+.image-card .select {
+  color: #5256ad;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+.image-card .select:hover {
+  opacity: 0.6;
+}
+
+.image-card .image-container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.image-card .image-container .image {
+  width: 75px;
+  margin-right: 5px;
+  height: 75px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.image-card .image-container .image img {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.image-card .image-container .image span {
+  position: absolute;
+  top: -2px;
+  right: 9px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.image-card input,
+.image-card .drag-area .on-drop,
+.image-card .drag-area.dragover .visible {
+  display: none;
+}
+
+.delete {
+  z-index: 999;
+  color: #0086fe;
 }
