@@ -48,7 +48,9 @@ export default function Train() {
     status,
     setStatus,
     trainingText,
-    setTrainingText
+    setTrainingText,
+    isImagesButtonClicked,
+    setIsImagesButtonClicked
   } = useUser();
   const [instanceList, setInstanceList] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -117,6 +119,7 @@ export default function Train() {
       alert('Please upload images');
       return;
     }
+    setIsImagesButtonClicked(true);
     // Add Images to the zip file
     for (let i = 0; i < uploadedImages.length; i++) {
       const response = await fetch(uploadedImages[i].url);
@@ -433,6 +436,7 @@ export default function Train() {
             setIsUploaded(false);
             console.log(trainingStatusResponse.data[0]);
           }
+          setIsImagesButtonClicked(false);
         }
         if ([null, 'canceled'].includes(trainingStatus.data.status)) {
           setIsTraining(false);
@@ -479,7 +483,9 @@ export default function Train() {
     // Cleanup function to reset status when trainingText is 'Training completed!'
     if (trainingText === 'Training completed!') {
       const timeoutId = setTimeout(() => {
-        setStatus(null); // Assuming setStatus is a function to update the status
+        setStatus(null);
+        setZipFileName(null); // Assuming setStatus is a function to update the status
+        setIsImagesButtonClicked(false);
       }, 3000); // 3 seconds delay
 
       // Clear the timeout if component unmounts or trainingText changes before the timeout
@@ -577,8 +583,20 @@ export default function Train() {
                   ))}
                 </div>
 
-                <button type="button" onClick={uploadImages}>
-                  Upload
+                {/* replace the HTML below */}
+                <button
+                  type="button"
+                  onClick={uploadImages}
+                  disabled={isImagesButtonClicked}
+                  style={{
+                    backgroundColor: isImagesButtonClicked ? 'gray' : 'blue'
+                  }}
+                >
+                  {isImagesButtonClicked
+                    ? zipFileName
+                      ? 'Go train'
+                      : 'Please wait'
+                    : 'Upload'}
                 </button>
               </div>
               {/* 
