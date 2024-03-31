@@ -113,6 +113,10 @@ export default function Train() {
 
   async function uploadImages() {
     console.log('Images: ', uploadedImages);
+    if (uploadedImages.length == 0) {
+      alert('Please upload images');
+      return;
+    }
     // Add Images to the zip file
     for (let i = 0; i < uploadedImages.length; i++) {
       const response = await fetch(uploadedImages[i].url);
@@ -133,8 +137,6 @@ export default function Train() {
         console.log('link.href is: ', link.href);
         // this IS the actual zip file url ^^. Consider saving that as a state variable
         // to upload to the supabase storage.
-        //link.download = 'snapcial-ai.zip';
-        //link.click();
         // Upload the zip file to Supabase storage
         if (zipFiles) {
           deleteFile(zipFileName);
@@ -329,6 +331,8 @@ export default function Train() {
       alert("You haven't entered anything!");
     } else if (classPrompt == null || classPrompt.trim() == '') {
       alert("You haven't entered anything!");
+    } else if (!zipFileName) {
+      alert("You haven't uploaded images yet or clicked the Upload button yet");
     } else {
       // check for the latest model version, if none, use default
       const prevModelInfo = await supabase
@@ -582,57 +586,37 @@ export default function Train() {
               images: [image1, image2, image3]
           */}
               <Row xs={1} md={3} className="g-4">
-                {zipFiles.map((file) => {
-                  return (
-                    <div className={styles['get-image-button']}>
-                      <Col>
-                        <Card>
-                          <Card.Img
-                            variant="top"
-                            src={CDNURL + user.id + '/' + file.name}
-                          />
-                          <Card.Body>
-                            <Button
-                              variant="danger"
-                              onClick={() => deleteFile(file.name)}
-                            >
-                              Delete File
-                            </Button>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                      <br></br>
-                      <input
-                        type="text"
-                        id="instancePrompt"
-                        name="instancePrompt"
-                        onChange={handleChangeInstancePrompt}
-                        value={instancePrompt || ''}
-                        //defaultValue={instancePrompt}
-                        placeholder="Enter name of product/brand to train"
-                        style={{ width: '420px' }}
-                      />
-                      <br></br>
-                      <input
-                        type="text"
-                        id="classPrompt"
-                        name="classPrompt"
-                        onChange={handleChangeClassPrompt}
-                        value={classPrompt || ''}
-                        //defaultValue={classPrompt}
-                        placeholder="Enter class of product/brand to train"
-                        style={{ width: '420px' }}
-                      />
-                      <br></br>
-                      {console.log('zipFileName: ', zipFileName)}
-                      <Button
-                        onClick={() => trainModel(instancePrompt, classPrompt)}
-                      >
-                        Train Model
-                      </Button>
-                    </div>
-                  );
-                })}
+                <div className={styles['get-image-button']}>
+                  <input
+                    type="text"
+                    id="instancePrompt"
+                    name="instancePrompt"
+                    onChange={handleChangeInstancePrompt}
+                    value={instancePrompt || ''}
+                    //defaultValue={instancePrompt}
+                    placeholder="Enter name of product/brand to train"
+                    style={{ width: '420px' }}
+                  />
+                  <br></br>
+                  <input
+                    type="text"
+                    id="classPrompt"
+                    name="classPrompt"
+                    onChange={handleChangeClassPrompt}
+                    value={classPrompt || ''}
+                    //defaultValue={classPrompt}
+                    placeholder="Enter class of product/brand to train"
+                    style={{ width: '420px' }}
+                  />
+                  <br></br>
+                  {console.log('zipFileName: ', zipFileName)}
+                  <Button
+                    onClick={() => trainModel(instancePrompt, classPrompt)}
+                  >
+                    Train Model
+                  </Button>
+                </div>
+                ); )
               </Row>
               <br></br>
             </div>
