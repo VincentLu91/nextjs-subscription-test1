@@ -424,11 +424,16 @@ export default function Train() {
             console.log(trainingStatusResponse.error);
           if (trainingStatusResponse.data) {
             setIsTraining(false);
+            setUploadedImages([]);
+            setZipFiles([]);
+            setIsUploaded(false);
             console.log(trainingStatusResponse.data[0]);
           }
         }
         if ([null, 'canceled'].includes(trainingStatus.data.status)) {
           setIsTraining(false);
+          setUploadedImages([]);
+          setZipFiles([]);
           //setTrainingText('Upload zip file and begin training.');
         }
         setStatus(trainingStatus.data.status);
@@ -457,6 +462,28 @@ export default function Train() {
   );
 
   useEffect(() => {
+    // Set initial text based on status
+    updateTrainingText();
+  }, []);
+
+  useEffect(() => {
+    // Update training text whenever status changes
+    updateTrainingText();
+  }, [status]);
+
+  useEffect(() => {
+    // Cleanup function to reset status when trainingText is 'Training completed!'
+    if (trainingText === 'Training completed!') {
+      const timeoutId = setTimeout(() => {
+        setStatus(null); // Assuming setStatus is a function to update the status
+      }, 3000); // 3 seconds delay
+
+      // Clear the timeout if component unmounts or trainingText changes before the timeout
+      return () => clearTimeout(timeoutId);
+    }
+  }, [trainingText]);
+
+  const updateTrainingText = () => {
     if (status === 'queued') {
       setTrainingText('Getting Ready...');
     } else if (status === 'processing') {
@@ -468,7 +495,7 @@ export default function Train() {
     } else {
       setTrainingText('Upload zip file and begin training.');
     }
-  }, [status]);
+  };
 
   function renderView() {
     if (subscription) {
@@ -485,14 +512,14 @@ export default function Train() {
           ) : (
             <div className={styles['white-text']}>
               <br></br>
-              <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+              {/* <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
                 <Form.Control
                   type="file"
                   //accept="image/png, image/jpeg"
                   accept="*"
                   onChange={(e) => uploadFile(e)}
                 />
-              </Form.Group>
+          </Form.Group>*/}
               <div className={styles['image-card']}>
                 <div className={styles['image-top']}>
                   <p>Drag & Drop image uploading</p>
