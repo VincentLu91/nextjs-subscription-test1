@@ -8,7 +8,7 @@ export default function ProductNameList() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const router = useRouter();
-  const { userLoaded, user, session, userDetails, subscription } = useUser();
+  const { isLoadingUser, user, session, userDetails, subscription } = useUser();
   const [instanceList, setInstanceList] = useState([]);
 
   const getInstancePrompts = async () => {
@@ -28,10 +28,49 @@ export default function ProductNameList() {
       }
     });
     console.log('instanceArr: ', instanceArr);
-    setInstanceList(instanceArr);
+    return instanceArr;
+    //setInstanceList(instanceArr);
   };
 
+  useEffect(() => {
+    const fetchAndStoreInstances = async () => {
+      try {
+        const storedInstances = localStorage.getItem('storedInstances');
+        if (storedInstances) {
+          setInstanceList(JSON.parse(storedInstances));
+        } else {
+          const productList = await getInstancePrompts();
+          console.log('productList: ', productList);
+          if (productList) {
+            setInstanceList(productList);
+            localStorage.setItem(
+              'storedInstances',
+              JSON.stringify(productList)
+            );
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching or storing products:', error);
+      }
+    };
+
+    // Fetch and store photos when the component mounts
+    fetchAndStoreInstances();
+  }, []);
+
   async function deleteInstance(instance) {
+    const storedInstances = localStorage.getItem('storedInstances');
+    const storedInstancesList = JSON.parse(storedInstances);
+    const index = storedInstancesList.indexOf(instance);
+    if (index > -1) {
+      // only splice array when item is found
+      storedInstancesList.splice(index, 1);
+      setInstanceList(storedInstancesList);
+      localStorage.setItem(
+        'storedInstances',
+        JSON.stringify(storedInstancesList)
+      );
+    }
     console.log('deleting instance: ', instance);
     console.log('instance delete.....');
     await supabase
@@ -39,16 +78,12 @@ export default function ProductNameList() {
       .delete()
       .eq('user_auth_id', user?.identities[0]?.id)
       .eq('instance_prompt', instance);
-    window.location.reload(true);
+    await getInstancePrompts();
   }
 
-  useEffect(
-    () => {
-      if (!user) router.replace('/signin');
-    },
-    [user],
-    []
-  );
+  useEffect(() => {
+    if (!isLoadingUser && !user) router.replace('/signin');
+  }, [user]);
 
   useEffect(() => {
     getInstancePrompts();
@@ -76,22 +111,28 @@ export default function ProductNameList() {
 
   return (
     <div className="App">
-      {subscription ? (
-        <div>
-          <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
-            List of Product Names
-          </h1>
-          <br></br>
-          {instanceList.map((instance) => (
-            <ul className="text-4xl text-white sm:text-center sm:text-2xl">
-              {instance} -
-              <button onClick={() => deleteInstance(instance)}>Delete</button>
-            </ul>
-          ))}
-        </div>
-      ) : (
-        <h1>You are not subscribed yet!</h1>
-      )}
+      <section className="bg-white mb-32">
+        {subscription ? (
+          <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+            <div className="sm:flex sm:flex-col sm:align-center">
+              <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+                List of Product Names
+              </h1>
+              <br></br>
+              {instanceList.map((instance) => (
+                <ul className="text-4xl text-black sm:text-center sm:text-2xl">
+                  {instance} -
+                  <button onClick={() => deleteInstance(instance)}>
+                    Delete
+                  </button>
+                </ul>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <h1 className="text-black">You are not subscribed yet!</h1>
+        )}
+      </section>
     </div>
   );
 }

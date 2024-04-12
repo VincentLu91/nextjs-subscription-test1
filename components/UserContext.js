@@ -45,6 +45,8 @@ export const UserContextProvider = (props) => {
   const [isGeneratingBGImages, setisGeneratingBGImages] = useState(false);
 
   const [isImagesButtonClicked, setIsImagesButtonClicked] = useState(false);
+  const [statusPercentage, setStatusPercentage] = useState(0);
+  const [generatedPhotos, setGeneratedPhotos] = useState([]);
 
   useEffect(async () => {
     const {
@@ -156,7 +158,11 @@ export const UserContextProvider = (props) => {
     isGeneratingImages,
     setIsGeneratingImages,
     isImagesButtonClicked,
-    setIsImagesButtonClicked
+    setIsImagesButtonClicked,
+    statusPercentage,
+    setStatusPercentage,
+    generatedPhotos,
+    setGeneratedPhotos
   };
   return <UserContext.Provider value={value} {...props} />;
 };

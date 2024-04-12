@@ -1,28 +1,27 @@
 import { useRouter } from 'next/router';
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
-import { Card, Form, Container, Row, Col } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import styles from '../styles/Home.module.css';
-
 import { supabase } from '../utils/initSupabase';
-import { v4 as uuidv4 } from 'uuid';
-import Image from 'next/image';
-import JSZip from 'jszip';
+import Select from 'react-select';
 
-// https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/062f6e29-5681-46f1-a4c4-48e60a441e4d/71894cfe-50dc-46fd-a31d-429671fba93e
-
-const CDNURL =
-  'https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/';
-
-// CDNURL + user.id + "/" + image.name
-
+const ATTEMPTS = 2;
+// the current code for this page is a workaround to account for switching model APIs to call
+// currently, there is no retraining of existing models. When the feature is available, revert back to the following:
+// https://github.com/VincentLu91/nextjs-subscription-test1/blob/31372c6dd2188fa96bb997c044088123f1d2b3e6/pages/dashboard.js
+// be mindful though, that if you go to other pages and coming back, the loading dots may disappear with
+// no images re-rendered. This is because the 'predictions' and 'setPredictions' were not included in
+// components/UserContext.js
 export default function Train() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
+  const [imageStyle, setImageStyle] = useState(null);
+  const [finishMessage, setFinishMessage] = useState('');
   const router = useRouter();
   const {
     userLoaded,
@@ -31,142 +30,125 @@ export default function Train() {
     userDetails,
     isLoadingUser,
     subscription,
-    zipFiles,
-    setZipFiles,
-    isUploaded,
-    setIsUploaded,
-    zipFileName,
-    setZipFileName,
-    instancePrompt,
-    setInstancePrompt,
-    classPrompt,
-    setClassPrompt,
-    trainingID,
-    setTrainingID,
-    isTraining,
-    setIsTraining,
-    status,
-    setStatus,
-    trainingText,
+    setImageLink,
+    imageList,
+    setImageList,
+    isLoading,
+    setIsLoading,
+    contentPrompt,
+    setcontentPrompt,
     setTrainingText,
-    isImagesButtonClicked,
-    setIsImagesButtonClicked
+    modelName,
+    setModelName,
+    modelVersion,
+    setModelVersion,
+    instanceList,
+    setInstanceList,
+    predictions,
+    setPredictions,
+    isGeneratingImages,
+    setIsGeneratingImages
   } = useUser();
-  const [instanceList, setInstanceList] = useState([]);
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef(null);
-
-  const zip = new JSZip(); // instance of JSZip
-
-  function selectFiles() {
-    fileInputRef.current.click();
-  }
-
-  function onFileSelect(event) {
-    const files = event.target.files;
-    if (files.length === 0) return;
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].type.split('/')[0] !== 'image') continue;
-      if (!uploadedImages.some((e) => e.name == files[i].name)) {
-        setUploadedImages((prevImages) => [
-          ...prevImages,
-          {
-            name: files[i].name,
-            url: URL.createObjectURL(files[i])
-          }
-        ]);
-      }
-    }
-  }
-
-  function deleteImage(index) {
-    setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
-  }
-
-  function onDragOver(event) {
-    event.preventDefault();
-    setIsDragging(true);
-    event.dataTransfer.dropEffect = 'copy';
-  }
-
-  function onDragLeave(event) {
-    event.preventDefault();
-    setIsDragging(false);
-  }
-
-  function onDrop(event) {
-    event.preventDefault();
-    setIsDragging(false);
-    const files = event.dataTransfer.files;
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].type.split('/')[0] !== 'image') continue;
-      if (!uploadedImages.some((e) => e.name == files[i].name)) {
-        setUploadedImages((prevImages) => [
-          ...prevImages,
-          {
-            name: files[i].name,
-            url: URL.createObjectURL(files[i])
-          }
-        ]);
-      }
-    }
-  }
-
-  async function uploadImages() {
-    console.log('Images: ', uploadedImages);
-    if (uploadedImages.length == 0) {
-      alert('Please upload images');
-      return;
-    }
-    setIsImagesButtonClicked(true);
-    // Add Images to the zip file
-    for (let i = 0; i < uploadedImages.length; i++) {
-      const response = await fetch(uploadedImages[i].url);
-      const blob = await response.blob();
-      console.log(blob);
-      zip.file(uploadedImages[i].name.split('/').pop(), blob);
-
-      if (i == uploadedImages.length - 1) {
-        // Generate the zip file
-        const zipData = await zip.generateAsync({
-          type: 'blob',
-          streamFiles: true
-        });
-        console.log(zipData);
-        // Create a download link for the zip file
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(zipData);
-        console.log('link.href is: ', link.href);
-        // this IS the actual zip file url ^^. Consider saving that as a state variable
-        // to upload to the supabase storage.
-        // Upload the zip file to Supabase storage
-        if (zipFiles) {
-          deleteFile(zipFileName);
-          setIsUploaded(false);
-        }
-        const { data, error } = await supabase.storage
-          .from('images')
-          .upload(user.id + '/' + uuidv4() + '.zip', zipData, {
-            contentType: 'application/zip',
-            cacheControl: '3600' // optional cache control
-          });
-
-        if (data) {
-          setIsUploaded(true);
-          getFiles();
-        } else {
-          console.log(error);
-        }
-      }
-    }
-  }
 
   const interval = useRef();
-  //{ current: undefined }
-  //{ current: "queued" }
-  //{ current: "processing" } etc...
-  // the difference between useRef and state variables is that changing values doesn't re-render components
+  // Access the query parameters to get the custom message
+  const message = router.query.message;
+
+  const imageStyles = [
+    { value: 'lifestyle', label: 'Lifestyle' },
+    { value: 'grayscale', label: 'Grayscale' }
+  ];
+
+  const getImage = async (attempt, contentPrompt) => {
+    let productIdentifier = '';
+    if (modelName) {
+      if (modelName != 'default') {
+        const classInstance = await supabase
+          .from('ai-models')
+          .select('class_prompt')
+          .eq('instance_prompt', modelName);
+        console.log('classInstance: ', classInstance.data[0].class_prompt);
+        productIdentifier =
+          'For context, the product is the ' +
+          modelName +
+          ' ' +
+          classInstance.data[0].class_prompt;
+      }
+    }
+
+    console.log('version: ', modelVersion);
+    setIsGeneratingImages(true);
+    const resp = await axios.get(
+      '/api/imagepredictions?contentPrompt=' +
+        contentPrompt +
+        ' ' +
+        productIdentifier +
+        '&imageStyle=' +
+        imageStyle +
+        '&version=' +
+        modelVersion
+    );
+    setPredictions((state) => ({ ...state, [attempt]: resp.data }));
+    console.log('Resp data is: ', resp.data);
+    return resp.data;
+  };
+
+  const getImageResults = async (attempt, url) => {
+    const output = await axios.get('/api/imageresults?url=' + url);
+    if (output.data.status === 'succeeded') {
+      await supabase.from('photos').insert({
+        customer_id: user.identities[0].id,
+        photo_url: output.data.output[0]
+      });
+      const result = output.data.output[0];
+      if (result) {
+        setImageList((current) => [
+          ...current,
+          { url: result, text: '' } // placeholder text is empty for optional caption generation
+        ]);
+      } else {
+        alert('nothing generated');
+      }
+      setPredictions((state) => ({
+        ...state,
+        [attempt]: { ...state[attempt], status: 'succeeded' }
+      }));
+      setcontentPrompt(null);
+    }
+    console.log('output data is: ', output);
+  };
+
+  useEffect(() => {
+    const list = Object.values(predictions);
+    if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
+      clearInterval(interval.current);
+      setIsLoading(false);
+      setIsGeneratingImages(false);
+      setFinishMessage(
+        'All images are generated and saved to gallery.\n' +
+          'Please go to the Gallery page to see all your generated images'
+      );
+    }
+  }, [predictions]);
+
+  useEffect(() => {
+    // [ [0, {get: 'sss.com' , cancel: 'ssswe.com', status: 'training'}],  ]
+    const predictionAry = Object.entries(predictions).filter(
+      ([attempt, item]) => item.status !== 'succeeded'
+    );
+
+    if (predictionAry.length > 0) {
+      interval.current = setInterval(() => {
+        predictionAry.forEach(([attempt, item]) => {
+          getImageResults(attempt, item.get);
+        });
+      }, 3000);
+    }
+    // at every 2 seconds, an 'interval' is created via calling setInterval().
+    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
+    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
+    return () => clearInterval(interval.current);
+  }, [predictions]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) router.replace('/signin');
@@ -183,118 +165,46 @@ export default function Train() {
     setLoading(false);
   };
 
-  const subscriptionName = subscription && subscription.prices.products.name;
-  const subscriptionPrice =
-    subscription &&
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: subscription.prices.currency,
-      minimumFractionDigits: 0
-    }).format(subscription.prices.unit_amount / 100);
-
-  async function getFiles() {
-    console.log('isUploaded: ', isUploaded);
-    const { data, error } = await supabase.storage
-      .from('images')
-      .list(user?.id + '/', {
-        limit: 1,
-        offset: 0,
-        //sortBy: { column: 'name', order: 'asc' }
-        sortBy: { column: 'updated_at', order: 'desc' }
-      }); // Cooper/
-    // data: [image1, image2, image3]
-    // image1: {name: "subscribeToCooperCodes.png"}
-
-    // to load image1: CDNURL.com/subscribeToCooperCodes.png -> hosted image
-
-    if (data != null) {
-      setZipFiles(data);
-      setZipFileName(data[0].name);
-      console.log('data: ', data);
-    } else {
-      alert('Error loading images');
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    if (user && isUploaded) {
-      getFiles();
-    }
-  }, [user, isUploaded]);
-
-  async function uploadFile(e) {
-    let file = e.target.files[0];
-    console.log('file: ', file);
-    if (file == undefined) {
-      return; // don't upload an empty file!
-    }
-
-    if (zipFiles) {
-      deleteFile(zipFileName);
-      setIsUploaded(false);
-    }
-
-    // userid: Cooper
-    // Cooper/
-    // Cooper/myNameOfImage.png
-    // Lindsay/myNameOfImage.png
-
-    const { data, error } = await supabase.storage
-      .from('images')
-      .upload(user.id + '/' + uuidv4() + '.zip', file); // add .zip extension otherwise training will err our
-
-    if (data) {
-      setIsUploaded(true);
-      getFiles();
-    } else {
-      console.log(error);
-    }
-  }
-
-  async function deleteFile(zipFileName) {
-    const { error } = await supabase.storage
-      .from('images')
-      .remove([user.id + '/' + zipFileName]);
-
-    if (error) {
-      alert(error);
-    } else {
-      //getFiles();
-      setIsUploaded(false);
-      setZipFiles([]);
-    }
-  }
-
-  const handleChangeInstancePrompt = (e) => {
-    setInstancePrompt(e.target.value);
-    console.log('instancePrompt: ', e.target.value);
+  // handle onChange event of the text input (no longer dropdown)
+  const handleChange = (e) => {
+    setcontentPrompt(e.target.value);
+    console.log('contentPrompt: ', e.target.value);
   };
 
-  const handleChangeClassPrompt = (e) => {
-    setClassPrompt(e.target.value);
-    console.log('classPrompt: ', e.target.value);
+  // handle onChange event of the dropdown
+  const handleSelectChange = (e) => {
+    setModelName(e.label);
+    console.log('Model name selected: ', e.label);
+    setModelVersion(e.value);
+    console.log('Model version selected: ', e.value);
+  };
+
+  const selectImageStyle = (e) => {
+    setImageStyle(e.label);
+    console.log('Image style selected: ', e.label);
   };
 
   const getInstancePrompts = async () => {
     if (!user?.identities[0]?.id) {
       return; // i.e., if user hasn't trained anything yet.
     }
-    let instanceArr = [];
+    let instanceArr = [
+      {
+        label: 'default',
+        value:
+          'd98c28497f972c7a6a90ee4f9052aab8ede8be5768a6ef42c6c7af5e42bd7608'
+      }
+    ];
     const instancePromptsInfo = await supabase
       .from('ai-models')
       .select('*')
       .eq('user_auth_id', user.identities[0].id);
-    /*setInstanceList(
-      instancePromptsInfo.data.map((i) => {
-        //console.log(i.instance_prompt);
-        i.instance_prompt;
-      })
-    );*/
     instancePromptsInfo.data.map((i) => {
       console.log(i.instance_prompt);
       //i.instance_prompt;
-      instanceArr.push(i.instance_prompt);
+      if (i.model_version != null) {
+        instanceArr.push({ label: i.instance_prompt, value: i.model_version });
+      }
     });
     console.log('instanceArr: ', instanceArr);
     setInstanceList(instanceArr);
@@ -304,356 +214,201 @@ export default function Train() {
     getInstancePrompts();
   }, []);
 
-  // next, implement deleting any models without model_versions i.e., user closes window while training
-  const deleteIncompleteModels = async () => {
-    console.log('delete incomplete model.....');
-    console.log('********user***********', user, isTraining);
-    await supabase
-      .from('ai-models')
-      .delete()
-      .eq('user_auth_id', user?.identities[0]?.id)
-      .is('model_version', null);
-  };
-
-  useEffect(() => {
-    if (!isTraining) {
-      deleteIncompleteModels();
-    }
-  }, [isTraining]);
-
-  const trainModel = async (instancePrompt, classPrompt) => {
-    if (instanceList.includes(instancePrompt)) {
-      alert('please select a distinct name');
-      return;
-    }
-    let trainerVersion =
-      //'cd3f925f7ab21afaef7d45224790eedbb837eeac40d22e8fefe015489ab644aa';
-      // https://replicate.com/stability-ai/sdxl/versions
-      '7ca7f0d3a51cd993449541539270971d38a24d9a0d42f073caf25190d41346d7';
-    if (instancePrompt == null || instancePrompt.trim() == '') {
-      alert("You haven't entered anything!");
-    } else if (classPrompt == null || classPrompt.trim() == '') {
-      alert("You haven't entered anything!");
-    } else if (!zipFileName) {
-      alert("You haven't uploaded images yet or clicked the Upload button yet");
-    } else {
-      // check for the latest model version, if none, use default
-      const prevModelInfo = await supabase
-        .from('ai-models')
-        .select('id, created_at, model_version, user_auth_id')
-        .eq('user_auth_id', user.identities[0].id)
-        .order('created_at', { ascending: false })
-        .limit(1);
-      console.log('prevModelInfo: ', prevModelInfo.data);
-      // assign the model_version for training, so long as it exists, otherwise keep the initialized value
-      /*if (prevModelInfo.data[0].model_version != null) {
-        trainerVersion = prevModelInfo.data[0].model_version;
-      }*/ console.log('trainerVersion: ', trainerVersion); // // I think dreambooth model version only allows versions from replicate dreambooth, not MY dreambooth
-      const trainingInfo = await supabase
-        .from('ai-models')
-        .insert({
-          instance_prompt: instancePrompt,
-          class_prompt: classPrompt,
-          user_auth_id: user.identities[0].id, // this references the authentication data, NOT `users` table
-          instance_data: CDNURL + user.identities[0].id + '/' + zipFileName
-        })
-        .select();
-      if (trainingInfo.error) {
-        alert('cannot train!');
-        console.log('training error: ', trainingInfo.error);
-      } else {
-        console.log('training data: ', trainingInfo.data);
-        // start making the call to Replicate API to train the model to save model_version
-        const resp = axios
-          .get(
-            '/api/trainImageGen?instance_prompt=' +
-              instancePrompt +
-              '&class_prompt=a%20photo%20of%20a%20' +
-              classPrompt +
-              '&instance_data=' +
-              CDNURL +
-              user.identities[0].id +
-              '/' +
-              zipFileName +
-              '&trainer_version=' +
-              trainerVersion
-          )
-          .then((resp) => {
-            console.log('resp training: ', resp);
-            console.log('resp.data.id: ', resp.data.id);
-            console.log('resp.data.status: ', resp.data.status);
-            setTrainingID(resp.data.id);
-            setStatus(resp.data.status);
-          })
-          .finally(() => {
-            setIsTraining(true);
-            setTrainingText('Getting Ready...');
-          });
-      }
-    }
-  };
-
-  async function getTrainingStatus() {
-    if (trainingID) {
-      const trainingStatus = await axios.get(
-        '/api/trainImageStatus?training_id=' + trainingID
-      );
-      if (trainingStatus) {
-        //console.log('trainingStatus: ', trainingStatus.data.status);
-        if (trainingStatus.data.status === 'succeeded') {
-          clearInterval(interval.current);
-
-          //setTrainingText('Training completed!');
-          // update the record with the model_version
-          console.log('success');
-          // version is something like
-          // vincentlu91/sdxl-tuning:eb6a135512a977d328ecfd5e615afc509ebc605816154a6c8a0b0be39cf2e0cc
-          const inputString = trainingStatus.data.output.version;
-          const delimiter = ':';
-          const parts = inputString.split(delimiter);
-          const result = '';
-          if (parts.length > 1) {
-            //result = parts[1];
-            console.log(parts[1]); // Output: eb6a135512a977d328ecfd5e615afc509ebc605816154a6c8a0b0be39cf2e0cc
-          } else {
-            console.log('Delimiter not found in the string.');
-          }
-          // now store the version number
-          const trainingStatusResponse = await supabase
-            .from('ai-models')
-            .update({ model_version: parts[1] })
-            .eq(
-              'instance_data',
-              CDNURL + user.identities[0].id + '/' + zipFileName
-            )
-            .select();
-          if (trainingStatusResponse.error)
-            console.log(trainingStatusResponse.error);
-          if (trainingStatusResponse.data) {
-            setIsTraining(false);
-            setUploadedImages([]);
-            setZipFiles([]);
-            setIsUploaded(false);
-            console.log(trainingStatusResponse.data[0]);
-          }
-          setIsImagesButtonClicked(false);
-        }
-        if ([null, 'canceled'].includes(trainingStatus.data.status)) {
-          setIsTraining(false);
-          setUploadedImages([]);
-          setZipFiles([]);
-          //setTrainingText('Upload zip file and begin training.');
-        }
-        setStatus(trainingStatus.data.status);
-      }
-    }
-  }
-
-  useEffect(() => {
-    // if !(status == null || status == 'canceled' || status == 'succeeded')
-    if (![null, 'canceled', 'succeeded'].includes(status)) {
-      interval.current = setInterval(() => {
-        console.log('status: ', status);
-        getTrainingStatus();
-      }, 2000);
-    }
-    // at every 2 seconds, an 'interval' is created via calling setInterval().
-    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
-    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
-    return () => clearInterval(interval.current);
-  }, [status]);
-
-  const loadingWhileTraining = isTraining && (
-    <div className={styles['white-text']}>
-      <LoadingDots />
+  const loadingWithContentPrompt = isLoading && (
+    <div className={styles['black-text']}>
+      Description of image: {contentPrompt}
+      <p>
+        Loading
+        <LoadingDots />
+      </p>
+      <p>Please do not refresh or you will lose all progress!</p>
     </div>
   );
 
-  useEffect(() => {
-    // Set initial text based on status
-    updateTrainingText();
-  }, []);
-
-  useEffect(() => {
-    // Update training text whenever status changes
-    updateTrainingText();
-  }, [status]);
-
-  useEffect(() => {
-    // Cleanup function to reset status when trainingText is 'Training completed!'
-    if (trainingText === 'Training completed!') {
-      const timeoutId = setTimeout(() => {
-        setStatus(null);
-        setZipFileName(null); // Assuming setStatus is a function to update the status
-        setIsImagesButtonClicked(false);
-      }, 3000); // 3 seconds delay
-
-      // Clear the timeout if component unmounts or trainingText changes before the timeout
-      return () => clearTimeout(timeoutId);
-    }
-  }, [trainingText]);
-
-  const updateTrainingText = () => {
-    if (status === 'queued') {
-      setTrainingText('Getting Ready...');
-    } else if (status === 'processing') {
-      setTrainingText('Training Now...');
-    } else if (status === 'pushing') {
-      setTrainingText('Finalizing...');
-    } else if (status === 'succeeded') {
-      setTrainingText('Training completed!');
-    } else {
-      setTrainingText('Upload zip file and begin training.');
-    }
+  const viewGeneratedContent = (url) => {
+    setImageLink(url);
+    localStorage.setItem('imageLink', url); // Save imageLink to localStorage
+    router.push('/view-content');
   };
 
-  function renderView() {
+  const renderCard = (image, index) => {
+    return (
+      <Card
+        style={{ width: '10rem' }} // the smaller the width, the more columns of images displayed
+        key={index}
+        className={`hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md ${styles.box}`}
+        onClick={() => viewGeneratedContent(image.url)}
+      >
+        <Card.Img variant="top" src={image.url} />
+      </Card>
+    );
+  };
+
+  const subscriptionName = subscription && subscription.prices.products.name;
+  const subscriptionPrice =
+    subscription &&
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: subscription.prices.currency,
+      minimumFractionDigits: 0
+    }).format(subscription.prices.unit_amount / 100);
+
+  function subscribedAndModelChosen() {
     if (subscription) {
-      return (
-        <div>
-          <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
-            Training page
-          </h1>
-          <br></br>
-          <br></br>
-          {trainingText}
-          {isTraining ? (
-            <h1>{loadingWhileTraining}</h1>
-          ) : (
-            <div className={styles['white-text']}>
-              <br></br>
-              {/* <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-                <Form.Control
-                  type="file"
-                  //accept="image/png, image/jpeg"
-                  accept="*"
-                  onChange={(e) => uploadFile(e)}
+      if (modelVersion) {
+        return (
+          <div className={styles['get-image-button']}>
+            <br />
+            {isGeneratingImages ? (
+              <p style={{ color: 'var(--accent-1)' }}>
+                Product to generate: {modelName}
+              </p>
+            ) : (
+              <div className="flex flex-row center-items p-2">
+                <Select
+                  placeholder="Select Option"
+                  value={instanceList.find((obj) => obj.value === modelName)} // set selected value
+                  options={instanceList} // set list of the data
+                  onChange={handleSelectChange} // assign onChange function
+                  className="mr-4" // Add right margin for spacing
                 />
-          </Form.Group>*/}
-              <div className={styles['image-card']}>
-                <div className={styles['image-top']}>
-                  <p>Drag & Drop image uploading</p>
-                </div>
-                <div
-                  className={styles['drag-area']}
-                  onDragOver={onDragOver}
-                  onDragLeave={onDragLeave}
-                  onDrop={onDrop}
-                >
-                  {isDragging ? (
-                    <span className={styles['select']}>Drop files here</span>
-                  ) : (
-                    <>
-                      Drag & Drop image here or{' '}
-                      <span
-                        className={styles['select']}
-                        role="button"
-                        onClick={selectFiles}
-                      >
-                        Browse
-                      </span>
-                    </>
-                  )}
+                <Select
+                  placeholder="Select image style"
+                  options={imageStyles} // set list of the data
+                  onChange={selectImageStyle} // assign onChange function
+                />
+              </div>
+            )}
+            <br />
 
-                  <input
-                    name="file"
-                    type="file"
-                    className={styles['file']}
-                    multiple
-                    ref={fileInputRef}
-                    onChange={onFileSelect}
-                  ></input>
-                </div>
-                <div className={styles['image-container']}>
-                  {uploadedImages.map((images, index) => (
-                    <div className={styles['image']} key={index}>
-                      <span
-                        className={styles['delete']}
-                        onClick={() => deleteImage(index)}
-                      >
-                        &times;
-                      </span>
-                      <Image
-                        src={images.url}
-                        alt={images.name}
-                        width={300}
-                        height={200}
-                      />
-                    </div>
-                  ))}
-                </div>
+            <br />
+            {!isGeneratingImages && (
+              <div className="flex flex-col items-center p-2">
+                <input
+                  type="text"
+                  id="contentPrompt"
+                  name="contentPrompt"
+                  onChange={handleChange}
+                  value={contentPrompt || ''}
+                  placeholder="Enter text to generate image of your product/brand"
+                  style={{ width: '420px' }}
+                  className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+                />
+                <br></br>
 
-                {/* replace the HTML below */}
-                <button
-                  type="button"
-                  onClick={uploadImages}
-                  disabled={isImagesButtonClicked}
-                  style={{
-                    backgroundColor: isImagesButtonClicked ? 'gray' : 'blue'
+                <Button
+                  onClick={async () => {
+                    if (
+                      contentPrompt == null ||
+                      contentPrompt.trim() == '' ||
+                      !imageStyle
+                    ) {
+                      alert('Please complete all fields');
+                    } else {
+                      clearInterval(interval.current);
+                      setPredictions({});
+                      setImageList([]); // when generation begins, list of images is empty
+                      setIsLoading(true);
+                      setFinishMessage('');
+                      for (let i = 0; i < ATTEMPTS; i++) {
+                        // 2 is a placeholder, later I plan to generate 16 images
+                        getImage(i, contentPrompt);
+                      }
+                    }
                   }}
                 >
-                  {isImagesButtonClicked
-                    ? zipFileName
-                      ? 'Go train'
-                      : 'Please wait'
-                    : 'Upload'}
-                </button>
+                  Generate Image
+                </Button>
               </div>
-              {/* 
-              to get an image: CDNURL + user.id + "/" + image.name
-              images: [image1, image2, image3]
-          */}
-              <Row xs={1} md={3} className="g-4">
-                <div className={styles['get-image-button']}>
-                  <input
-                    type="text"
-                    id="instancePrompt"
-                    name="instancePrompt"
-                    onChange={handleChangeInstancePrompt}
-                    value={instancePrompt || ''}
-                    //defaultValue={instancePrompt}
-                    placeholder="Enter name of product/brand to train"
-                    style={{ width: '420px' }}
-                  />
-                  <br></br>
-                  <input
-                    type="text"
-                    id="classPrompt"
-                    name="classPrompt"
-                    onChange={handleChangeClassPrompt}
-                    value={classPrompt || ''}
-                    //defaultValue={classPrompt}
-                    placeholder="Enter class of product/brand to train"
-                    style={{ width: '420px' }}
-                  />
-                  <br></br>
-                  {console.log('zipFileName: ', zipFileName)}
-                  <Button
-                    onClick={() => trainModel(instancePrompt, classPrompt)}
-                  >
-                    Train Model
-                  </Button>
-                </div>
-                ); )
-              </Row>
-              <br></br>
+            )}
+            <br></br>
+            {loadingWithContentPrompt}
+            {finishMessage}
+            <div className={styles['grid']}>{imageList.map(renderCard)}</div>
+          </div>
+        );
+      } else {
+        //
+        return (
+          <div className={styles['get-image-button']}>
+            <br />
+            <div className="flex flex-row center-items p-2">
+              <Select
+                placeholder="Select Option"
+                value={instanceList.find((obj) => obj.value === modelName)} // set selected value
+                options={instanceList} // set list of the data
+                onChange={handleSelectChange} // assign onChange function
+                className="mr-4" // Add right margin for spacing
+              />
+              <Select
+                placeholder="Select image style"
+                options={imageStyles} // set list of the data
+                onChange={selectImageStyle} // assign onChange function
+              />
             </div>
-          )}
-        </div>
-      );
+            <br />
+            <input
+              type="text"
+              id="contentPrompt"
+              name="contentPrompt"
+              onChange={handleChange}
+              value={contentPrompt || ''}
+              placeholder="Enter text to generate image of your product/brand"
+              style={{ width: '420px' }}
+              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+            />
+            <br />
+            <Button
+              onClick={async () => {
+                if (
+                  contentPrompt == null ||
+                  contentPrompt.trim() == '' ||
+                  !imageStyle
+                ) {
+                  alert('Please complete all fields');
+                } else {
+                  clearInterval(interval.current);
+                  setPredictions({});
+                  setImageList([]); // when generation begins, list of images is empty
+                  setIsLoading(true);
+                  for (let i = 0; i < ATTEMPTS; i++) {
+                    // 2 is a placeholder, later I plan to generate 16 images
+                    getImage(i, contentPrompt);
+                  }
+                }
+              }}
+            >
+              Generate Image
+            </Button>
+          </div>
+        );
+      }
     } else {
-      return (
-        <div>
-          <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
-            Training page
-          </h1>
-          <br></br>
-          <br></br>
-          <h1>You are not subscribed yet!</h1>
-        </div>
-      );
+      return <h1 className="text-black">You are not subscribed yet!</h1>;
     }
   }
 
-  return <div className="App">{renderView()}</div>;
+  return (
+    <section className="bg-white mb-32">
+      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
+        <div className="sm:flex sm:flex-col sm:align-center">
+          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+            Go Ahead...Generate Images
+          </h1>
+          <br />
+          <p className="text-black sm:text-center">
+            Here, you will select product and style to generate.
+          </p>
+          {/* Display the custom message */}
+          <p className="text-black sm:text-center">{message}</p>
+          <br></br>
+          <p className="text-black sm:text-center">
+            Each time you generate, it will create {ATTEMPTS} images and they
+            will be saved to the gallery
+          </p>
+          {subscribedAndModelChosen()}
+        </div>
+      </div>
+    </section>
+  );
 }

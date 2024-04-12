@@ -9,6 +9,7 @@ import axios from 'axios';
 import { Card } from 'react-bootstrap';
 import Select from 'react-select';
 import styles from '../styles/Home.module.css';
+import Input from '../components/ui/Input';
 
 // import trainML's config code
 import contentTypes from './api/contentTypes';
@@ -25,7 +26,8 @@ export default function ViewContent() {
     userDetails,
     isLoadingUser,
     subscription,
-    imageLink
+    imageLink,
+    setImageLink
   } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
@@ -38,6 +40,13 @@ export default function ViewContent() {
   useEffect(() => {
     if (!isLoadingUser && !user) router.replace('/signin');
   }, [user]);
+
+  useEffect(() => {
+    const storedImageLink = localStorage.getItem('imageLink');
+    if (storedImageLink) {
+      setImageLink(storedImageLink);
+    }
+  }, []); // Retrieve imageLink from localStorage on component mount
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);
@@ -65,6 +74,7 @@ export default function ViewContent() {
     //<img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
     <div className={styles['display-image']}>
       <img alt="uploaded" src={imageLink} />
+      <br />
       <Button variant="primary" onClick={() => download(imageLink)}>
         Download Content
       </Button>
@@ -96,7 +106,11 @@ export default function ViewContent() {
     } else {
       //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
       const rawCaption = await axios.post(
-        '/api/imageCaption?prompt=' + prompt + '&imageLink=' + imageLink
+        '/api/imageCaption?prompt=' +
+          prompt +
+          'in the style of a social media caption' +
+          '&imageLink=' +
+          imageLink
       );
       console.log('raw caption', rawCaption);
       setCaptionObject(rawCaption);
@@ -154,52 +168,58 @@ export default function ViewContent() {
     }).format(subscription.prices.unit_amount / 100);
 
   return (
-    <div className="App">
-      <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
-        View Content and Generate Captions
-      </h1>
-      <br></br>
-      {subscription ? ( // goal of this is to restrict content to subscribers.
-        <div className={styles['display-image']}>
-          {isLoading && <LoadingDots />}
-          {displayContent || (
-            <p className={styles['white-text']}>
-              You do not have image! Go back to Dashboard and select an image
-              first!
-            </p>
+    <section className="bg-white mb-32">
+      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
+        <div className="sm:flex sm:flex-col sm:align-center">
+          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+            View Content and Generate Captions
+          </h1>
+          <br></br>
+          {subscription ? ( // goal of this is to restrict content to subscribers.
+            <div className={styles['display-image']}>
+              {isLoading && <LoadingDots />}
+              {displayContent || (
+                <p className="text-black">
+                  You do not have image! Go back to Dashboard and select an
+                  image first!
+                </p>
+              )}
+              <br></br>
+              <input
+                type="text"
+                id="prompt"
+                name="prompt"
+                onChange={handleChange}
+                value={prompt}
+                placeholder="Describe caption you want generated"
+                style={{ width: '600px' }}
+                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+              />
+              <br></br>
+              <Button
+                variant="primary"
+                onClick={() => generateCaptionsReplicate(prompt, imageLink)}
+              >
+                Generate Caption
+              </Button>
+              <br></br>
+              <textarea
+                type="text"
+                id="caption"
+                name="caption"
+                onChange={handleChangeCaption}
+                value={caption}
+                cols="80"
+                rows="15"
+                placeholder="Caption generating or you could type it yourself..."
+                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+              />
+            </div>
+          ) : (
+            <h1 className="text-black">You are not subscribed yet!</h1>
           )}
-          <br></br>
-          <input
-            type="text"
-            id="prompt"
-            name="prompt"
-            onChange={handleChange}
-            value={prompt}
-            placeholder="Describe caption you want generated"
-            style={{ width: '600px' }}
-          />
-          <br></br>
-          <Button
-            variant="primary"
-            onClick={() => generateCaptionsReplicate(prompt, imageLink)}
-          >
-            Generate Caption
-          </Button>
-          <br></br>
-          <textarea
-            type="text"
-            id="caption"
-            name="caption"
-            onChange={handleChangeCaption}
-            value={caption}
-            cols="80"
-            rows="15"
-            placeholder="Caption generating or you could type it yourself..."
-          />
         </div>
-      ) : (
-        <h1>You are not subscribed yet!</h1>
-      )}
-    </div>
+      </div>
+    </section>
   );
 }

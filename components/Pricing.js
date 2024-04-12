@@ -22,15 +22,19 @@ export default function Pricing({ products }) {
       router.push('/account');
       return;
     }
-    const { sessionId, url, error: apiError } = await postData({
+    const {
+      sessionId,
+      url,
+      error: apiError
+    } = await postData({
       url: '/api/createCheckoutSession',
       data: { price },
       token: session.access_token
     });
     if (apiError) return alert(apiError.message);
     const stripe = await getStripe();
-    console.log(sessionId, url)
-    window.location.href = url
+    console.log(sessionId, url);
+    window.location.href = url;
     //const { error: stripeError } = stripe.redirectToCheckout({ sessionId });
     //if (stripeError) alert(error.message);
     //setLoading(false);
@@ -58,13 +62,13 @@ export default function Pricing({ products }) {
     );
 
   return (
-    <section className="bg-blue">
+    <section className="bg-white">
       <div className="max-w-6xl mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
+          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
             Choose a Plan.
           </h1>
-          <p className="mt-5 text-xl text-accents-6 sm:text-center sm:text-2xl max-w-2xl m-auto">
+          <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
             You could start generating quality images for 14 days.
           </p>
           <div className="relative self-center mt-6 bg-primary-2 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
@@ -75,7 +79,7 @@ export default function Pricing({ products }) {
                 billingInterval === 'month'
                   ? 'relative w-1/2 bg-accents-1 border-accents-0 shadow-sm text-white'
                   : 'ml-0.5 relative w-1/2 border border-transparent text-accents-4'
-              } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
             >
               Monthly billing
             </button>
@@ -86,7 +90,7 @@ export default function Pricing({ products }) {
                 billingInterval === 'year'
                   ? 'relative w-1/2 bg-accents-1 border-accents-0 shadow-sm text-white'
                   : 'ml-0.5 relative w-1/2 border border-transparent text-accents-4'
-              } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
             >
               Yearly billing
             </button>
@@ -133,7 +137,7 @@ export default function Pricing({ products }) {
                     disabled={session && !userLoaded}
                     loading={loading}
                     onClick={() => handleCheckout(price.id)}
-                    className="mt-8 block w-full rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-gray-900"
+                    className="mt-8 block w-full rounded-lg py-2 text-sm font-semibold text-white text-center hover:bg-gray-900"
                   >
                     {product.name === subscription?.prices?.products.name
                       ? 'Manage'

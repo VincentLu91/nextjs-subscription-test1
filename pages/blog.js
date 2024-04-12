@@ -33,7 +33,7 @@ export default function Home({ posts }) {
   return (
     <div>
       <Toolbar />
-      <div className={styles.main}>
+      <div className={`${styles.main} ${styles.secondaryTextColor}`}>
         <h1>Welcome To My Blog</h1>
 
         <h3>Recent Posts:</h3>

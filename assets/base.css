@@ -1,7 +1,7 @@
 :root {
-  --primary: #012345; /*colour of navbar and pricing plan grid, default #000000*/
-  --primary-2: #113; /*colour of footer, defaut: #111*/
-  --secondary: #ffffff;
+  --primary: #ffffff; /*colour of navbar and pricing plan grid, default #000000*/
+  --primary-2: #383454; /*colour of footer, defaut: #111*/
+  --secondary: #943bdc;
   --secondary-2: #f1f3f5;
   --hover: rgba(255, 255, 255, 0.075);
   --hover-1: rgba(255, 255, 255, 0.15);
@@ -9,10 +9,10 @@
   --selection: var(--purple);
 
   --text-base: white;
-  --text-primary: white;
+  --text-primary: #943bdc;
   --text-secondary: black;
 
-  --accents-0: #212529;
+  --accents-0: #ffffff;
   --accents-1: #343a40;
   --accents-2: #495057;
   --accents-3: #868e96;
@@ -43,14 +43,17 @@
 }
 
 *:focus {
-  @apply outline-none ring-2 ring-pink ring-opacity-50;
+  @apply outline-none ring-2 ring-blue ring-opacity-50;
 }
 
 html {
   height: 100%;
   box-sizing: border-box;
   touch-action: manipulation;
-  font-feature-settings: 'case' 1, 'rlig' 1, 'calt' 0;
+  font-feature-settings:
+    'case' 1,
+    'rlig' 1,
+    'calt' 0;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

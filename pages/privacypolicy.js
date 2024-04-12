@@ -1,6 +1,6 @@
 const privacypolicy = () => {
   return (
-    <div>
+    <div style={{ color: 'black' }}>
       <h1>Privacy Policy</h1>
       <p>Last updated: January 25, 2021</p>
       <p>

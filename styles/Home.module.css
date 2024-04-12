@@ -191,7 +191,7 @@
 }
 
 .get-image-button {
-  min-height: 100vh;
+  /*min-height: 100vh;*/
   padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
@@ -224,6 +224,8 @@
   box-shadow: 0 0 5px #ffdfdf;
   border-radius: 5px;
   overflow: hidden;
+  max-width: 50%; /* Adjust as needed */
+  margin: auto; /* Horizontally center the div */
 }
 
 .image-card .image-top {
@@ -318,4 +320,12 @@
 .delete {
   z-index: 999;
   color: #0086fe;
+}
+
+.baseTextColor {
+  color: var(--text-base); /* Use your base text color variable here */
+}
+
+.secondaryTextColor {
+  color: var(--text-secondary);
 }

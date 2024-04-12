@@ -17,9 +17,7 @@ const Navbar = () => {
         <div className="flex justify-between align-center flex-row py-4 md:py-6 relative">
           <div className="flex flex-1 items-center">
             <Link href="/" className={s.logo} aria-label="Logo">
-
               <Logo />
-
             </Link>
             <nav className="space-x-2 ml-6 hidden lg:block">
               <Link href="/pricing" className={s.link}>
@@ -37,39 +35,47 @@ const Navbar = () => {
                 <Link
                   href="/dashboard"
                   //onClick={() => router.push('/dashboard')}
-                  className={s.link}>
-                  
-                    Dashboard
-                  
+                  className={s.link}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/productnamelist"
+                  //onClick={() => router.push('/dashboard')}
+                  className={s.link}
+                >
+                  Your Products
                 </Link>
                 <Link
                   href="/dashboard2"
                   //onClick={() => router.push('/dashboard2')}
-                  className={s.link}>
-                  
-                    Dashboard2
-                  
+                  className={s.link}
+                >
+                  Dashboard2
                 </Link>
                 <Link
                   href="/train"
                   //onClick={() => router.push('/train')}
-                  className={s.link}>
-                  
-                    Train
-                  
+                  className={s.link}
+                >
+                  Train
                 </Link>
                 <Link
                   href="/view-content"
                   //onClick={() => router.push('/view-content')}
-                  className={s.link}>
-                  
-                    View Content
-                  
+                  className={s.link}
+                >
+                  View Content
+                </Link>
+                <Link
+                  href="/gallery"
+                  //onClick={() => router.push('/view-content')}
+                  className={s.link}
+                >
+                  Gallery
                 </Link>
                 <Link href="#" className={s.link} onClick={() => signOut()}>
-                  
-                    Sign out
-                  
+                  Sign out
                 </Link>
               </>
             ) : (

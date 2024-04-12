@@ -46,7 +46,8 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (user) { // originally account route
+    if (user) {
+      // originally account route
       router.replace('/dashboard');
     }
   }, [user]);
@@ -111,7 +112,7 @@ const SignIn = () => {
                 variant="slim"
                 type="submit"
                 loading={loading}
-                disabled={!password.length}
+                //disabled={!password.length}
               >
                 Sign in
               </Button>
@@ -135,19 +136,18 @@ const SignIn = () => {
           </span>
 
           <span className="pt-1 text-center text-sm">
-            <span className="text-accents-7">Don't have an account?</span>
+            <span className="text-secondary">Don't have an account?</span>
             {` `}
             <Link
               href="/signup"
-              className="text-accent-9 font-bold hover:underline cursor-pointer">
-              
-                Sign up.
-              
+              className="text-accent-9 font-bold hover:underline cursor-pointer"
+            >
+              Sign up.
             </Link>
           </span>
         </div>
 
-        <div className="flex items-center my-6">
+        {/*<div className="flex items-center my-6">
           <div
             className="border-t border-accents-2 flex-grow mr-3"
             aria-hidden="true"
@@ -167,7 +167,7 @@ const SignIn = () => {
         >
           <GitHub />
           <span className="ml-2">Continue with GitHub</span>
-        </Button>
+            </Button>*/}
       </div>
     );
 

@@ -19,7 +19,7 @@ export const Post = ({ title, body, image }) => {
 
   const url = image[0]?.url;
   return (
-    <div>
+    <div style={{ color: 'var(--text-secondary)' }}>
       <Toolbar />
       <div className={styles.unset_img}>
         <h1>{title}</h1>

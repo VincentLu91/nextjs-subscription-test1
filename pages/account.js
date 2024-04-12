@@ -8,13 +8,13 @@ import Button from '../components/ui/Button';
 
 function Card({ title, description, footer, children }) {
   return (
-    <div className="border border-accents-1	max-w-3xl w-full p rounded-md m-auto my-8">
+    <div className="border border-accents-1	max-w-3xl w-full p rounded-lg m-auto my-8">
       <div className="px-5 py-4">
         <h3 className="text-2xl mb-1 font-medium">{title}</h3>
-        <p className="text-accents-5">{description}</p>
+        <p className="text-black">{description}</p>
         {children}
       </div>
-      <div className="border-t border-accents-1 bg-primary-2 p-4 text-accents-3 rounded-b-md">
+      <div className="border-t border-accents-1 bg-primary-2 p-4 text-accents-3 rounded-b-lg">
         {footer}
       </div>
     </div>
@@ -50,13 +50,13 @@ export default function Account() {
     }).format(subscription.prices.unit_amount / 100);
 
   return (
-    <section className="bg-black mb-32">
+    <section className="bg-white mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
+          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
             Account
           </h1>
-          <p className="mt-5 text-xl text-accents-6 sm:text-center sm:text-2xl max-w-2xl m-auto">
+          <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
             We partnered with Stripe for a simplified billing.
           </p>
         </div>
@@ -70,10 +70,10 @@ export default function Account() {
           }
           footer={
             <div className="flex items-start justify-between flex-col sm:flex-row sm:items-center">
-              <p className="pb-4 sm:pb-0">
+              <p className="pb-4 sm:pb-0 text-white">
                 Manage your subscription on Stripe.
               </p>
-              <p className="pb-4 sm:pb-0">
+              <p className="pb-4 sm:pb-0 text-white">
                 Go to your <Link href="/dashboard">dashboard</Link>.
               </p>
               <Button
@@ -95,13 +95,11 @@ export default function Account() {
             ) : subscriptionPrice ? (
               `${subscriptionPrice}/${subscription.prices.interval}`
             ) : (
-              <Link href="/">
-                Choose your plan
-              </Link>
+              <Link href="/">Choose your plan</Link>
             )}
           </div>
         </Card>
-        <Card
+        {/*<Card
           title="Your Name"
           description="Please enter your full name, or a display name you are comfortable with."
           footer={<p>Please use 64 characters at maximum.</p>}
@@ -115,11 +113,15 @@ export default function Account() {
               </div>
             )}
           </div>
-        </Card>
+            </Card>*/}
         <Card
           title="Your Email"
           description="Please enter the email address you want to use to login."
-          footer={<p>We will email you to verify the change.</p>}
+          footer={
+            <p className="text-white">
+              We will email you to verify the change.
+            </p>
+          }
         >
           <p className="text-xl mt-8 mb-4 font-semibold">
             {user ? user.email : undefined}

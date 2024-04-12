@@ -19,6 +19,7 @@ const CDNURL =
 export default function Dashboard2() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
+  const [finishMessage, setFinishMessage] = useState('');
   const router = useRouter();
   const {
     userLoaded,
@@ -62,12 +63,17 @@ export default function Dashboard2() {
       [attempt]: resp.data
     }));
     console.log('Resp data is: ', resp.data);
+    setisGeneratingBGImages(true);
     return resp.data;
   };
 
   const getImageResults = async (attempt, url) => {
     const output = await axios.get('/api/imageresults?url=' + url);
     if (output.data.status === 'succeeded') {
+      await supabase.from('photos').insert({
+        customer_id: user.identities[0].id,
+        photo_url: output.data.output.image
+      });
       const result = output.data.output.image;
       if (result) {
         setBackgroundImageList((current) => [
@@ -82,6 +88,7 @@ export default function Dashboard2() {
         ...state,
         [attempt]: { ...state[attempt], status: 'succeeded' }
       }));
+      setBackgroundPrompt(null);
     }
     console.log('output data is: ', output);
   };
@@ -93,6 +100,10 @@ export default function Dashboard2() {
       clearInterval(intervalImage.current);
       setisBGImagesLoading(false);
       setisGeneratingBGImages(false);
+      setFinishMessage(
+        'All images are generated and saved to gallery.\n' +
+          'Please go to the Gallery page to see all your generated images'
+      );
     }
   }, [backgroundImagePredictions]);
 
@@ -132,34 +143,31 @@ export default function Dashboard2() {
   };
 
   const loadingWithBackgroundPrompt = isBGImagesLoading && (
-    <div className={styles['white-text']}>
-      <p>Loading...</p>
-      <LoadingDots />
+    <div className={styles['black-text']}>
+      Description of image: {backgroundPrompt}
+      <p>
+        Loading
+        <LoadingDots />
+      </p>
+      <p>Please do not refresh or you will lose all progress!</p>
     </div>
   );
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
+    localStorage.setItem('imageLink', url); // Save imageLink to localStorage
     router.push('/view-content');
   };
 
   const renderCard = (image, index) => {
     return (
       <Card
-        style={{ width: '10rem', backgroundColor: 'orange' }} // the smaller the width, the more columns of images displayed
+        style={{ width: '10rem' }} // the smaller the width, the more columns of images displayed
         key={index}
-        className={styles['box']}
+        className={`hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md ${styles.box}`}
+        onClick={() => viewGeneratedContent(image.url)}
       >
         <Card.Img variant="top" src={image.url} />
-        <Card.Body>
-          <Card.Text>{image.text}</Card.Text>
-          <Button
-            variant="primary"
-            onClick={() => viewGeneratedContent(image.url)}
-          >
-            View Content
-          </Button>
-        </Card.Body>
       </Card>
     );
   };
@@ -177,11 +185,11 @@ export default function Dashboard2() {
     if (subscription) {
       return (
         <div className={styles['get-image-button']}>
-          {isGeneratingBGImages ? (
-            <p style={{ color: 'white' }}>Generating</p>
+          {/*isGeneratingBGImages ? (
+            <p style={{ color: 'black' }}>Generating</p>
           ) : (
-            <p style={{ color: 'white' }}>Please generate</p>
-          )}
+            <p style={{ color: 'black' }}>Please generate</p>
+          )*/}
 
           <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
             <Form.Control
@@ -191,50 +199,56 @@ export default function Dashboard2() {
               onChange={(e) => uploadFile(e)}
             />
           </Form.Group>
-
-          <input
-            type="text"
-            id="backgroundPrompt"
-            name="backgroundPrompt"
-            onChange={handleChange}
-            value={backgroundPrompt || ''}
-            placeholder="Enter text to generate image of your product/brand"
-            style={{ width: '420px' }}
-          />
-          <br></br>
+          <br />
           {!isGeneratingBGImages && (
-            <Button
-              onClick={async () => {
-                if (
-                  backgroundPrompt == null ||
-                  backgroundPrompt.trim() == '' ||
-                  isImageUploaded == false
-                ) {
-                  alert('Please enter all prompts and upload your image!');
-                } else {
-                  clearInterval(intervalImage.current);
-                  setBackgroundImagePredictions({});
-                  setBackgroundImageList([]); // when generation begins, list of images is empty
-                  setisBGImagesLoading(true); // change this. seriously
-                  for (let i = 0; i < ATTEMPTS; i++) {
-                    // 2 is a placeholder, later I plan to generate 16 images
-                    getImage(i, backgroundPrompt);
+            <div className="flex flex-col items-center p-2">
+              <input
+                type="text"
+                id="backgroundPrompt"
+                name="backgroundPrompt"
+                placeholder="Enter text to generate image of your product/brand"
+                value={backgroundPrompt || ''}
+                onChange={handleChange}
+                style={{ width: '420px' }}
+                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+              />
+              <br></br>
+
+              <Button
+                onClick={async () => {
+                  if (
+                    backgroundPrompt == null ||
+                    backgroundPrompt.trim() == '' ||
+                    isImageUploaded == false
+                  ) {
+                    alert('Please enter all prompts and upload your image!');
+                  } else {
+                    clearInterval(intervalImage.current);
+                    setBackgroundImagePredictions({});
+                    setBackgroundImageList([]); // when generation begins, list of images is empty
+                    setisBGImagesLoading(true); // change this. seriously
+                    setFinishMessage('');
+                    for (let i = 0; i < ATTEMPTS; i++) {
+                      // 2 is a placeholder, later I plan to generate 16 images
+                      getImage(i, backgroundPrompt);
+                    }
                   }
-                }
-              }}
-            >
-              Generate Image
-            </Button>
+                }}
+              >
+                Generate Image
+              </Button>
+            </div>
           )}
           <br></br>
           {loadingWithBackgroundPrompt}
+          {finishMessage}
           <div className={styles['grid']}>
             {backgroundImageList.map(renderCard)}
           </div>
         </div>
       );
     } else {
-      return <h1>You are not subscribed yet!</h1>;
+      return <h1 className="text-black">You are not subscribed yet!</h1>;
     }
   }
 
@@ -298,13 +312,25 @@ export default function Dashboard2() {
   }
 
   return (
-    <div className="App">
-      <h1 className="text-4xl text-white sm:text-center sm:text-6xl">
-        Go Ahead...Generate Images
-      </h1>
-      {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
-      <br></br>
-      {subscribedAndModelChosen()}
-    </div>
+    <section className="bg-white mb-32">
+      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="sm:flex sm:flex-col sm:align-center">
+          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+            Go Ahead...Generate Images
+          </h1>
+          {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
+          <br></br>
+          <p className="text-black sm:text-center">
+            Here, you will select background to generate one image.
+          </p>
+          <br></br>
+          <p className="text-black sm:text-center">
+            Once generated, it will be saved to the gallery.
+          </p>
+          <br />
+          {subscribedAndModelChosen()}
+        </div>
+      </div>
+    </section>
   );
 }
