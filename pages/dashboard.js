@@ -557,8 +557,12 @@ export default function Dashboard() {
           <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:flex-col sm:align-center">
               <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-                Training page
+                Introduce Your Product to the AI
               </h1>
+              <br></br>
+              <p className="text-black sm:text-center">
+                Feed images of your product for the AI to learn from
+              </p>
               <br></br>
               <p className="text-black sm:text-center">
                 Note that training typically takes 3-5 minutes. While training,

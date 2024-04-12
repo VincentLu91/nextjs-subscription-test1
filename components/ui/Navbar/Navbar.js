@@ -47,18 +47,18 @@ const Navbar = () => {
                   Your Products
                 </Link>
                 <Link
-                  href="/generate-bg"
-                  //onClick={() => router.push('/dashboard2')}
-                  className={s.link}
-                >
-                  Generate Background
-                </Link>
-                <Link
                   href="/generate-images"
                   //onClick={() => router.push('/train')}
                   className={s.link}
                 >
                   Generate Images
+                </Link>
+                <Link
+                  href="/generate-bg"
+                  //onClick={() => router.push('/dashboard2')}
+                  className={s.link}
+                >
+                  Generate Background
                 </Link>
                 <Link
                   href="/view-content"

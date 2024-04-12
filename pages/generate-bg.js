@@ -316,12 +316,17 @@ export default function Dashboard2() {
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Go Ahead...Generate Images
+            Replace Background with Product Shot
           </h1>
           {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
           <br></br>
           <p className="text-black sm:text-center">
-            Here, you will select background to generate one image.
+            Happy with existing product shot or just want to preserve product
+            labels in the photo?
+          </p>
+          <br></br>
+          <p className="text-black sm:text-center">
+            Just tell the AI the background you want generated.
           </p>
           <br></br>
           <p className="text-black sm:text-center">
