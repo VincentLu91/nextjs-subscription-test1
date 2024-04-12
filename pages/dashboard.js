@@ -561,7 +561,8 @@ export default function Dashboard() {
               </h1>
               <br></br>
               <p className="text-black sm:text-center">
-                Feed images of your product for the AI to learn from
+                Give your Product an identity! Feed images of it for the AI to
+                learn from
               </p>
               <br></br>
               <p className="text-black sm:text-center">
@@ -584,6 +585,12 @@ export default function Dashboard() {
                 <div>
                   <div style={{ textAlign: 'center' }}>
                     <br />
+                    <label
+                      htmlFor="instancePrompt"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Name of Product/Brand:
+                    </label>
                     <input
                       type="text"
                       id="instancePrompt"
@@ -593,10 +600,16 @@ export default function Dashboard() {
                       //defaultValue={instancePrompt}
                       placeholder="Enter name of product/brand to train"
                       style={{ width: '420px' }}
-                      className="border-2 border-gray-300 rounded-md placeholder:pl-1"
+                      className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
                     />
                     <br></br>
                     <br></br>
+                    <label
+                      htmlFor="classPrompt"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Name of Product/Brand:
+                    </label>
                     <input
                       type="text"
                       id="classPrompt"
@@ -606,7 +619,7 @@ export default function Dashboard() {
                       //defaultValue={classPrompt}
                       placeholder="Enter product category e.g., VR headset, lotion, etc"
                       style={{ width: '420px' }}
-                      className="border-2 border-gray-300 rounded-md placeholder:pl-1"
+                      className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
                     />
                   </div>
                   <br></br>
