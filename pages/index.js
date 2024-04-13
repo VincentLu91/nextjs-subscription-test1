@@ -2,11 +2,26 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { useUser } from '../components/UserContext';
 
 const index = () => {
+  const router = useRouter();
+  const { user, signIn } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      // originally account route
+      router.replace('/dashboard');
+    } else {
+      router.push('/signin');
+    }
+  }, [user]);
+
   return (
     <div className={styles.container}>
-      <main>
+      {/*<main>
         <div className={styles['hero-image']}>
           <h1 className={styles.title}>Let AI Generate Photos For You</h1>
           <br />
@@ -93,7 +108,7 @@ const index = () => {
         </Link>
       </h2>
       <br />
-      <br />
+  <br />*/}
     </div>
   );
 };
