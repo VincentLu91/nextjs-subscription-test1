@@ -79,7 +79,7 @@ export default function Footer() {
       <div className="py-12 flex flex-col md:flex-row justify-between items-center space-y-4 bg-primary-2">
         <div>
           <span className="text-base">
-            &copy; 2021 brandpix.ai, Inc. All rights reserved.
+            &copy; 2024 brandpix.ai, Inc. All rights reserved.
           </span>
         </div>
       </div>
