@@ -16,7 +16,7 @@ const Navbar = () => {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex justify-between align-center flex-row py-4 md:py-6 relative">
           <div className="flex flex-1 items-center">
-            <Link href="/" className={s.logo} aria-label="Logo">
+            <Link href="/" /*className={s.logo}*/ aria-label="Logo">
               <Logo />
             </Link>
             <nav className="space-x-2 ml-6 hidden lg:block">

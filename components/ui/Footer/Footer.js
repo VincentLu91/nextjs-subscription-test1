@@ -12,7 +12,11 @@ export default function Footer() {
             href="/"
             className="flex flex-initial items-center font-bold md:mr-24"
           >
-            <span className="rounded-full border border-gray-700 mr-2">
+            <span
+              /*className="rounded-full border border-gray-700 mr-2"*/ style={{
+                marginRight: '8px'
+              }}
+            >
               <Logo />
             </span>
             <span>brandpix.ai</span>
