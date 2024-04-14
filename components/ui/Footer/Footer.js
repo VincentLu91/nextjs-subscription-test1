@@ -15,7 +15,7 @@ export default function Footer() {
             <span className="rounded-full border border-gray-700 mr-2">
               <Logo />
             </span>
-            <span>AutoStock ai</span>
+            <span>brandpix.ai</span>
           </Link>
         </div>
         <div className="col-span-1 lg:col-span-2">
@@ -75,7 +75,7 @@ export default function Footer() {
       <div className="py-12 flex flex-col md:flex-row justify-between items-center space-y-4 bg-primary-2">
         <div>
           <span className="text-base">
-            &copy; 2021 AutoStock ai, Inc. All rights reserved.
+            &copy; 2021 brandpix.ai, Inc. All rights reserved.
           </span>
         </div>
       </div>
