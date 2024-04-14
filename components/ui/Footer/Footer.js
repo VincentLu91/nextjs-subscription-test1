@@ -30,10 +30,10 @@ export default function Footer() {
             </li>
             <li className="py-3 md:py-0 md:pb-4">
               <Link
-                href="/about"
+                href="/contact"
                 className="text-base hover:text-accents-6 transition ease-in-out duration-150"
               >
-                About
+                Contact
               </Link>
             </li>
             <li className="py-3 md:py-0 md:pb-4">

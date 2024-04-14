@@ -43,7 +43,7 @@ const privacypolicy = () => {
           <p>
             <strong>Company</strong> (referred to as either &quot;the
             Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in
-            this Agreement) refers to AutoStock ai.
+            this Agreement) refers to brandpix.ai.
           </p>
         </li>
         <li>
@@ -54,11 +54,11 @@ const privacypolicy = () => {
             uses.
           </p>
         </li>
-        <li>
+        {/*<li>
           <p>
             <strong>Country</strong> refers to: Ontario, Canada
           </p>
-        </li>
+            </li>*/}
         <li>
           <p>
             <strong>Device</strong> means any device that can access the Service
@@ -102,13 +102,13 @@ const privacypolicy = () => {
         </li>
         <li>
           <p>
-            <strong>Website</strong> refers to AutoStock ai, accessible from{' '}
+            <strong>Website</strong> refers to brandpix.ai, accessible from{' '}
             <a
-              href="https://autostock.vercel.app"
+              href="https://brandpix.ai"
               rel="external nofollow noopener"
               target="_blank"
             >
-              https://autostock.vercel.app.
+              https://brandpix.ai.
             </a>
           </p>
         </li>
