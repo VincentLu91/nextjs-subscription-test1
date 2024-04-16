@@ -1811,10 +1811,10 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/functions-js@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.2.2.tgz"
-  integrity sha512-sJGq1nludmi7pY/fdtCpyY/pYonx7MfHdN408bqb736guWcVI1AChYVbI4kUM978EuOE4Ci6l7bUudfGg07QRw==
+"@supabase/functions-js@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.3.0.tgz"
+  integrity sha512-GPXzSl4MXdc0P7q+TvE8XgaPdvGBeAJ0p6AN0tbKcezpkp32mpsDf58JXaWOJGyiWSVJn6z1W73eKxf6NZNaFA==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
@@ -1849,13 +1849,13 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.42.3":
-  version "2.42.3"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.42.3.tgz"
-  integrity sha512-/o52L/ngsGapcOUygWigvxzBo/bUVM4bubZMsUSZqZc+9sgjXZsgP/cwyggWUv3QOIqmbBrfSPgDLUh+Ofgi7Q==
+"@supabase/supabase-js@^2.42.4":
+  version "2.42.4"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.42.4.tgz"
+  integrity sha512-tRn3wloKnnFdmEr3O2VIaxqzKACpyJ3ymLDmeq0V5lvhkJ+B4VH+QmDrnBbJJUkO2t+IHg65j5jombZxU4yMyw==
   dependencies:
     "@supabase/auth-js" "2.63.0"
-    "@supabase/functions-js" "2.2.2"
+    "@supabase/functions-js" "2.3.0"
     "@supabase/node-fetch" "2.6.15"
     "@supabase/postgrest-js" "1.15.2"
     "@supabase/realtime-js" "2.9.4"
@@ -1874,10 +1874,10 @@
     legacy-swc-helpers "npm:@swc/helpers@=0.4.14"
     tslib "^2.4.0"
 
-"@swc/helpers@^0.5.0", "@swc/helpers@^0.5.9":
-  version "0.5.9"
-  resolved "https://registry.npmjs.org/@swc/helpers/-/helpers-0.5.9.tgz"
-  integrity sha512-XI76sLwMJoLjJTOK5RblBZkouOJG3X3hjxLCzLnyN1ifAiKQc6Hck3uvnU4Z/dV/Dyk36Ffj8FLvDLV2oWvKTw==
+"@swc/helpers@^0.5.0", "@swc/helpers@^0.5.10":
+  version "0.5.10"
+  resolved "https://registry.npmjs.org/@swc/helpers/-/helpers-0.5.10.tgz"
+  integrity sha512-CU+RF9FySljn7HVSkkjiB84hWkvTaI3rtLvF433+jRSBL2hMu3zX5bGhHS8C80SM++h4xy8hBSnUHFQHmRXSBw==
   dependencies:
     tslib "^2.4.0"
 
