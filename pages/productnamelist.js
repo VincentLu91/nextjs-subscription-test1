@@ -32,28 +32,25 @@ export default function ProductNameList() {
     //setInstanceList(instanceArr);
   };
 
-  useEffect(() => {
-    const fetchAndStoreInstances = async () => {
-      try {
-        const storedInstances = localStorage.getItem('storedInstances');
-        if (storedInstances) {
-          setInstanceList(JSON.parse(storedInstances));
-        } else {
-          const productList = await getInstancePrompts();
-          console.log('productList: ', productList);
-          if (productList) {
-            setInstanceList(productList);
-            localStorage.setItem(
-              'storedInstances',
-              JSON.stringify(productList)
-            );
-          }
+  const fetchAndStoreInstances = async (isForceSync = false) => {
+    try {
+      const storedInstances = localStorage.getItem('storedInstances');
+      if (storedInstances && !isForceSync) {
+        setInstanceList(JSON.parse(storedInstances));
+      } else {
+        const productList = await getInstancePrompts();
+        console.log('productList: ', productList);
+        if (productList) {
+          setInstanceList(productList);
+          localStorage.setItem('storedInstances', JSON.stringify(productList));
         }
-      } catch (error) {
-        console.error('Error fetching or storing products:', error);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching or storing products:', error);
+    }
+  };
 
+  useEffect(() => {
     // Fetch and store photos when the component mounts
     fetchAndStoreInstances();
   }, []);
@@ -119,6 +116,7 @@ export default function ProductNameList() {
                 List of Product Names
               </h1>
               <br></br>
+              <button onClick={() => fetchAndStoreInstances(true)}>sync</button>
               {instanceList.map((instance) => (
                 <ul className="text-4xl text-black sm:text-center sm:text-2xl">
                   {instance} -

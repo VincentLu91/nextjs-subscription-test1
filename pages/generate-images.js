@@ -107,6 +107,15 @@ export default function Train() {
         customer_id: user.identities[0].id,
         photo_url: output.data.output[0]
       });
+      const localPhotos = localStorage.getItem('generatedPhotos');
+      if (localPhotos) {
+        const localPhotosJson = JSON.parse(localPhotos);
+        localPhotosJson.push(output.data.output[0]);
+        localStorage.setItem(
+          'generatedPhotos',
+          JSON.stringify(localPhotosJson)
+        );
+      }
       const result = output.data.output[0];
       if (result) {
         setImageList((current) => [
@@ -160,6 +169,7 @@ export default function Train() {
 
   useEffect(() => {
     if (!isLoadingUser && !user) router.replace('/signin');
+    console.log('message is: ', message);
   }, [user]);
 
   const redirectToCustomerPortal = async () => {

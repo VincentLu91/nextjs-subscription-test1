@@ -365,6 +365,15 @@ export default function Dashboard() {
         alert('cannot train!');
         console.log('training error: ', trainingInfo.error);
       } else {
+        const localInstances = localStorage.getItem('storedInstances');
+        if (localInstances) {
+          const localInstancesJson = JSON.parse(localInstances);
+          localInstancesJson.push(instancePrompt);
+          localStorage.setItem(
+            'storedInstances',
+            JSON.stringify(localInstancesJson)
+          );
+        }
         console.log('training data: ', trainingInfo.data);
         // start making the call to Replicate API to train the model to save model_version
         const resp = axios
@@ -379,7 +388,8 @@ export default function Dashboard() {
               '/' +
               zipFileName +
               '&trainer_version=' +
-              trainerVersion
+              trainerVersion +
+              `&user=${user.id}`
           )
           .then((resp) => {
             console.log('resp training: ', resp);
@@ -475,7 +485,7 @@ export default function Dashboard() {
           setInstancePrompt(null);
           setClassPrompt(null);
           router.push({
-            pathname: '/train',
+            pathname: '/generate-images',
             query: { message: 'congrats, now begin generating!' }
           });
         }
@@ -571,14 +581,14 @@ export default function Dashboard() {
               </p>
               <br></br>
               <p
-                className="sm:text-center"
-                style={{ color: 'var(--text-secondary)' }}
+                className="text-black sm:text-center"
+                //style={{ color: 'var(--text-secondary)' }}
               >
                 {trainingText}
                 <br />
               </p>
               {isTraining ? (
-                <div style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'center', color: 'black' }}>
                   {loadingWhileTraining}
                 </div>
               ) : (

@@ -78,6 +78,15 @@ export default function Dashboard2() {
         customer_id: user.identities[0].id,
         photo_url: output.data.output.image
       });
+      const localPhotos = localStorage.getItem('generatedPhotos');
+      if (localPhotos) {
+        const localPhotosJson = JSON.parse(localPhotos);
+        localPhotosJson.push(output.data.output.image);
+        localStorage.setItem(
+          'generatedPhotos',
+          JSON.stringify(localPhotosJson)
+        );
+      }
       const result = output.data.output.image;
       if (result) {
         setBackgroundImageList((current) => [

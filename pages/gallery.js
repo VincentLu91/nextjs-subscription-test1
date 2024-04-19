@@ -206,24 +206,24 @@ export default function Gallery() {
     //setGeneratedPhotos(listOfPhotos);
   };
 
-  useEffect(() => {
-    const fetchAndStorePhotos = async () => {
-      try {
-        const storedPhotos = localStorage.getItem('generatedPhotos');
-        if (storedPhotos) {
-          setGeneratedPhotos(JSON.parse(storedPhotos));
-        } else {
-          const photos = await getPhotos();
-          if (photos) {
-            setGeneratedPhotos(photos);
-            localStorage.setItem('generatedPhotos', JSON.stringify(photos));
-          }
+  const fetchAndStorePhotos = async (isForceSync = false) => {
+    try {
+      const storedPhotos = localStorage.getItem('generatedPhotos');
+      if (storedPhotos && !isForceSync) {
+        setGeneratedPhotos(JSON.parse(storedPhotos));
+      } else {
+        const photos = await getPhotos();
+        if (photos) {
+          setGeneratedPhotos(photos);
+          localStorage.setItem('generatedPhotos', JSON.stringify(photos));
         }
-      } catch (error) {
-        console.error('Error fetching or storing photos:', error);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching or storing photos:', error);
+    }
+  };
 
+  useEffect(() => {
     // Fetch and store photos when the component mounts
     fetchAndStorePhotos();
   }, []);
@@ -291,6 +291,7 @@ export default function Gallery() {
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
             Gallery
           </h1>
+          <button onClick={() => fetchAndStorePhotos(true)}>sync</button>
           <br />
           <p className="text-black sm:text-center">
             here is a list of generated images
