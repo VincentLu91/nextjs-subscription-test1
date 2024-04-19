@@ -110,7 +110,8 @@ export default function ViewContent() {
           prompt +
           'in the style of a social media caption' +
           '&imageLink=' +
-          imageLink
+          imageLink +
+          `&user=${user.id}`
       );
       console.log('raw caption', rawCaption);
       setCaptionObject(rawCaption);

@@ -91,11 +91,11 @@ const manageSubscriptionStatusChange = async (
 ) => {
   // Get customer's UUID from mapping table.
   const {
-    data: { id: uuid, image_tokens, training_tokens },
+    data: { id: uuid, image_tokens, training_tokens, caption_tokens },
     error: noCustomerError
   } = await supabaseAdmin
     .from('customers')
-    .select('id, image_tokens', 'training_tokens')
+    .select('id, image_tokens', 'training_tokens', 'caption_tokens')
     .eq('stripe_customer_id', customerId)
     .single();
   if (noCustomerError) throw noCustomerError;
@@ -151,7 +151,8 @@ const manageSubscriptionStatusChange = async (
       id: uuid,
       //image_tokens: image_tokens + 30 // this is where `image_tokens` gets updated
       image_tokens: 30, // each time the subscription is renewed, it resets the number of tokens as expected
-      training_tokens: 5
+      training_tokens: 5,
+      caption_tokens: 10
     };
 
     await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
@@ -216,11 +217,37 @@ const deductUserTrainingToken = async (customerId, tokensToDeduct) => {
   }
 };
 
+const deductUserCaptionToken = async (customerId, tokensToDeduct) => {
+  // Get customer's UUID from mapping table.
+  const {
+    data: { id: uuid, caption_tokens },
+    error: noCustomerError
+  } = await supabaseAdmin
+    .from('customers')
+    .select('id,caption_tokens')
+    .eq('id', customerId)
+    .single();
+  if (noCustomerError) return false;
+
+  if (caption_tokens - tokensToDeduct >= 0) {
+    let customerTokenUpdate = {
+      id: uuid,
+      caption_tokens: caption_tokens - tokensToDeduct
+    };
+
+    await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
+    return true;
+  } else {
+    return false;
+  }
+};
+
 export {
   upsertProductRecord,
   upsertPriceRecord,
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
   deductUserImageGenerationToken,
-  deductUserTrainingToken
+  deductUserTrainingToken,
+  deductUserCaptionToken
 };
