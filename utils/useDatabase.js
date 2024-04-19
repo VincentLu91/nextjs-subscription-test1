@@ -91,11 +91,11 @@ const manageSubscriptionStatusChange = async (
 ) => {
   // Get customer's UUID from mapping table.
   const {
-    data: { id: uuid },
+    data: { id: uuid, image_tokens },
     error: noCustomerError
   } = await supabaseAdmin
     .from('customers')
-    .select('id')
+    .select('id, image_tokens')
     .eq('stripe_customer_id', customerId)
     .single();
   if (noCustomerError) throw noCustomerError;
@@ -146,6 +146,16 @@ const manageSubscriptionStatusChange = async (
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
   );
 
+  if (subscription.status == 'active') {
+    let customerTokenUpdate = {
+      id: uuid,
+      //image_tokens: image_tokens + 30 // this is where `image_tokens` gets updated
+      image_tokens: 30 // each time the subscription is renewed, it resets the number of tokens as expected
+    };
+
+    await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
+  }
+
   // For a new subscription copy the billing details to the customer object.
   // NOTE: This is a costly operation and should happen at the very end.
   if (createAction && subscription.default_payment_method)
@@ -155,9 +165,35 @@ const manageSubscriptionStatusChange = async (
     );
 };
 
+const deductUserImageGenerationToken = async (customerId, tokensToDeduct) => {
+  // Get customer's UUID from mapping table.
+  const {
+    data: { id: uuid, image_tokens },
+    error: noCustomerError
+  } = await supabaseAdmin
+    .from('customers')
+    .select('id,image_tokens')
+    .eq('id', customerId)
+    .single();
+  if (noCustomerError) return false;
+
+  if (image_tokens - tokensToDeduct >= 0) {
+    let customerTokenUpdate = {
+      id: uuid,
+      image_tokens: image_tokens - tokensToDeduct
+    };
+
+    await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
+    return true;
+  } else {
+    return false;
+  }
+};
+
 export {
   upsertProductRecord,
   upsertPriceRecord,
   createOrRetrieveCustomer,
-  manageSubscriptionStatusChange
+  manageSubscriptionStatusChange,
+  deductUserImageGenerationToken
 };

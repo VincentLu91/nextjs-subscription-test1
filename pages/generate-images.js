@@ -77,20 +77,27 @@ export default function Train() {
     }
 
     console.log('version: ', modelVersion);
+
     setIsGeneratingImages(true);
-    const resp = await axios.get(
-      '/api/imagepredictions?contentPrompt=' +
-        contentPrompt +
-        ' ' +
-        productIdentifier +
-        '&imageStyle=' +
-        imageStyle +
-        '&version=' +
-        modelVersion
-    );
-    setPredictions((state) => ({ ...state, [attempt]: resp.data }));
-    console.log('Resp data is: ', resp.data);
-    return resp.data;
+    try {
+      const resp = await axios.get(
+        '/api/imagepredictions?contentPrompt=' +
+          contentPrompt +
+          ' ' +
+          productIdentifier +
+          '&imageStyle=' +
+          imageStyle +
+          '&version=' +
+          modelVersion +
+          `&user=${user.id}`
+      );
+      setPredictions((state) => ({ ...state, [attempt]: resp.data }));
+      console.log('Resp data is: ', resp.data);
+      return resp.data;
+    } catch (err) {
+      setIsLoading(false);
+      alert('Doesnt have enought tokens');
+    }
   };
 
   const getImageResults = async (attempt, url) => {
@@ -136,6 +143,7 @@ export default function Train() {
     const predictionAry = Object.entries(predictions).filter(
       ([attempt, item]) => item.status !== 'succeeded'
     );
+    console.log(predictionAry);
 
     if (predictionAry.length > 0) {
       interval.current = setInterval(() => {

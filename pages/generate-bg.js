@@ -56,7 +56,11 @@ export default function Dashboard2() {
 
   const getImage = async (attempt, backgroundPrompt) => {
     const resp = await axios.get(
-      '/api/modifyImage?prompt=' + backgroundPrompt + '&image=' + imageFileName
+      '/api/modifyImage?prompt=' +
+        backgroundPrompt +
+        '&image=' +
+        imageFileName +
+        `&user=${user.id}`
     );
     setBackgroundImagePredictions((state) => ({
       ...state,
