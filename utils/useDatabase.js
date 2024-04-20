@@ -205,6 +205,29 @@ const deductUserImageGenerationToken = async (customerId, tokensToDeduct) => {
   }
 };
 
+const getTokens = async (customerId, typeOfToken) => {
+  // Validate typeOfToken
+  const validTokenTypes = ['image_tokens', 'caption_tokens', 'training_tokens'];
+  if (!validTokenTypes.includes(typeOfToken)) {
+    throw new Error(`Invalid typeOfToken: ${typeOfToken}`);
+  }
+
+  // Get customer's UUID from mapping table.
+  const {
+    data: { id: uuid, [typeOfToken]: tokens }, // Use computed property to select the token based on typeOfToken
+    error: noCustomerError
+  } = await supabaseAdmin
+    .from('customers')
+    .select('id, ' + typeOfToken) // Select the token based on typeOfToken
+    .eq('id', customerId)
+    .single();
+
+  if (noCustomerError) return false;
+
+  console.log(`get${typeOfToken}: `, tokens.data);
+  return tokens;
+};
+
 const deductUserTrainingToken = async (customerId, tokensToDeduct) => {
   // Get customer's UUID from mapping table.
   const {
@@ -262,5 +285,6 @@ export {
   manageSubscriptionStatusChange,
   deductUserImageGenerationToken,
   deductUserTrainingToken,
-  deductUserCaptionToken
+  deductUserCaptionToken,
+  getTokens
 };

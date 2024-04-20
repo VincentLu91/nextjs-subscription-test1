@@ -22,6 +22,7 @@ export default function Train() {
   const [visible, setVisible] = useState(5);
   const [imageStyle, setImageStyle] = useState(null);
   const [finishMessage, setFinishMessage] = useState('');
+  const [numTokens, setNumTokens] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -232,6 +233,21 @@ export default function Train() {
     getInstancePrompts();
   }, []);
 
+  async function getImageTokenData() {
+    console.log('user is: ', user.id);
+    const imageTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTokenData: ', imageTokenData.data);
+    setNumTokens(imageTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getImageTokenData();
+    }
+  }, [user]);
+
   const loadingWithContentPrompt = isLoading && (
     <div className={styles['black-text']}>
       Description of image: {contentPrompt}
@@ -416,6 +432,9 @@ export default function Train() {
           <br />
           <p className="text-black sm:text-center">
             Here, you will select product and style to generate.
+          </p>
+          <p className="text-black sm:text-center">
+            Number of imageTokens: {numTokens}
           </p>
           {/* Display the custom message */}
           <p className="text-black sm:text-center">{message}</p>

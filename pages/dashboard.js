@@ -59,6 +59,7 @@ export default function Dashboard() {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const [numTokens, setNumTokens] = useState(null);
 
   const zip = new JSZip(); // instance of JSZip
 
@@ -406,6 +407,21 @@ export default function Dashboard() {
     }
   };
 
+  async function getTrainingTokenData() {
+    console.log('user is: ', user.id);
+    const trainingTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=training_tokens`
+    );
+    console.log('trainingTokenData: ', trainingTokenData.data);
+    setNumTokens(trainingTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getTrainingTokenData();
+    }
+  }, [user]);
+
   async function getTrainingStatus() {
     if (trainingID) {
       const trainingStatus = await axios.get(
@@ -570,6 +586,9 @@ export default function Dashboard() {
                 Introduce Your Product to the AI
               </h1>
               <br></br>
+              <p className="text-black sm:text-center">
+                Number of trainingTokens: {numTokens}
+              </p>
               <p className="text-black sm:text-center">
                 Give your Product an identity! Feed images of it for the AI to
                 learn from

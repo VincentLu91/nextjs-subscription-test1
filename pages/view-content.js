@@ -34,6 +34,7 @@ export default function ViewContent() {
   const [caption, setCaption] = useState('');
   const [captionObject, setCaptionObject] = useState(null);
   const [captionStatus, setCaptionStatus] = useState(null);
+  const [numTokens, setNumTokens] = useState(null);
 
   const interval = useRef();
 
@@ -159,6 +160,21 @@ export default function ViewContent() {
     // why is the useEffect running continuously, even though it's finished?
   }, [captionStatus]);
 
+  async function getCaptionTokenData() {
+    console.log('user is: ', user.id);
+    const captionTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=caption_tokens`
+    );
+    console.log('captionTokenData: ', captionTokenData.data);
+    setNumTokens(captionTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getCaptionTokenData();
+    }
+  }, [user]);
+
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
     subscription &&
@@ -176,6 +192,9 @@ export default function ViewContent() {
             View Content and Generate Captions
           </h1>
           <br></br>
+          <p className="sm:text-center text-black">
+            Number of captionTokens: {numTokens}
+          </p>
           {subscription ? ( // goal of this is to restrict content to subscribers.
             <div className={styles['display-image']}>
               {isLoading && <LoadingDots />}

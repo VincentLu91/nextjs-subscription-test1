@@ -20,6 +20,7 @@ export default function Dashboard2() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
+  const [numTokens, setNumTokens] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -324,6 +325,21 @@ export default function Dashboard2() {
     }
   }
 
+  async function getImageTokenData() {
+    console.log('user is: ', user.id);
+    const imageTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTokenData: ', imageTokenData.data);
+    setNumTokens(imageTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getImageTokenData();
+    }
+  }, [user]);
+
   return (
     <section className="bg-white mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
@@ -340,6 +356,9 @@ export default function Dashboard2() {
           <br></br>
           <p className="text-black sm:text-center">
             Just tell the AI the background you want generated.
+          </p>
+          <p className="text-black sm:text-center">
+            Number of imageTokens: {numTokens}
           </p>
           <br></br>
           <p className="text-black sm:text-center">
