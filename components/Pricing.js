@@ -106,6 +106,13 @@ export default function Pricing({ products }) {
               currency: price.currency,
               minimumFractionDigits: 0
             }).format(price.unit_amount / 100);
+            // Check if price and image_tokens are defined before accessing image_tokens
+            const imageTokens =
+              price && price.image_tokens ? price.image_tokens : [];
+            const trainingTokens =
+              price && price.training_tokens ? price.training_tokens : [];
+            const captionTokens =
+              price && price.caption_tokens ? price.caption_tokens : [];
             return (
               <div
                 key={product.id}
@@ -123,6 +130,15 @@ export default function Pricing({ products }) {
                     {product.name}
                   </h2>
                   <p className="mt-4 text-accents-5">{product.description}</p>
+                  <p className="mt-4 text-accents-5">
+                    {imageTokens} image tokens
+                  </p>
+                  <p className="mt-4 text-accents-5">
+                    {trainingTokens} training tokens
+                  </p>
+                  <p className="mt-4 text-accents-5">
+                    {captionTokens} caption tokens
+                  </p>
                   <p className="mt-8">
                     <span className="text-5xl font-extrabold white">
                       {priceString}
