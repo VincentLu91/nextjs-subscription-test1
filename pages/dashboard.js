@@ -60,6 +60,7 @@ export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [numTokens, setNumTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(null);
 
   const zip = new JSZip(); // instance of JSZip
 
@@ -422,6 +423,21 @@ export default function Dashboard() {
     }
   }, [user]);
 
+  async function getTieredTokenData() {
+    console.log('user is: ', user.id);
+    const trainingTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=training_tokens`
+    );
+    console.log('trainingTieredData: ', trainingTieredData.data);
+    setNumTieredTokens(trainingTieredData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getTieredTokenData();
+    }
+  }, [user]);
+
   async function getTrainingStatus() {
     if (trainingID) {
       const trainingStatus = await axios.get(
@@ -588,6 +604,9 @@ export default function Dashboard() {
               <br></br>
               <p className="text-black sm:text-center">
                 Number of trainingTokens: {numTokens}
+              </p>
+              <p className="text-black sm:text-center">
+                Tiered Number of trainingTokens: {numTieredTokens}
               </p>
               <p className="text-black sm:text-center">
                 Give your Product an identity! Feed images of it for the AI to

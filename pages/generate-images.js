@@ -23,6 +23,7 @@ export default function Train() {
   const [imageStyle, setImageStyle] = useState(null);
   const [finishMessage, setFinishMessage] = useState('');
   const [numTokens, setNumTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -248,6 +249,21 @@ export default function Train() {
     }
   }, [user]);
 
+  async function getTieredImageData() {
+    console.log('user is: ', user.id);
+    const imageTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTieredData: ', imageTieredData.data);
+    setNumTieredTokens(imageTieredData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getTieredImageData();
+    }
+  }, [user]);
+
   const loadingWithContentPrompt = isLoading && (
     <div className={styles['black-text']}>
       Description of image: {contentPrompt}
@@ -435,6 +451,9 @@ export default function Train() {
           </p>
           <p className="text-black sm:text-center">
             Number of imageTokens: {numTokens}
+          </p>
+          <p className="text-black sm:text-center">
+            Tiered Number of imageTokens: {numTieredTokens}
           </p>
           {/* Display the custom message */}
           <p className="text-black sm:text-center">{message}</p>

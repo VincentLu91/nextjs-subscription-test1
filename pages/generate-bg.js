@@ -21,6 +21,7 @@ export default function Dashboard2() {
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
   const [numTokens, setNumTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -340,6 +341,21 @@ export default function Dashboard2() {
     }
   }, [user]);
 
+  async function getTieredImageData() {
+    console.log('user is: ', user.id);
+    const imageTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTieredData: ', imageTieredData.data);
+    setNumTieredTokens(imageTieredData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getTieredImageData();
+    }
+  }, [user]);
+
   return (
     <section className="bg-white mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
@@ -359,6 +375,9 @@ export default function Dashboard2() {
           </p>
           <p className="text-black sm:text-center">
             Number of imageTokens: {numTokens}
+          </p>
+          <p className="text-black sm:text-center">
+            Tiered Number of imageTokens: {numTieredTokens}
           </p>
           <br></br>
           <p className="text-black sm:text-center">

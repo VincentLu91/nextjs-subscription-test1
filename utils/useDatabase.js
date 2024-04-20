@@ -228,6 +228,42 @@ const getTokens = async (customerId, typeOfToken) => {
   return tokens;
 };
 
+const getTieredTokens = async (customerId, typeOfToken) => {
+  const {
+    data: { price_id },
+    error: noPriceDataError
+  } = await supabaseAdmin
+    .from('subscriptions')
+    .select('price_id')
+    .eq('user_id', customerId)
+    .single();
+
+  if (noPriceDataError) return false;
+
+  console.log(`price_id: `, price_id);
+
+  // Validate typeOfToken
+  const validTokenTypes = ['image_tokens', 'caption_tokens', 'training_tokens'];
+  if (!validTokenTypes.includes(typeOfToken)) {
+    throw new Error(`Invalid typeOfToken: ${typeOfToken}`);
+  }
+
+  // Get customer's UUID from mapping table.
+  const {
+    data: { [typeOfToken]: tokens }, // Use computed property to select the token based on typeOfToken
+    error: noPriceError
+  } = await supabaseAdmin
+    .from('prices')
+    .select('id, ' + typeOfToken) // Select the token based on typeOfToken
+    .eq('id', price_id)
+    .single();
+
+  if (noPriceError) return false;
+
+  console.log(`tiered${typeOfToken}: `, tokens.data);
+  return tokens;
+};
+
 const deductUserTrainingToken = async (customerId, tokensToDeduct) => {
   // Get customer's UUID from mapping table.
   const {
@@ -286,5 +322,6 @@ export {
   deductUserImageGenerationToken,
   deductUserTrainingToken,
   deductUserCaptionToken,
-  getTokens
+  getTokens,
+  getTieredTokens
 };

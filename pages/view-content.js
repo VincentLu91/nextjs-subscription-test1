@@ -35,6 +35,7 @@ export default function ViewContent() {
   const [captionObject, setCaptionObject] = useState(null);
   const [captionStatus, setCaptionStatus] = useState(null);
   const [numTokens, setNumTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(null);
 
   const interval = useRef();
 
@@ -175,6 +176,21 @@ export default function ViewContent() {
     }
   }, [user]);
 
+  async function getTieredTokenData() {
+    console.log('user is: ', user.id);
+    const captionTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=caption_tokens`
+    );
+    console.log('captionTieredData: ', captionTieredData.data);
+    setNumTieredTokens(captionTieredData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getTieredTokenData();
+    }
+  }, [user]);
+
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
     subscription &&
@@ -194,6 +210,9 @@ export default function ViewContent() {
           <br></br>
           <p className="sm:text-center text-black">
             Number of captionTokens: {numTokens}
+          </p>
+          <p className="text-black sm:text-center">
+            Tiered Number of captionTokens: {numTieredTokens}
           </p>
           {subscription ? ( // goal of this is to restrict content to subscribers.
             <div className={styles['display-image']}>
