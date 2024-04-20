@@ -147,12 +147,25 @@ const manageSubscriptionStatusChange = async (
   );
 
   if (subscription.status == 'active') {
+    const {
+      data: {
+        image_tokens: priceImageTokens,
+        training_tokens: priceTrainTokens,
+        caption_tokens: priceCaptionTokens
+      },
+      error: noCustomerError
+    } = await supabaseAdmin
+      .from('prices')
+      .select('image_tokens', 'training_tokens', 'caption_tokens')
+      .eq('id', subscription.items.data[0].price.id)
+      .single();
+
     let customerTokenUpdate = {
       id: uuid,
       //image_tokens: image_tokens + 30 // this is where `image_tokens` gets updated
-      image_tokens: 30, // each time the subscription is renewed, it resets the number of tokens as expected
-      training_tokens: 5,
-      caption_tokens: 10
+      image_tokens: priceImageTokens, // each time the subscription is renewed, it resets the number of tokens as expected
+      training_tokens: priceTrainTokens,
+      caption_tokens: priceCaptionTokens
     };
 
     await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
