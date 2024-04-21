@@ -449,10 +449,8 @@ export default function Train() {
           </h1>
           <br />
           <p className="text-black sm:text-center">
-            Number of imageTokens: {numTokens}
-          </p>
-          <p className="text-black sm:text-center">
-            Tiered Number of imageTokens: {numTieredTokens}
+            Number of image rendering credits available: {numTokens} /{' '}
+            {numTieredTokens}
           </p>
           <br />
           <p className="text-black sm:text-center">

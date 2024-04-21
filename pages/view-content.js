@@ -209,10 +209,8 @@ export default function ViewContent() {
           </h1>
           <br></br>
           <p className="sm:text-center text-black">
-            Number of captionTokens: {numTokens}
-          </p>
-          <p className="text-black sm:text-center">
-            Tiered Number of captionTokens: {numTieredTokens}
+            Number of caption creation credits available: {numTokens} /{' '}
+            {numTieredTokens}
           </p>
           <br />
           {subscription ? ( // goal of this is to restrict content to subscribers.

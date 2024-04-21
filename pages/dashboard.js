@@ -606,10 +606,8 @@ export default function Dashboard() {
               </h1>
               <br></br>
               <p className="text-black sm:text-center">
-                Number of trainingTokens: {numTokens}
-              </p>
-              <p className="text-black sm:text-center">
-                Tiered Number of trainingTokens: {numTieredTokens}
+                Number of training sessions available: {numTokens} /{' '}
+                {numTieredTokens}
               </p>
               <br></br>
               <p className="text-black sm:text-center">

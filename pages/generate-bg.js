@@ -367,10 +367,8 @@ export default function Dashboard2() {
           {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
           <br></br>
           <p className="text-black sm:text-center">
-            Number of imageTokens: {numTokens}
-          </p>
-          <p className="text-black sm:text-center">
-            Tiered Number of imageTokens: {numTieredTokens}
+            Number of image rendering credits available: {numTokens} /{' '}
+            {numTieredTokens}
           </p>
           <br></br>
           <p className="text-black sm:text-center">
