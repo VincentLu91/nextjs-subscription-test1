@@ -131,13 +131,13 @@ export default function Pricing({ products }) {
                   </h2>
                   <p className="mt-4 text-accents-5">{product.description}</p>
                   <p className="mt-4 text-accents-5">
-                    {imageTokens} image tokens
+                    {imageTokens} image renders
                   </p>
                   <p className="mt-4 text-accents-5">
-                    {trainingTokens} training tokens
+                    {trainingTokens} training sessions
                   </p>
                   <p className="mt-4 text-accents-5">
-                    {captionTokens} caption tokens
+                    {captionTokens} caption creation credits
                   </p>
                   <p className="mt-8">
                     <span className="text-5xl font-extrabold white">
