@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import { supabase } from '../utils/initSupabase';
+import Button from '../components/ui/Button';
 
 export default function ProductNameList() {
   const [loading, setLoading] = useState(false);
@@ -22,9 +23,11 @@ export default function ProductNameList() {
       .eq('user_auth_id', user.identities[0].id);
     instancePromptsInfo.data.map((i) => {
       console.log(i.instance_prompt);
+      console.log('class prompt: ', i.class_prompt);
+
       //i.instance_prompt;
       if (i.model_version != null) {
-        instanceArr.push(i.instance_prompt);
+        instanceArr.push(i);
       }
     });
     console.log('instanceArr: ', instanceArr);
@@ -35,6 +38,8 @@ export default function ProductNameList() {
   const fetchAndStoreInstances = async (isForceSync = false) => {
     try {
       const storedInstances = localStorage.getItem('storedInstances');
+      console.log('storedInstances: ', storedInstances);
+
       if (storedInstances && !isForceSync) {
         setInstanceList(JSON.parse(storedInstances));
       } else {
@@ -58,7 +63,9 @@ export default function ProductNameList() {
   async function deleteInstance(instance) {
     const storedInstances = localStorage.getItem('storedInstances');
     const storedInstancesList = JSON.parse(storedInstances);
-    const index = storedInstancesList.indexOf(instance);
+    const index = storedInstancesList.findIndex(
+      (item) => item.instance_prompt === instance.instance_prompt
+    );
     if (index > -1) {
       // only splice array when item is found
       storedInstancesList.splice(index, 1);
@@ -74,7 +81,7 @@ export default function ProductNameList() {
       .from('ai-models')
       .delete()
       .eq('user_auth_id', user?.identities[0]?.id)
-      .eq('instance_prompt', instance);
+      .eq('instance_prompt', instance.instance_prompt);
     await getInstancePrompts();
   }
 
@@ -111,19 +118,42 @@ export default function ProductNameList() {
       <section className="bg-white mb-32">
         {subscription ? (
           <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-            <div className="sm:flex sm:flex-col sm:align-center">
+            <div className="flex flex-col items-center sm:flex-col sm:items-center">
               <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
                 List of Product Names
               </h1>
               <br></br>
-              <button onClick={() => fetchAndStoreInstances(true)}>sync</button>
+              <p className="text-black sm:text-center">
+                Here are the AI models that you trained and saved.
+              </p>
+              <p className="text-black sm:text-center">
+                If not needed, you can choose to delete them.
+              </p>
+              <br></br>
+              <Button
+                className="w-60 center-items"
+                variant="slim"
+                onClick={() => fetchAndStoreInstances(true)}
+              >
+                Sync Product AIs
+              </Button>
+              <br></br>
               {instanceList.map((instance) => (
-                <ul className="text-4xl text-black sm:text-center sm:text-2xl">
-                  {instance} -
-                  <button onClick={() => deleteInstance(instance)}>
-                    Delete
-                  </button>
-                </ul>
+                <div
+                  key={instance.id}
+                  className="flex items-center text-4xl text-black sm:text-center sm:text-2xl"
+                >
+                  <p>
+                    {instance.instance_prompt} - {instance.class_prompt}:
+                  </p>
+                  <div className="ml-2">
+                    {' '}
+                    {/* Adjust the spacing as needed */}
+                    <button onClick={() => deleteInstance(instance)}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

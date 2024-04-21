@@ -367,15 +367,7 @@ export default function Dashboard() {
         alert('cannot train!');
         console.log('training error: ', trainingInfo.error);
       } else {
-        const localInstances = localStorage.getItem('storedInstances');
-        if (localInstances) {
-          const localInstancesJson = JSON.parse(localInstances);
-          localInstancesJson.push(instancePrompt);
-          localStorage.setItem(
-            'storedInstances',
-            JSON.stringify(localInstancesJson)
-          );
-        }
+        // moved local storage away from here
         console.log('training data: ', trainingInfo.data);
         // start making the call to Replicate API to train the model to save model_version
         const resp = axios
@@ -516,6 +508,17 @@ export default function Dashboard() {
           setIsImagesButtonClicked(false);
           setInstancePrompt(null);
           setClassPrompt(null);
+          // update the local storage...
+          console.log('trainingStatusResponse: ', trainingStatusResponse);
+          const localInstances = localStorage.getItem('storedInstances');
+          if (localInstances) {
+            let localInstancesJson = JSON.parse(localInstances);
+            localInstancesJson.push(trainingStatusResponse.data[0]);
+            localStorage.setItem(
+              'storedInstances',
+              JSON.stringify(localInstancesJson)
+            );
+          }
           router.push({
             pathname: '/generate-images',
             query: { message: 'congrats, now begin generating!' }
