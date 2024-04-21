@@ -77,7 +77,7 @@ export default function ViewContent() {
     <div className={styles['display-image']}>
       <img alt="uploaded" src={imageLink} />
       <br />
-      <Button variant="primary" onClick={() => download(imageLink)}>
+      <Button variant="slim" onClick={() => download(imageLink)}>
         Download Content
       </Button>
     </div>
@@ -214,6 +214,7 @@ export default function ViewContent() {
           <p className="text-black sm:text-center">
             Tiered Number of captionTokens: {numTieredTokens}
           </p>
+          <br />
           {subscription ? ( // goal of this is to restrict content to subscribers.
             <div className={styles['display-image']}>
               {isLoading && <LoadingDots />}
@@ -236,7 +237,7 @@ export default function ViewContent() {
               />
               <br></br>
               <Button
-                variant="primary"
+                variant="slim"
                 onClick={() => generateCaptionsReplicate(prompt, imageLink)}
               >
                 Generate Caption

@@ -230,6 +230,7 @@ export default function Dashboard2() {
               <br></br>
 
               <Button
+                variant="slim"
                 onClick={async () => {
                   if (
                     backgroundPrompt == null ||
@@ -373,6 +374,7 @@ export default function Dashboard2() {
           <p className="text-black sm:text-center">
             Just tell the AI the background you want generated.
           </p>
+          <br />
           <p className="text-black sm:text-center">
             Number of imageTokens: {numTokens}
           </p>

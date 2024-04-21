@@ -758,11 +758,12 @@ export default function Dashboard() {
               images: [image1, image2, image3]
           */}
                   <Row xs={1} md={3} className="g-4">
-                    <div>
+                    <div className="flex flex-col items-center sm:flex-col sm:items-center">
                       <br></br>
                       {console.log('zipFileName: ', zipFileName)}
                       {zipFileName && (
                         <Button
+                          variant="slim"
                           onClick={() =>
                             trainModel(instancePrompt, classPrompt)
                           }

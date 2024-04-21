@@ -287,11 +287,18 @@ export default function Gallery() {
   function subscribedAndModelChosen() {
     if (subscription) {
       return (
-        <div className="sm:flex sm:flex-col sm:align-center">
+        <div className="sm:flex sm:flex-col sm:align-center sm:items-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
             Gallery
           </h1>
-          <button onClick={() => fetchAndStorePhotos(true)}>sync</button>
+          <br />
+          <Button
+            className="w-60 center-items"
+            variant="slim"
+            onClick={() => fetchAndStorePhotos(true)}
+          >
+            Sync AI Imagery
+          </Button>
           <br />
           <p className="text-black sm:text-center">
             here is a list of generated images

@@ -347,6 +347,7 @@ export default function Train() {
                 <br></br>
 
                 <Button
+                  variant="slim"
                   onClick={async () => {
                     if (
                       contentPrompt == null ||
@@ -409,6 +410,7 @@ export default function Train() {
             />
             <br />
             <Button
+              variant="slim"
               onClick={async () => {
                 if (
                   contentPrompt == null ||
