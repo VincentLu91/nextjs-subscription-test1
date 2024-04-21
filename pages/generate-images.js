@@ -449,13 +449,14 @@ export default function Train() {
           </h1>
           <br />
           <p className="text-black sm:text-center">
-            Here, you will select product and style to generate.
-          </p>
-          <p className="text-black sm:text-center">
             Number of imageTokens: {numTokens}
           </p>
           <p className="text-black sm:text-center">
             Tiered Number of imageTokens: {numTieredTokens}
+          </p>
+          <br />
+          <p className="text-black sm:text-center">
+            Here, you will select product and style to generate.
           </p>
           {/* Display the custom message */}
           <p className="text-black sm:text-center">{message}</p>

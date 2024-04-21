@@ -611,6 +611,7 @@ export default function Dashboard() {
               <p className="text-black sm:text-center">
                 Tiered Number of trainingTokens: {numTieredTokens}
               </p>
+              <br></br>
               <p className="text-black sm:text-center">
                 Give your Product an identity! Feed images of it for the AI to
                 learn from

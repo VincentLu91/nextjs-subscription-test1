@@ -367,19 +367,19 @@ export default function Dashboard2() {
           {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
           <br></br>
           <p className="text-black sm:text-center">
+            Number of imageTokens: {numTokens}
+          </p>
+          <p className="text-black sm:text-center">
+            Tiered Number of imageTokens: {numTieredTokens}
+          </p>
+          <br></br>
+          <p className="text-black sm:text-center">
             Happy with existing product shot or just want to preserve product
             labels in the photo?
           </p>
           <br></br>
           <p className="text-black sm:text-center">
             Just tell the AI the background you want generated.
-          </p>
-          <br />
-          <p className="text-black sm:text-center">
-            Number of imageTokens: {numTokens}
-          </p>
-          <p className="text-black sm:text-center">
-            Tiered Number of imageTokens: {numTieredTokens}
           </p>
           <br></br>
           <p className="text-black sm:text-center">

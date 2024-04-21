@@ -301,7 +301,8 @@ export default function Gallery() {
           </Button>
           <br />
           <p className="text-black sm:text-center">
-            here is a list of generated images
+            All your generated images are saved here. To delete an image, click
+            'X' at the top left corner.
           </p>
           <p className="text-black sm:text-center">{message}</p>
           <br></br>

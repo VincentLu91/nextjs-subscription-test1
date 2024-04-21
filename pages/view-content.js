@@ -218,6 +218,11 @@ export default function ViewContent() {
           {subscription ? ( // goal of this is to restrict content to subscribers.
             <div className={styles['display-image']}>
               {isLoading && <LoadingDots />}
+              <p>
+                Download the image selected and generate caption for your social
+                media post.
+              </p>
+              <br />
               {displayContent || (
                 <p className="text-black">
                   You do not have image! Go back to Dashboard and select an
