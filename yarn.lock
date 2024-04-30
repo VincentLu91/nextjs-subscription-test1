@@ -4561,13 +4561,13 @@ react-bootstrap@^2.10.2:
     uncontrollable "^7.2.1"
     warning "^4.0.3"
 
-"react-dom@^16.8.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0", react-dom@^18.2.0, react-dom@^18.3.0, react-dom@>=16, react-dom@>=16.14.0, react-dom@>=16.6.0:
-  version "18.3.0"
-  resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.3.0.tgz"
-  integrity sha512-zaKdLBftQJnvb7FtDIpZtsAIb2MZU087RM8bRDZU8LVCCFYjPTsDZJNFUWPcVz3HFSN1n/caxi0ca4B/aaVQGQ==
+"react-dom@^16.8.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0", react-dom@^18.2.0, react-dom@^18.3.1, react-dom@>=16, react-dom@>=16.14.0, react-dom@>=16.6.0:
+  version "18.3.1"
+  resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz"
+  integrity sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==
   dependencies:
     loose-envify "^1.1.0"
-    scheduler "^0.23.1"
+    scheduler "^0.23.2"
 
 react-hot-toast@^2.4.1:
   version "2.4.1"
@@ -4616,10 +4616,10 @@ react-transition-group@^4.3.0, react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-"react@^16.11.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0", react@^18.2.0, react@^18.3.0, "react@>= 16.8.0 || 17.x.x || ^18.0.0-0", react@>=0.14.0, react@>=15.0.0, react@>=16, react@>=16.14.0, react@>=16.6.0, react@>=16.8.0:
-  version "18.3.0"
-  resolved "https://registry.npmjs.org/react/-/react-18.3.0.tgz"
-  integrity sha512-RPutkJftSAldDibyrjuku7q11d3oy6wKOyPe5K1HA/HwwrXcEqBdHsLypkC2FFYjP7bPUa6gbzSBhw4sY2JcDg==
+"react@^16.11.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0", react@^18.2.0, react@^18.3.1, "react@>= 16.8.0 || 17.x.x || ^18.0.0-0", react@>=0.14.0, react@>=15.0.0, react@>=16, react@>=16.14.0, react@>=16.6.0, react@>=16.8.0:
+  version "18.3.1"
+  resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
+  integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
   dependencies:
     loose-envify "^1.1.0"
 
@@ -4778,10 +4778,10 @@ safe-buffer@~5.2.0:
   resolved "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-scheduler@^0.23.1:
-  version "0.23.1"
-  resolved "https://registry.npmjs.org/scheduler/-/scheduler-0.23.1.tgz"
-  integrity sha512-5GKS5JGfiah1O38Vfa9srZE4s3wdHbwjlCrvIookrg2FO9aIwKLOJXuJQFlEfNcVSOXuaL2hzDeY20uVXcUtrw==
+scheduler@^0.23.2:
+  version "0.23.2"
+  resolved "https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz"
+  integrity sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==
   dependencies:
     loose-envify "^1.1.0"
 
