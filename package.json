@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.0.2",
     "@stripe/stripe-js": "^3.3.0",
-    "@supabase/supabase-js": "^2.42.7",
+    "@supabase/supabase-js": "^2.43.0",
     "@swc/helpers": "^0.5.11",
     "axios": "^1.6.8",
     "classnames": "^2.5.1",
