@@ -2818,10 +2818,10 @@
     "@smithy/types" "^3.0.0"
     tslib "^2.6.2"
 
-"@stripe/stripe-js@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.5.0.tgz"
-  integrity sha512-pKS3wZnJoL1iTyGBXAvCwduNNeghJHY6QSRSNNvpYnrrQrLZ6Owsazjyynu0e0ObRgks0i7Rv+pe2M7/MBTZpQ==
+"@stripe/stripe-js@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-4.0.0.tgz"
+  integrity sha512-R5zewuzTVPGn4dXkavbgDk8vSILkT5hRlzga10p6JzngR17qKi1fgc27kl58TmaVvgBZGngTRNH2j9kYdvfPGA==
 
 "@supabase/auth-js@2.64.2":
   version "2.64.2"
@@ -3413,10 +3413,10 @@ clsx@^2.0.0:
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
 
-cohere-ai@^7.10.5:
-  version "7.10.5"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.10.5.tgz"
-  integrity sha512-mfMiWktE07z0BzhRl0pJSLsNEXMlPPfkxR75PCEc99tuK5auVD2ZLhr37GtByQbN2ToIq34HrfQvMCZFO5V5pA==
+cohere-ai@^7.10.6:
+  version "7.10.6"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.10.6.tgz"
+  integrity sha512-J9y5wenl6IMqQUjklseocgusXcym0wnmuSoEdWyaNEQSYrNsHqWrpjeOYbQZ3A8/5edpPkR5Qsdwcc4FOJ5DOA==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
@@ -3430,7 +3430,6 @@ cohere-ai@^7.10.5:
     qs "6.11.2"
     readable-stream "^4.5.2"
     url-join "4.0.1"
-    web-streams-polyfill "^4.0.0"
 
 color-convert@^1.9.0:
   version "1.9.3"
@@ -6468,11 +6467,6 @@ warning@^4.0.0, warning@^4.0.3:
   integrity sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==
   dependencies:
     loose-envify "^1.0.0"
-
-web-streams-polyfill@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-4.0.0.tgz"
-  integrity sha512-0zJXHRAYEjM2tUfZ2DiSOHAa2aw1tisnnhU3ufD57R8iefL+DcdJyRBRyJpG+NUimDgbTI/lH+gAE1PAvV3Cgw==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
