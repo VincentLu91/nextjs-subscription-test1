@@ -3423,10 +3423,10 @@ clsx@^2.0.0:
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
 
-cohere-ai@^7.10.6:
-  version "7.10.6"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.10.6.tgz"
-  integrity sha512-J9y5wenl6IMqQUjklseocgusXcym0wnmuSoEdWyaNEQSYrNsHqWrpjeOYbQZ3A8/5edpPkR5Qsdwcc4FOJ5DOA==
+cohere-ai@^7.11.0:
+  version "7.11.0"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.11.0.tgz"
+  integrity sha512-rtBx1J4ifcg+zbl8o4yN7pzJ0akczj68wmMue1beqelVUEjbcw3uwP3dQ3hR14y41J3CDnCx+eYAh0oizx04fQ==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
@@ -6227,10 +6227,10 @@ swr@2.2.5:
     client-only "^0.0.1"
     use-sync-external-store "^1.2.0"
 
-tailwindcss@^3.4.5:
-  version "3.4.5"
-  resolved "https://registry.npmjs.org/tailwindcss/-/tailwindcss-3.4.5.tgz"
-  integrity sha512-DlTxttYcogpDfx3tf/8jfnma1nfAYi2cBUYV2YNoPPecwmO3YGiFlOX9D8tGAu+EDF38ryBzvrDKU/BLMsUwbw==
+tailwindcss@^3.4.6:
+  version "3.4.6"
+  resolved "https://registry.npmjs.org/tailwindcss/-/tailwindcss-3.4.6.tgz"
+  integrity sha512-1uRHzPB+Vzu57ocybfZ4jh5Q3SdlH7XW23J5sQoM9LhE9eIOlzxer/3XPSsycvih3rboRsvt0QCmzSrqyOYUIA==
   dependencies:
     "@alloc/quick-lru" "^5.2.0"
     arg "^5.0.2"
