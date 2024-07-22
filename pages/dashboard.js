@@ -418,6 +418,7 @@ export default function Dashboard() {
   async function getTieredTokenData() {
     console.log('user is: ', user.id);
     const trainingTieredData = await axios.get(
+      // when user first subscribes, it tries to get a price_id that didn't exist yet
       `/api/tieredToken?user=${user.id}` + `&tokenType=training_tokens`
     );
     console.log('trainingTieredData: ', trainingTieredData.data);
@@ -426,6 +427,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user) {
+      // maybe check if user is subscribed at all?
       getTieredTokenData();
     }
   }, [user]);
