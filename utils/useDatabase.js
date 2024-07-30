@@ -236,6 +236,7 @@ const getTieredTokens = async (customerId, typeOfToken) => {
     .from('subscriptions')
     .select('price_id')
     .eq('user_id', customerId)
+    .or('status.eq.active,status.eq.trialing')
     .single();
 
   if (noPriceDataError) return false;
