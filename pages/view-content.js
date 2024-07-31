@@ -186,7 +186,7 @@ export default function ViewContent() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (user && subscription) {
       getTieredTokenData();
     }
   }, [user]);

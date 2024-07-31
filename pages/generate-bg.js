@@ -352,7 +352,7 @@ export default function Dashboard2() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (user && subscription) {
       getTieredImageData();
     }
   }, [user]);

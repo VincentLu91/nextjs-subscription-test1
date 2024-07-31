@@ -68,6 +68,8 @@ const webhookHandler = async (req, res) => {
           case 'price.updated':
             await upsertPriceRecord(event.data.object);
             break;
+          case 'invoice.paid':
+            console.log('event.data.object is: ', event.data.object);
           case 'customer.subscription.created':
           case 'customer.subscription.updated':
           case 'customer.subscription.deleted':

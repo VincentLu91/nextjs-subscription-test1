@@ -426,7 +426,7 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (user && subscription) {
       // maybe check if user is subscribed at all?
       getTieredTokenData();
     }

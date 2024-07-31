@@ -259,7 +259,7 @@ export default function Train() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (user && subscription) {
       getTieredImageData();
     }
   }, [user]);
