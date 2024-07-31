@@ -156,7 +156,7 @@ const manageSubscriptionStatusChange = async (
       error: noCustomerError
     } = await supabaseAdmin
       .from('prices')
-      .select('image_tokens', 'training_tokens', 'caption_tokens')
+      .select('image_tokens, training_tokens, caption_tokens')
       .eq('id', subscription.items.data[0].price.id)
       .single();
 
