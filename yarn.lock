@@ -3414,16 +3414,16 @@ clsx@^2.0.0:
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
 
-cohere-ai@^7.11.0:
-  version "7.11.0"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.11.0.tgz"
-  integrity sha512-rtBx1J4ifcg+zbl8o4yN7pzJ0akczj68wmMue1beqelVUEjbcw3uwP3dQ3hR14y41J3CDnCx+eYAh0oizx04fQ==
+cohere-ai@^7.11.1:
+  version "7.11.1"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.11.1.tgz"
+  integrity sha512-Ua3BJmbQC+lQ9j6yHF/e+6Jsy47WUWczjYqwg9dKY5uBZSbSifmu79FgEcZiPo9VmfGMGWc2+U2gmxeguuO04w==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
     "@aws-sdk/protocol-http" "^3.374.0"
     "@aws-sdk/signature-v4" "^3.374.0"
-    form-data "4.0.0"
+    form-data "^4.0.0"
     form-data-encoder "^4.0.2"
     formdata-node "^6.0.3"
     js-base64 "3.7.2"
@@ -3831,7 +3831,7 @@ form-data-encoder@^4.0.2:
   resolved "https://registry.npmjs.org/form-data-encoder/-/form-data-encoder-4.0.2.tgz"
   integrity sha512-KQVhvhK8ZkWzxKxOr56CPulAhH3dobtuQ4+hNQ+HekH/Wp5gSOafqRAeTphQUJAIk0GBvHZgJ2ZGRWd5kphMuw==
 
-form-data@^4.0.0, form-data@4.0.0:
+form-data@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/form-data/-/form-data-4.0.0.tgz"
   integrity sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==
