@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.0.2",
     "@stripe/stripe-js": "^4.1.0",
-    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/supabase-js": "^2.45.1",
     "@swc/helpers": "^0.5.12",
     "axios": "^1.7.3",
     "classnames": "^2.5.1",
@@ -20,7 +20,7 @@
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "next": "^14.2.5",
-    "npm-check-updates": "^17.0.1",
+    "npm-check-updates": "^17.0.3",
     "react": "^18.3.1",
     "react-aria": "^3.34.1",
     "react-bootstrap": "^2.10.4",
@@ -34,9 +34,9 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "postcss": "^8.4.40",
+    "postcss": "^8.4.41",
     "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-preset-env": "^9.6.0",
+    "postcss-preset-env": "^10.0.0",
     "prettier": "^3.3.3"
   },
   "prettier": {
