@@ -19,7 +19,7 @@
     "cohere-ai": "^7.12.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "next": "^14.2.5",
+    "next": "^14.2.6",
     "npm-check-updates": "^17.1.0",
     "react": "^18.3.1",
     "react-aria": "^3.34.3",
