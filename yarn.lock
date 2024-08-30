@@ -2669,15 +2669,15 @@
     "@smithy/types" "^3.0.0"
     tslib "^2.6.2"
 
-"@stripe/stripe-js@^4.3.0":
-  version "4.3.0"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-4.3.0.tgz"
-  integrity sha512-bf8MxzzgD3dybtyIJUQSDMqxjEkJfsmj9IdRqDv609Zw08R41O7eoIy0f8KY41u8MbaFOYsn+XGJZtg1xwR2wQ==
+"@stripe/stripe-js@^4.4.0":
+  version "4.4.0"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-4.4.0.tgz"
+  integrity sha512-p1WeTOwnAyXQ9I5/YC3+JXoUB6NKMR4qGjBobie2+rgYa3ftUTRS2L5qRluw/tGACty5SxqnfORCdsaymD1XjQ==
 
-"@supabase/auth-js@2.64.4":
-  version "2.64.4"
-  resolved "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.64.4.tgz"
-  integrity sha512-9ITagy4WP4FLl+mke1rchapOH0RQpf++DI+WSG2sO1OFOZ0rW3cwAM0nCrMOxu+Zw4vJ4zObc08uvQrXx590Tg==
+"@supabase/auth-js@2.65.0":
+  version "2.65.0"
+  resolved "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.65.0.tgz"
+  integrity sha512-+wboHfZufAE2Y612OsKeVP4rVOeGZzzMLD/Ac3HrTQkkY4qXNjI6Af9gtmxwccE5nFvTiF114FEbIQ1hRq5uUw==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
@@ -2719,12 +2719,12 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.45.2":
-  version "2.45.2"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.45.2.tgz"
-  integrity sha512-kJKY3ISFusVKQWCP8Kqo20Ebxy2WLp6Ry/Suco0aQsPXH7bvn7clswsdhcfcH/5Tr0MYz/jcCjF0n/27SetiCw==
+"@supabase/supabase-js@^2.45.3":
+  version "2.45.3"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.45.3.tgz"
+  integrity sha512-4wAux6cuVMrdH/qUjKn6p3p3L9AtAO3Une6ojIrtpCj1RaXKVoyIATiacSRAI+pKff6XZBVCGC29v+z4Jo/uSw==
   dependencies:
-    "@supabase/auth-js" "2.64.4"
+    "@supabase/auth-js" "2.65.0"
     "@supabase/functions-js" "2.4.1"
     "@supabase/node-fetch" "2.6.15"
     "@supabase/postgrest-js" "1.15.8"
@@ -3008,10 +3008,10 @@ clsx@^2.0.0:
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
 
-cohere-ai@^7.12.1:
-  version "7.12.1"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.12.1.tgz"
-  integrity sha512-EgyhPSPR+d8ZP9JDe4obc/MHWbDVPlyqjnbGlY+rpL752JJ+9Fb2LCphRQt9AZhiwQhZUnUj2/xM+2cFK8fyAQ==
+cohere-ai@^7.13.0:
+  version "7.13.0"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.13.0.tgz"
+  integrity sha512-/VTqq2dW7YkQEfeBwEmckAHorQuw1exnfrO3orsixVXASr71oF3TL0w/xi9ZVN9xsoYpXZyVaiD8GBxLEiGJ7Q==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
@@ -4366,10 +4366,10 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-stripe@^16.8.0:
-  version "16.8.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-16.8.0.tgz"
-  integrity sha512-6rOIcGOkxcc29jvhEyOYmpPFilekOBV+7vpemAoIAfbtCRW1yxzdDGM0/0vyekHglLL+wqGpP5ldrhO3dJ2JEQ==
+stripe@^16.9.0:
+  version "16.9.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-16.9.0.tgz"
+  integrity sha512-SgzwdMgWNe1FD1A1WevZ/wuv8b4yWz8SiG/vO7Pf4cBl0qat20Clz8Zself+tcbB+fuMkZJrjJ2WmarIgXfCow==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
