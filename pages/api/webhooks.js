@@ -4,6 +4,7 @@ import {
   upsertPriceRecord,
   manageSubscriptionStatusChange
 } from '../../utils/useDatabase';
+import getRawBody from 'raw-body';
 
 // Stripe requires the raw body to construct the event.
 export const config = {
@@ -42,7 +43,8 @@ const relevantEvents = new Set([
 
 const webhookHandler = async (req, res) => {
   if (req.method === 'POST') {
-    const buf = await buffer(req);
+    //const buf = await buffer(req);
+    const buf = await getRawBody(req);
     const sig = req.headers['stripe-signature'];
     const webhookSecret =
       process.env.STRIPE_WEBHOOK_SECRET_LIVE ??
