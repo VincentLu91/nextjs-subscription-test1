@@ -20,7 +20,7 @@
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "next": "^14.2.7",
-    "npm-check-updates": "^17.1.0",
+    "npm-check-updates": "^17.1.1",
     "raw-body": "^3.0.0",
     "react": "^18.3.1",
     "react-aria": "^3.34.3",
@@ -35,7 +35,7 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "postcss": "^8.4.42",
+    "postcss": "^8.4.43",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-preset-env": "^10.0.2",
     "prettier": "^3.3.3"
