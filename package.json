@@ -13,7 +13,7 @@
     "@sanity/image-url": "^1.0.2",
     "@stripe/stripe-js": "^4.4.0",
     "@supabase/supabase-js": "^2.45.3",
-    "@swc/helpers": "^0.5.12",
+    "@swc/helpers": "^0.5.13",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "cohere-ai": "^7.13.0",
@@ -35,7 +35,7 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "postcss": "^8.4.43",
+    "postcss": "^8.4.44",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-preset-env": "^10.0.2",
     "prettier": "^3.3.3"
