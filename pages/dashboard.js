@@ -410,7 +410,7 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (user && subscription) {
       getTrainingTokenData();
     }
   }, [user]);
