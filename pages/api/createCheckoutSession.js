@@ -9,9 +9,11 @@ const createCheckoutSession = async (req, res) => {
     const { price, quantity = 1, metadata = {} } = req.body;
 
     try {
-      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+      const {
+        data: { user },
+        error
+      } = await supabaseAdmin.auth.getUser(token);
       if (error) throw error;
-
 
       const customer = await createOrRetrieveCustomer({
         uuid: user.id,
@@ -30,10 +32,21 @@ const createCheckoutSession = async (req, res) => {
         ],
         mode: 'subscription',
         allow_promotion_codes: true,
-        subscription_data: {
+        /*subscription_data: { // I don't know what's the use of this.
           trial_from_plan: true, // todo is this ok?
           metadata
+        },*/
+        // use this instead...from docs
+        // https://docs.stripe.com/billing/subscriptions/trials#configure-free-trials-without-payment-methods-to-cancel
+        subscription_data: {
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'pause'
+            }
+          },
+          trial_period_days: 30
         },
+        payment_method_collection: 'if_required',
         success_url: `${getURL()}/account`,
         cancel_url: `${getURL()}/`
       });
