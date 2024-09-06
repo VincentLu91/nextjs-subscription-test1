@@ -69,7 +69,7 @@ export default function Pricing({ products }) {
             Choose a Plan.
           </h1>
           <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
-            You could start generating quality images for 14 days.
+            You could start generating quality images for 30 days.
           </p>
           <div className="relative self-center mt-6 bg-primary-2 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
             <button
