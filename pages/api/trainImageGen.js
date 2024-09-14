@@ -9,6 +9,8 @@ export default async function handler(req, res) {
     trainer_version,
     user
   } = req.query;
+  // Access environment variable for steps
+  const steps = process.env.TRAINING_STEPS || 10; // Default to 10 if not set
   let result = await deductUserTrainingToken(user, 1);
   if (result) {
     try {
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
             learning_rate: 0.0004,
             input_images: instance_data,
             lora_rank: 16,
-            steps: 10 //2000 or 1000
+            steps: parseInt(steps) // Use the environment variable for steps
           }
           //model: 'vincentlu91/vincelubooth',
           //trainer_version,
