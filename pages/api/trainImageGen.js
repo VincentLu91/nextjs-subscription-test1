@@ -15,18 +15,17 @@ export default async function handler(req, res) {
       const resp = await axios.post(
         // send prediction to dashboard but it takes time to generate image
         //'https://dreambooth-api-experimental.replicate.com/v1/trainings',
-        'https://api.replicate.com/v1/models/stability-ai/sdxl/versions/' +
+        'https://api.replicate.com/v1/models/ostris/flux-dev-lora-trainer/versions/' +
           trainer_version +
           '/trainings',
         {
-          destination: 'vincentlu91/sdxl-tuning',
+          destination: 'vincentlu91/flux-tuning',
           input: {
-            token_string: instance_prompt,
-            caption_prefix: 'a photo of ' + instance_prompt,
-            mask_target_prompts: class_prompt,
-            refine: 'expert_ensemble_refiner', // expert_ensemble_refiner or base_image_refiner
+            trigger_word: instance_prompt,
+            learning_rate: 0.0004,
             input_images: instance_data,
-            max_train_steps: 10 //2000
+            lora_rank: 16,
+            steps: 10 //2000 or 1000
           }
           //model: 'vincentlu91/vincelubooth',
           //trainer_version,
