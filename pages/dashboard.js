@@ -332,9 +332,7 @@ export default function Dashboard() {
       return;
     }
     let trainerVersion =
-      //'cd3f925f7ab21afaef7d45224790eedbb837eeac40d22e8fefe015489ab644aa';
-      // https://replicate.com/stability-ai/sdxl/versions
-      '7ca7f0d3a51cd993449541539270971d38a24d9a0d42f073caf25190d41346d7';
+      'd995297071a44dcb72244e6c19462111649ec86a9646c32df56daa7f14801944';
     if (instancePrompt == null || instancePrompt.trim() == '') {
       alert("You haven't entered anything!");
     } else if (classPrompt == null || classPrompt.trim() == '') {
