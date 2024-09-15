@@ -16,8 +16,7 @@ import Input from '../components/ui/Input';
 
 // https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/062f6e29-5681-46f1-a4c4-48e60a441e4d/71894cfe-50dc-46fd-a31d-429671fba93e
 
-const CDNURL =
-  'https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/';
+const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
 
 // CDNURL + user.id + "/" + image.name
 

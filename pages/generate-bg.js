@@ -13,8 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const ATTEMPTS = 1;
 
-const CDNURL =
-  'https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/';
+const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
 
 export default function Dashboard2() {
   const [loading, setLoading] = useState(false);
