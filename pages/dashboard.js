@@ -657,7 +657,7 @@ export default function Dashboard() {
                       htmlFor="classPrompt"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Name of Product/Brand:
+                      Category of Product/Brand:
                     </label>
                     <input
                       type="text"
