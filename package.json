@@ -19,8 +19,8 @@
     "cohere-ai": "^7.13.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "next": "^14.2.11",
-    "npm-check-updates": "^17.1.1",
+    "next": "^14.2.12",
+    "npm-check-updates": "^17.1.2",
     "raw-body": "^3.0.0",
     "react": "^18.3.1",
     "react-aria": "^3.34.3",
@@ -31,7 +31,7 @@
     "react-select": "^5.8.0",
     "stripe": "^16.11.0",
     "swr": "2.2.5",
-    "tailwindcss": "^3.4.11",
+    "tailwindcss": "^3.4.12",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
