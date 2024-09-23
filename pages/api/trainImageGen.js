@@ -26,6 +26,8 @@ export default async function handler(req, res) {
             trigger_word: instance_prompt,
             learning_rate: 0.0004,
             input_images: instance_data,
+            autocaption_prefix:
+              'a photo of a ' + instance_prompt + ' ' + class_prompt,
             lora_rank: 16,
             steps: parseInt(steps) // Use the environment variable for steps
           }
