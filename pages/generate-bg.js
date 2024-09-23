@@ -72,39 +72,76 @@ export default function Dashboard2() {
     return resp.data;
   };
 
+  async function copyImageToSupabase(img_url) {
+    try {
+      const response = await fetch(img_url);
+      const blob = await response.blob();
+      const uniqueFileName = `${user.id}/${uuidv4()}.png`;
+
+      const { data, error } = await supabase.storage
+        .from('images') // Specify the bucket name
+        .upload(uniqueFileName, blob, {
+          contentType: blob.type
+        });
+
+      if (error) {
+        console.error('Error uploading file:', error);
+        return null;
+      }
+
+      // Return the unique file name to be used later for URL generation
+      return uniqueFileName;
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+  }
+
   const getImageResults = async (attempt, url) => {
     const output = await axios.get('/api/imageresults?url=' + url);
     if (output.data.status === 'succeeded') {
-      await supabase.from('photos').insert({
-        customer_id: user.identities[0].id,
-        photo_url: output.data.output.image
-      });
-      const localPhotos = localStorage.getItem('generatedPhotos');
-      if (localPhotos) {
-        const localPhotosJson = JSON.parse(localPhotos);
-        localPhotosJson.push(output.data.output.image);
-        localStorage.setItem(
-          'generatedPhotos',
-          JSON.stringify(localPhotosJson)
-        );
-      }
       const result = output.data.output.image;
-      if (result) {
+
+      // Wait for the image to be copied and get the unique filename
+      const uniqueFileName = await copyImageToSupabase(result);
+
+      if (uniqueFileName) {
+        console.log('uniqueFileName: ', uniqueFileName);
+        const { data, error: urlError } = supabase.storage
+          .from('images')
+          .getPublicUrl(uniqueFileName);
+
+        if (urlError) {
+          console.error('Error generating public URL:', urlError.message);
+          return;
+        }
+        // Save the uploaded URL to the database
+        await supabase.from('photos').insert({
+          customer_id: user.identities[0].id,
+          photo_url: data.publicUrl
+        });
+
+        // Save the uploaded URL to localStorage
+        const localPhotos = localStorage.getItem('generatedPhotos');
+        if (localPhotos) {
+          const localPhotosJson = JSON.parse(localPhotos);
+          localPhotosJson.push(output.data.output.image);
+          localStorage.setItem(
+            'generatedPhotos',
+            JSON.stringify(localPhotosJson)
+          );
+        }
         setBackgroundImageList((current) => [
           ...current,
           { url: result, text: '' } // placeholder text is empty for optional caption generation
         ]);
-      } else {
-        alert('nothing generated');
+        setBackgroundImagePredictions((state) => ({
+          ...state,
+          [attempt]: { ...state[attempt], status: 'succeeded' }
+        }));
+        setBackgroundPrompt(null);
       }
-      console.log('results', result);
-      setBackgroundImagePredictions((state) => ({
-        ...state,
-        [attempt]: { ...state[attempt], status: 'succeeded' }
-      }));
-      setBackgroundPrompt(null);
     }
-    console.log('output data is: ', output);
   };
 
   useEffect(() => {
