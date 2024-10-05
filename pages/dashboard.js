@@ -371,7 +371,7 @@ export default function Dashboard() {
           .get(
             '/api/trainImageGen?instance_prompt=' +
               instancePrompt +
-              '&class_prompt=a%20photo%20of%20a%20' +
+              '&class_prompt=' +
               classPrompt +
               '&instance_data=' +
               CDNURL +
