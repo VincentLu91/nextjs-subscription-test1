@@ -37,7 +37,7 @@
   "devDependencies": {
     "postcss": "^8.4.47",
     "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-preset-env": "^10.0.6",
+    "postcss-preset-env": "^10.0.7",
     "prettier": "^3.3.3"
   },
   "prettier": {
