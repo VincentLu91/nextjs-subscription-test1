@@ -271,7 +271,10 @@ export default function Train() {
       console.log(i.instance_prompt);
       //i.instance_prompt;
       if (i.model_version != null) {
-        instanceArr.push({ label: i.instance_prompt, value: i.model_version });
+        instanceArr.push({
+          label: i.instance_prompt + '' + i.class_prompt,
+          value: i.model_version
+        });
       }
     });
     console.log('instanceArr: ', instanceArr);
@@ -382,6 +385,15 @@ export default function Train() {
             <br />
             {!isGeneratingImages && (
               <div className="flex flex-col items-center p-2">
+                <p>
+                  **Tip:** To reference the product in your instruction, ensure
+                  it's exactly as selected from the dropdown.
+                </p>
+                <p>
+                  For example, if the value is "myProduct cup" and you want it
+                  on a brown table, write: "myProduct cup on a brown table."
+                </p>
+                <br />
                 <input
                   type="text"
                   id="contentPrompt"
