@@ -228,6 +228,11 @@ export default function ViewContent() {
                 </p>
               )}
               <br></br>
+              <p>
+                Enter your instruction for the AI to generate a caption,
+                including any product details or relevant context.
+              </p>
+              <br></br>
               <input
                 type="text"
                 id="prompt"
