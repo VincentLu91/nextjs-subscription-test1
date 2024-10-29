@@ -233,6 +233,12 @@ export default function ViewContent() {
                 including any product details or relevant context.
               </p>
               <br></br>
+              <p>
+                e.g., Write a 300-word caption for our honey brand above. Try to
+                encourage followers to check out our store storename.com. Also
+                our IG handle is @store_name
+              </p>
+              <br></br>
               <input
                 type="text"
                 id="prompt"
