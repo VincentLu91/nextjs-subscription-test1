@@ -417,6 +417,11 @@ export default function Dashboard2() {
           </p>
           <br></br>
           <p className="text-black sm:text-center">
+            Your product remains fixed in place, no matter where you position it
+            when generating a new background.
+          </p>
+          <br></br>
+          <p className="text-black sm:text-center">
             Once generated, it will be saved to the gallery.
           </p>
           <br />
