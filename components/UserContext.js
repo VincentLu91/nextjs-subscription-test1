@@ -35,6 +35,7 @@ export const UserContextProvider = (props) => {
   );
   const [modelName, setModelName] = useState(null);
   const [modelVersion, setModelVersion] = useState(null);
+  const [modelClass, setModelClass] = useState(null);
 
   const [instanceList, setInstanceList] = useState([]);
   const [predictions, setPredictions] = useState({}); // { 0 : { get: 'url', cancel: "url", status: 'succeeded'}}
@@ -141,6 +142,8 @@ export const UserContextProvider = (props) => {
     setModelName,
     modelVersion,
     setModelVersion,
+    modelClass,
+    setModelClass,
     backgroundPrompt,
     setBackgroundPrompt,
     isBGImagesLoading,
