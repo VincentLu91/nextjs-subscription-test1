@@ -272,7 +272,7 @@ export default function Train() {
       //i.instance_prompt;
       if (i.model_version != null) {
         instanceArr.push({
-          label: i.instance_prompt + '' + i.class_prompt,
+          label: i.instance_prompt + ' ' + i.class_prompt,
           value: i.model_version
         });
       }
