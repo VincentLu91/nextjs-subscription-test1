@@ -379,21 +379,13 @@ export default function Train() {
         return (
           <div className={styles['get-image-button']}>
             <p style={{ color: 'var(--accent-1)' }}>
-              Product to generate: {modelName}
-            </p>
-            <p style={{ color: 'var(--accent-1)' }}>
-              Type of product: {modelClass}
+              Product to generate: {modelName} {modelClass}
             </p>
             <br />
             {isGeneratingImages ? (
-              <>
-                <p style={{ color: 'var(--accent-1)' }}>
-                  Product to generate: {modelName}
-                </p>
-                <p style={{ color: 'var(--accent-1)' }}>
-                  Type of product: {modelClass}
-                </p>
-              </>
+              <p style={{ color: 'var(--accent-1)' }}>
+                Generating product: {modelName} {modelClass}
+              </p>
             ) : (
               <div className="flex flex-row center-items p-2">
                 <Select
@@ -417,7 +409,8 @@ export default function Train() {
               <div className="flex flex-col items-center p-2">
                 <p>
                   **Tip:** To reference the product in your instruction, ensure
-                  it's exactly as selected from the dropdown.
+                  it's exactly as written as seen in 'Product to generate:'
+                  field.
                 </p>
                 <p>
                   For example, if the value is "myProduct cup" and you want it
