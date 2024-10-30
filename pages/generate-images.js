@@ -45,6 +45,8 @@ export default function Train() {
     setModelName,
     modelVersion,
     setModelVersion,
+    modelClass,
+    setModelClass,
     instanceList,
     setInstanceList,
     predictions,
@@ -240,11 +242,28 @@ export default function Train() {
   };
 
   // handle onChange event of the dropdown
-  const handleSelectChange = (e) => {
+  const handleSelectChange = async (e) => {
+    // Make the function async
     setModelName(e.label);
     console.log('Model name selected: ', e.label);
     setModelVersion(e.value);
     console.log('Model version selected: ', e.value);
+
+    try {
+      // Await the supabase call
+      const { data, error } = await supabase
+        .from('ai-models')
+        .select('class_prompt')
+        .eq('instance_prompt', e.label);
+
+      if (error) {
+        console.error('Error fetching class prompt:', error);
+      } else if (data && data.length > 0) {
+        setModelClass(data[0].class_prompt);
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    }
   };
 
   const selectImageStyle = (e) => {
@@ -359,11 +378,22 @@ export default function Train() {
       if (modelVersion) {
         return (
           <div className={styles['get-image-button']}>
+            <p style={{ color: 'var(--accent-1)' }}>
+              Product to generate: {modelName}
+            </p>
+            <p style={{ color: 'var(--accent-1)' }}>
+              Type of product: {modelClass}
+            </p>
             <br />
             {isGeneratingImages ? (
-              <p style={{ color: 'var(--accent-1)' }}>
-                Product to generate: {modelName}
-              </p>
+              <>
+                <p style={{ color: 'var(--accent-1)' }}>
+                  Product to generate: {modelName}
+                </p>
+                <p style={{ color: 'var(--accent-1)' }}>
+                  Type of product: {modelClass}
+                </p>
+              </>
             ) : (
               <div className="flex flex-row center-items p-2">
                 <Select
