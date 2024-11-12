@@ -11,9 +11,9 @@
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.1.0",
-    "@stripe/stripe-js": "^4.9.0",
+    "@stripe/stripe-js": "^4.10.0",
     "@supabase/supabase-js": "^2.46.1",
-    "@swc/helpers": "^0.5.13",
+    "@swc/helpers": "^0.5.15",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "cohere-ai": "^7.14.0",
@@ -28,16 +28,16 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-merge-refs": "^2.1.1",
-    "react-select": "^5.8.2",
+    "react-select": "^5.8.3",
     "stripe": "^17.3.1",
     "swr": "2.2.5",
     "tailwindcss": "^3.4.14",
-    "uuid": "^11.0.2"
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "postcss": "^8.4.47",
+    "postcss": "^8.4.49",
     "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-preset-env": "^10.0.9",
+    "postcss-preset-env": "^10.1.0",
     "prettier": "^3.3.3"
   },
   "prettier": {
