@@ -11,7 +11,7 @@
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.1.0",
-    "@stripe/stripe-js": "^5.0.0",
+    "@stripe/stripe-js": "^5.2.0",
     "@supabase/supabase-js": "^2.46.1",
     "@swc/helpers": "^0.5.15",
     "axios": "^1.7.7",
