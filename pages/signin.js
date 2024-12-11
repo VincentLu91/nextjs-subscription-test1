@@ -145,6 +145,17 @@ const SignIn = () => {
               Sign up.
             </Link>
           </span>
+
+          <span className="pt-1 text-center text-sm">
+            <span className="text-secondary">Forgot your password?</span>
+            {` `}
+            <Link
+              href="/reset"
+              className="text-accent-9 font-bold hover:underline cursor-pointer"
+            >
+              Request a reset.
+            </Link>
+          </span>
         </div>
 
         {/*<div className="flex items-center my-6">
