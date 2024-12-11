@@ -57,16 +57,12 @@ function PasswordReset() {
         });
 
         if (error) {
-          toast.error(error.message, {
-            id: notification
-          });
-        } else if (!error) {
-          toast.success('Password Changed', {
-            id: notification
-          });
+          toast.error(error.message, { id: notification });
         } else {
-          alert("You've changed your password");
-          router.replace('/dashboard');
+          // Success flow
+          toast.success('Password Changed', { id: notification });
+          alert("You've changed your password"); // Alert the user
+          router.replace('/dashboard'); // Redirect to dashboard
         }
       }
     } catch (error) {

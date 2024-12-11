@@ -28,6 +28,9 @@ function reset() {
         toast.success('Sent', {
           id: notification
         });
+        alert(
+          'Your password reset email is sent to you. Please check your spam mail'
+        );
       }
     } catch (error) {
       toast.error('Sorry Error occured', {
