@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { supabase } from '../utils/initSupabase';
+import { useRouter } from 'next/router';
 
 function PasswordReset() {
   const [password, setPassword] = useState(null);
 
   const [hash, setHash] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     setHash(window.location.hash);
@@ -62,6 +64,9 @@ function PasswordReset() {
           toast.success('Password Changed', {
             id: notification
           });
+        } else {
+          alert("You've changed your password");
+          router.replace('/dashboard');
         }
       }
     } catch (error) {
