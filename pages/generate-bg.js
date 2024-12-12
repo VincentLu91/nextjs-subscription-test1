@@ -233,75 +233,76 @@ export default function Dashboard2() {
     }).format(subscription.prices.unit_amount / 100);
 
   function subscribedAndModelChosen() {
-    if (subscription) {
-      return (
-        <div className={styles['get-image-button']}>
-          {/*isGeneratingBGImages ? (
+    // currently working with free users
+    //if (subscription) {
+    return (
+      <div className={styles['get-image-button']}>
+        {/*isGeneratingBGImages ? (
             <p style={{ color: 'black' }}>Generating</p>
           ) : (
             <p style={{ color: 'black' }}>Please generate</p>
           )*/}
 
-          <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-            <Form.Control
-              type="file"
-              accept="image/png, image/jpeg"
-              //accept="*"
-              onChange={(e) => uploadFile(e)}
+        <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+          <Form.Control
+            type="file"
+            accept="image/png, image/jpeg"
+            //accept="*"
+            onChange={(e) => uploadFile(e)}
+          />
+        </Form.Group>
+        <br />
+        {!isGeneratingBGImages && (
+          <div className="flex flex-col items-center p-2">
+            <input
+              type="text"
+              id="backgroundPrompt"
+              name="backgroundPrompt"
+              placeholder="Enter text to generate image of your product/brand"
+              value={backgroundPrompt || ''}
+              onChange={handleChange}
+              style={{ width: '420px' }}
+              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
             />
-          </Form.Group>
-          <br />
-          {!isGeneratingBGImages && (
-            <div className="flex flex-col items-center p-2">
-              <input
-                type="text"
-                id="backgroundPrompt"
-                name="backgroundPrompt"
-                placeholder="Enter text to generate image of your product/brand"
-                value={backgroundPrompt || ''}
-                onChange={handleChange}
-                style={{ width: '420px' }}
-                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-              />
-              <br></br>
+            <br></br>
 
-              <Button
-                variant="slim"
-                onClick={async () => {
-                  if (
-                    backgroundPrompt == null ||
-                    backgroundPrompt.trim() == '' ||
-                    isImageUploaded == false
-                  ) {
-                    alert('Please enter all prompts and upload your image!');
-                  } else {
-                    clearInterval(intervalImage.current);
-                    setBackgroundImagePredictions({});
-                    setBackgroundImageList([]); // when generation begins, list of images is empty
-                    setisBGImagesLoading(true); // change this. seriously
-                    setFinishMessage('');
-                    for (let i = 0; i < ATTEMPTS; i++) {
-                      // 2 is a placeholder, later I plan to generate 16 images
-                      getImage(i, backgroundPrompt);
-                    }
+            <Button
+              variant="slim"
+              onClick={async () => {
+                if (
+                  backgroundPrompt == null ||
+                  backgroundPrompt.trim() == '' ||
+                  isImageUploaded == false
+                ) {
+                  alert('Please enter all prompts and upload your image!');
+                } else {
+                  clearInterval(intervalImage.current);
+                  setBackgroundImagePredictions({});
+                  setBackgroundImageList([]); // when generation begins, list of images is empty
+                  setisBGImagesLoading(true); // change this. seriously
+                  setFinishMessage('');
+                  for (let i = 0; i < ATTEMPTS; i++) {
+                    // 2 is a placeholder, later I plan to generate 16 images
+                    getImage(i, backgroundPrompt);
                   }
-                }}
-              >
-                Generate Image
-              </Button>
-            </div>
-          )}
-          <br></br>
-          {loadingWithBackgroundPrompt}
-          {finishMessage}
-          <div className={styles['grid']}>
-            {backgroundImageList.map(renderCard)}
+                }
+              }}
+            >
+              Generate Image
+            </Button>
           </div>
+        )}
+        <br></br>
+        {loadingWithBackgroundPrompt}
+        {finishMessage}
+        <div className={styles['grid']}>
+          {backgroundImageList.map(renderCard)}
         </div>
-      );
-    } else {
+      </div>
+    );
+    /*} else {
       return <h1 className="text-black">You are not subscribed yet!</h1>;
-    }
+    }*/
   }
 
   async function getFiles() {
@@ -372,11 +373,11 @@ export default function Dashboard2() {
     setNumTokens(imageTokenData.data);
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (user) {
       getImageTokenData();
     }
-  }, [user]);
+  }, [user]);*/
 
   async function getTieredImageData() {
     console.log('user is: ', user.id);
@@ -387,11 +388,11 @@ export default function Dashboard2() {
     setNumTieredTokens(imageTieredData.data);
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (user && subscription) {
       getTieredImageData();
     }
-  }, [user]);
+  }, [user]);*/
 
   return (
     <section className="bg-white mb-32">
@@ -402,10 +403,11 @@ export default function Dashboard2() {
           </h1>
           {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
           <br></br>
-          <p className="text-black sm:text-center">
+          {/** working with free users */}
+          {/*<p className="text-black sm:text-center">
             Number of image rendering credits available: {numTokens} /{' '}
             {numTieredTokens}
-          </p>
+          </p>*/}
           <br></br>
           <p className="text-black sm:text-center">
             Happy with existing product shot or just want to preserve product
