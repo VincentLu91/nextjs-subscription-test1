@@ -2,6 +2,8 @@ import { supabase } from '../utils/initSupabase';
 import Pricing from '../components/Pricing';
 
 export default function PricingPage({ products }) {
+  // currently working with free users
+  return <div>Pricing TBA!</div>;
   return <Pricing products={products} />;
 }
 

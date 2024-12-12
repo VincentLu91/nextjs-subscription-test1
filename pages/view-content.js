@@ -170,11 +170,14 @@ export default function ViewContent() {
     setNumTokens(captionTokenData.data);
   }
 
-  useEffect(() => {
+  {
+    /** working with free users */
+  }
+  /*useEffect(() => {
     if (user) {
       getCaptionTokenData();
     }
-  }, [user]);
+  }, [user]);*/
 
   async function getTieredTokenData() {
     console.log('user is: ', user.id);
@@ -185,11 +188,14 @@ export default function ViewContent() {
     setNumTieredTokens(captionTieredData.data);
   }
 
-  useEffect(() => {
+  {
+    /** working with free users */
+  }
+  /*useEffect(() => {
     if (user && subscription) {
       getTieredTokenData();
     }
-  }, [user]);
+  }, [user]);*/
 
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
@@ -208,12 +214,13 @@ export default function ViewContent() {
             View Content and Generate Captions
           </h1>
           <br></br>
-          <p className="sm:text-center text-black">
+          {/** working with free users */}
+          {/*<p className="sm:text-center text-black">
             Number of caption creation credits available: {numTokens} /{' '}
             {numTieredTokens}
-          </p>
+          </p>*/}
           <br />
-          {subscription ? ( // goal of this is to restrict content to subscribers.
+          {/*subscription ? ( // goal of this is to restrict content to subscribers.
             <div className={styles['display-image']}>
               {isLoading && <LoadingDots />}
               <p>
@@ -271,7 +278,63 @@ export default function ViewContent() {
             </div>
           ) : (
             <h1 className="text-black">You are not subscribed yet!</h1>
-          )}
+          )*/}
+          {/** working with free users, so commented above logic */}
+          <div className={styles['display-image']}>
+            {isLoading && <LoadingDots />}
+            <p>
+              Download the image selected and generate caption for your social
+              media post.
+            </p>
+            <br />
+            {displayContent || (
+              <p className="text-black">
+                You do not have image! Go back to Dashboard and select an image
+                first!
+              </p>
+            )}
+            <br></br>
+            <p>
+              Enter your instruction for the AI to generate a caption, including
+              any product details or relevant context.
+            </p>
+            <br></br>
+            <p>
+              e.g., Write a 300-word caption for our honey brand above. Try to
+              encourage followers to check out our store storename.com. Also our
+              IG handle is @store_name
+            </p>
+            <br></br>
+            <input
+              type="text"
+              id="prompt"
+              name="prompt"
+              onChange={handleChange}
+              value={prompt}
+              placeholder="Describe caption you want generated"
+              style={{ width: '600px' }}
+              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+            />
+            <br></br>
+            <Button
+              variant="slim"
+              onClick={() => generateCaptionsReplicate(prompt, imageLink)}
+            >
+              Generate Caption
+            </Button>
+            <br></br>
+            <textarea
+              type="text"
+              id="caption"
+              name="caption"
+              onChange={handleChangeCaption}
+              value={caption}
+              cols="80"
+              rows="15"
+              placeholder="Caption generating or you could type it yourself..."
+              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+            />
+          </div>
         </div>
       </div>
     </section>
