@@ -312,7 +312,7 @@ export default function Gallery() {
         </div>
       );
     } else {
-      return <h1 className="text-black">You are not subscribed yet!</h1>;
+      return <h1 className="text-black">You are not a paid member yet!!</h1>;
     }
   }
 
