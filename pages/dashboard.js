@@ -618,8 +618,8 @@ export default function Dashboard() {
             </p>
             <br></br>
             <p className="text-black sm:text-center">
-              Note that training typically takes 3-5 minutes. While training, go
-              get some coffee.
+              For best results, upload 20 or more images. Training will take
+              half an hour to over 1 hour. While training, go get some coffee.
             </p>
             <br></br>
             <p
