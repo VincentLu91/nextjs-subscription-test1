@@ -618,7 +618,7 @@ export default function Dashboard() {
             </p>
             <br></br>
             <p className="text-black sm:text-center">
-              For best results, upload 20 or more images. Training will take
+              At least 3-5 images. For best results, upload 20 or more images. Training will take
               half an hour to over 1 hour. While training, go get some coffee.
             </p>
             <br></br>
