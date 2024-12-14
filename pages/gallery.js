@@ -228,6 +228,28 @@ export default function Gallery() {
     fetchAndStorePhotos();
   }, []);
 
+  // Clear localStorage on route change
+  useEffect(() => {
+    const handleRouteChange = () => {
+      localStorage.removeItem('generatedPhotos'); // Clear the data
+    };
+
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('generatedPhotos'); // Clear on tab close
+    };
+
+    // Listen to route changes
+    router.events.on('routeChangeStart', handleRouteChange);
+    // Listen to tab close or reload
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      // Cleanup the listeners when the component unmounts
+      router.events.off('routeChangeStart', handleRouteChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [router]);
+
   const viewGeneratedContent = (url) => {
     setImageLink(url);
     localStorage.setItem('imageLink', url); // Save imageLink to localStorage
