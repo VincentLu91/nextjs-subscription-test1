@@ -386,12 +386,12 @@ export default function Train() {
     return (
       <div className={styles['get-image-button']}>
         <p style={{ color: 'var(--accent-1)' }}>
-          Product to generate: {modelName}
+          Product to generate: {modelName} {modelClass}
         </p>
         <br />
         {isGeneratingImages ? (
           <p style={{ color: 'var(--accent-1)' }}>
-            Generating product: {modelName}
+            Generating product: {modelName} {modelClass}
           </p>
         ) : (
           <div className="flex flex-row center-items p-2">
