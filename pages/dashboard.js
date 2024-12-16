@@ -622,9 +622,8 @@ export default function Dashboard() {
               Training will take half an hour to over 1 hour. While training, go
               get some coffee.
             </p>
-            <p>
-              Once finished, you'll be taken to a new page to the "Generate
-              Images" page.
+            <p className="text-black sm:text-center">
+              Once finished, you'll be taken to the "Generate Images" page.
             </p>
             <br></br>
             <p
