@@ -70,6 +70,11 @@ const SignUp = () => {
             {message.content}
           </div>
         )}
+        <span className="pt-1 text-center text-sm">
+          <span className="text-secondary">
+            Sign up and we'll send you $15 via e-transfer.
+          </span>
+        </span>
         <Input placeholder="Name" onChange={setName} />
         <Input type="email" placeholder="Email" onChange={setEmail} required />
         <Input type="password" placeholder="Password" onChange={setPassword} />
