@@ -72,7 +72,7 @@ const SignUp = () => {
         )}
         <span className="pt-1 text-center text-sm">
           <span className="text-secondary">
-            Sign up and we'll send you $15 via e-transfer.
+            Sign up and we'll send you $15 via PayPal.
           </span>
         </span>
         <Input placeholder="Name" onChange={setName} />
