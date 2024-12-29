@@ -37,7 +37,7 @@ const SignUp = () => {
       } else {
         setMessage({
           type: 'note',
-          content: 'Check your email for the confirmation link.'
+          content: 'Check your email or spam folder for the confirmation link.'
         });
       }
     }
@@ -71,9 +71,7 @@ const SignUp = () => {
           </div>
         )}
         <span className="pt-1 text-center text-sm">
-          <span className="text-secondary">
-            Sign up and we'll send you $15 via PayPal.
-          </span>
+          <span className="text-secondary">Sign up and receive $15.</span>
         </span>
         <Input placeholder="Name" onChange={setName} />
         <Input type="email" placeholder="Email" onChange={setEmail} required />
