@@ -487,9 +487,6 @@ export default function Train() {
             {numTieredTokens}
           </p>*/}
           <br />
-          <p className="text-black sm:text-center">
-            Here, you will select product and style to generate.
-          </p>
           {/* Display the custom message */}
           <p className="text-black sm:text-center">{message}</p>
           <br></br>
