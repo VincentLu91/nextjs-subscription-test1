@@ -11,8 +11,9 @@ export default async function handler(req, res) {
   } = req.query;
   // Access environment variable for steps
   const steps = process.env.TRAINING_STEPS || 10; // Default to 10 if not set
-  let result = await deductUserTrainingToken(user, 1);
-  if (result) {
+  //let result = await deductUserTrainingToken(user, 1);
+  if (user) {
+    // should be if (result) but disabling paywall
     try {
       const resp = await axios.post(
         // send prediction to dashboard but it takes time to generate image
