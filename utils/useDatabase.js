@@ -190,7 +190,7 @@ const deductUserImageGenerationToken = async (customerId, tokensToDeduct) => {
     .select('id,image_tokens')
     .eq('id', customerId)
     .single();
-  if (noCustomerError) return false;
+  if (noCustomerError) throw new Error(noCustomerError);
 
   if (image_tokens - tokensToDeduct >= 0) {
     let customerTokenUpdate = {

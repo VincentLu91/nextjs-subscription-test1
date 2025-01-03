@@ -3,8 +3,9 @@ import { deductUserImageGenerationToken } from '../../utils/useDatabase';
 
 export default async function handler(req, res) {
   const { contentPrompt, imageStyle, version, user } = req.query;
-  let result = await deductUserImageGenerationToken(user, 1);
-  if (result) {
+  //let result = await deductUserImageGenerationToken(user, 1);
+  if (user) {
+    // should be if (result) but disabling paywall
     // first, make an api call to GENERATE a prediction (HTTP method is POST):
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
