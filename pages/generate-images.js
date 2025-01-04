@@ -417,12 +417,12 @@ export default function Train() {
         {!isGeneratingImages && (
           <div className="flex flex-col items-center p-2">
             <p>
-              **Tip:** To reference the product in your instruction, ensure it's
-              exactly as written as seen in 'Product to generate:' field.
+              <strong>Tip:</strong> Use the exact product name in your
+              instructions.
             </p>
             <p>
-              For example, if the value is "myProduct cup" and you want it on a
-              brown table, write: "myProduct cup on a brown table."
+              Example: For "myProduct cup," write: "myProduct cup on a brown
+              table."
             </p>
             <br />
             <textarea
@@ -433,7 +433,7 @@ export default function Train() {
               value={contentPrompt || ''}
               cols="80"
               rows="15"
-              placeholder="Enter text to generate image of your product/brand"
+              placeholder="Enter text to generate your product/brand image. Be descriptive!"
               className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
             />
             <br></br>
@@ -494,8 +494,7 @@ export default function Train() {
           <p className="text-black sm:text-center">{message}</p>
           <br></br>
           <p className="text-black sm:text-center">
-            Each time you generate, it will create {ATTEMPTS} images and they
-            will be saved to the gallery
+            Each generation creates {ATTEMPTS} images, saved to the gallery.
           </p>
           {subscribedAndModelChosen()}
         </div>
