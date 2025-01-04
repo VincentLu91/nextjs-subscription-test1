@@ -21,6 +21,7 @@ export default function Dashboard2() {
   const [finishMessage, setFinishMessage] = useState('');
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [photoData, setPhotoData] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -121,6 +122,7 @@ export default function Dashboard2() {
           photo_url: data.publicUrl
         });
 
+        setPhotoData(data);
         // Save the uploaded URL to localStorage
         const localPhotos = localStorage.getItem('generatedPhotos');
         if (localPhotos) {
@@ -133,7 +135,7 @@ export default function Dashboard2() {
         }
         setBackgroundImageList((current) => [
           ...current,
-          { url: result, text: '' } // placeholder text is empty for optional caption generation
+          { url: data.publicUrl, text: '' } // placeholder text is empty for optional caption generation
         ]);
         setBackgroundImagePredictions((state) => ({
           ...state,
