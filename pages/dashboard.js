@@ -603,7 +603,7 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center">
             <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-              Introduce Your Product to the AI
+              Create Your AI Model
             </h1>
             <br></br>
             {/** working with free users */}
@@ -613,23 +613,15 @@ export default function Dashboard() {
             </p>*/}
             <br></br>
             <p className="text-black sm:text-center">
-              Give your Product an identity! Feed images of it for the AI to
-              learn from
+              Give your Product an identity!
             </p>
             <br></br>
             <p className="text-black sm:text-center">
-              To change backgrounds instead, click "Generate Background" in the
-              navigation bar.
+              Training takes <strong>30-60 mins</strong>—perfect time for a
+              coffee break! When done, you'll be redirected to "Generate
+              Images."
             </p>
-            <br></br>
-            <p className="text-black sm:text-center">
-              At least 3-5 images. For best results, upload 20 or more images.
-              Training will take half an hour to over 1 hour. While training, go
-              get some coffee.
-            </p>
-            <p className="text-black sm:text-center">
-              Once finished, you'll be taken to the "Generate Images" page.
-            </p>
+
             <br></br>
             <p
               className="text-black sm:text-center"
@@ -694,6 +686,10 @@ export default function Dashboard() {
                 />
           </Form.Group>*/}
                 <div className={styles['image-card']}>
+                  <p className="sm:text-center">
+                    Upload 3-20+ images of your product in various angles,
+                    perspectives, and lighting.
+                  </p>
                   <div className={styles['image-top']}></div>
                   <div
                     className={styles['drag-area']}
