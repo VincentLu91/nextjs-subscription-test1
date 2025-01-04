@@ -5,7 +5,7 @@ import { useUser } from '../components/UserContext';
 import { supabase } from '../utils/initSupabase';
 import Button from '../components/ui/Button';
 
-export default function ProductNameList() {
+export default function AIModels() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const router = useRouter();
