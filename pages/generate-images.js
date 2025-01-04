@@ -25,6 +25,7 @@ export default function Train() {
   const [finishMessage, setFinishMessage] = useState('');
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [photoData, setPhotoData] = useState(null);
   const router = useRouter();
   const {
     userLoaded,
@@ -157,6 +158,7 @@ export default function Train() {
           photo_url: data.publicUrl
         });
 
+        setPhotoData(data);
         // Save the uploaded URL to localStorage
         const localPhotos = localStorage.getItem('generatedPhotos');
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
