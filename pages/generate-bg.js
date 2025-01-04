@@ -256,14 +256,15 @@ export default function Dashboard2() {
         <br />
         {!isGeneratingBGImages && (
           <div className="flex flex-col items-center p-2">
-            <input
+            <textarea
               type="text"
               id="backgroundPrompt"
               name="backgroundPrompt"
               placeholder="Enter text to generate image of your product/brand"
               value={backgroundPrompt || ''}
+              cols="80"
+              rows="15"
               onChange={handleChange}
-              style={{ width: '420px' }}
               className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
             />
             <br></br>
