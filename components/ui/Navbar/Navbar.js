@@ -40,6 +40,13 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <Link
+                  href="/create-models"
+                  //onClick={() => router.push('/dashboard')}
+                  className={s.link}
+                >
+                  Create Models
+                </Link>
+                <Link
                   href="/aimodels"
                   //onClick={() => router.push('/dashboard')}
                   className={s.link}

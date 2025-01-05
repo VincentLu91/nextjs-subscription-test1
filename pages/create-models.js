@@ -12,7 +12,7 @@ import { supabase } from '../utils/initSupabase';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
 import JSZip from 'jszip';
-import Link from 'next/link';
+import Input from '../components/ui/Input';
 
 // https://eolmngjyubxaxlvtwbzs.supabase.co/storage/v1/object/public/images/062f6e29-5681-46f1-a4c4-48e60a441e4d/71894cfe-50dc-46fd-a31d-429671fba93e
 
@@ -20,7 +20,7 @@ const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
 
 // CDNURL + user.id + "/" + image.name
 
-export default function Dashboard() {
+export default function CreateModels() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const router = useRouter();
@@ -603,7 +603,7 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center">
             <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-              Welcome
+              Create Your AI Model
             </h1>
             <br></br>
             {/** working with free users */}
@@ -613,67 +613,192 @@ export default function Dashboard() {
             </p>*/}
             <br></br>
             <p className="text-black sm:text-center">
-              Get started creating content for your brand!
+              Give your Product an identity!
             </p>
+            <br></br>
+            <p className="text-black sm:text-center">
+              Training takes <strong>30-60 mins</strong>—perfect time for a
+              coffee break! When done, you'll be redirected to "Generate
+              Images."
+            </p>
+
             <br></br>
             <p
               className="text-black sm:text-center"
               //style={{ color: 'var(--text-secondary)' }}
             >
-              <Link href="/create-models">
-                <strong>Train AI Models</strong>
-              </Link>
-              : Upload product images to create AI models.
+              {trainingText}
               <br />
             </p>
-            <br></br>
-            <p
-              className="text-black sm:text-center"
-              //style={{ color: 'var(--text-secondary)' }}
-            >
-              <Link href="/generate-images">
-                <strong>Create original visuals</strong>
-              </Link>
-              : Use the AI models to create new images.
-              <br />
-            </p>
-            <br></br>
-            <p
-              className="text-black sm:text-center"
-              //style={{ color: 'var(--text-secondary)' }}
-            >
-              <Link href="/generate-bg">
-                <strong>Change Backgrounds</strong>
-              </Link>
-              : Use one product image to place it in new settings.
-              <br />
-            </p>
-            <br></br>
-            <p
-              className="text-black sm:text-center"
-              //style={{ color: 'var(--text-secondary)' }}
-            >
-              <Link href="/view-content">
-                <strong>Generate Captions</strong>
-              </Link>
-              : Create text for your social media posts.
-              <br />
-            </p>
-            <br></br>
-            <p
-              className="text-black sm:text-center"
-              //style={{ color: 'var(--text-secondary)' }}
-            >
-              <Link href="/gallery">
-                <strong>View Your Creations</strong>
-              </Link>
-              : Check the Gallery for all your generated images.
-              <br />
-            </p>
+            {isTraining ? (
+              <div style={{ textAlign: 'center', color: 'black' }}>
+                {loadingWhileTraining}
+              </div>
+            ) : (
+              <div>
+                <div style={{ textAlign: 'center' }}>
+                  <br />
+                  <label
+                    htmlFor="instancePrompt"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Name of Product/Brand:
+                  </label>
+                  <input
+                    type="text"
+                    id="instancePrompt"
+                    name="instancePrompt"
+                    onChange={handleChangeInstancePrompt}
+                    value={instancePrompt || ''}
+                    //defaultValue={instancePrompt}
+                    placeholder="Enter name of product/brand to train"
+                    style={{ width: '420px' }}
+                    className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
+                  />
+                  <br></br>
+                  <br></br>
+                  <label
+                    htmlFor="classPrompt"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Category of Product/Brand:
+                  </label>
+                  <input
+                    type="text"
+                    id="classPrompt"
+                    name="classPrompt"
+                    onChange={handleChangeClassPrompt}
+                    value={classPrompt || ''}
+                    //defaultValue={classPrompt}
+                    placeholder="Enter product category e.g., VR headset, lotion, etc"
+                    style={{ width: '420px' }}
+                    className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
+                  />
+                </div>
+                <br></br>
+                {/** ignore this below */}
+                {/* <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+                <Form.Control
+                  type="file"
+                  //accept="image/png, image/jpeg"
+                  accept="*"
+                  onChange={(e) => uploadFile(e)}
+                />
+          </Form.Group>*/}
+                <div className={styles['image-card']}>
+                  <p className="sm:text-center">
+                    Upload 3-20+ images of your product in various angles,
+                    perspectives, and lighting.
+                  </p>
+                  <div className={styles['image-top']}></div>
+                  <div
+                    className={styles['drag-area']}
+                    onDragOver={onDragOver}
+                    onDragLeave={onDragLeave}
+                    onDrop={onDrop}
+                  >
+                    {isDragging ? (
+                      <span className={styles['select']}>Drop files here</span>
+                    ) : (
+                      <>
+                        Drag & Drop image here or{' '}
+                        <span
+                          className={styles['select']}
+                          role="button"
+                          onClick={selectFiles}
+                        >
+                          Browse
+                        </span>
+                      </>
+                    )}
+
+                    <input
+                      name="file"
+                      type="file"
+                      className={styles['file']}
+                      multiple
+                      ref={fileInputRef}
+                      onChange={onFileSelect}
+                    ></input>
+                  </div>
+                  <div className={styles['image-container']}>
+                    {uploadedImages.map((images, index) => (
+                      <div className={styles['image']} key={index}>
+                        <span
+                          className={styles['delete']}
+                          onClick={() => deleteImage(index)}
+                        >
+                          &times;
+                        </span>
+                        <Image
+                          src={images.url}
+                          alt={images.name}
+                          width={300}
+                          height={200}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* replace the HTML below */}
+                  <button
+                    type="button"
+                    onClick={uploadImages}
+                    disabled={isImagesButtonClicked}
+                    style={{
+                      backgroundColor: isImagesButtonClicked
+                        ? 'gray'
+                        : 'var(--secondary)'
+                    }}
+                  >
+                    {isImagesButtonClicked
+                      ? zipFileName
+                        ? 'Go train'
+                        : 'Please wait'
+                      : 'Upload'}
+                  </button>
+                </div>
+                {/* 
+              to get an image: CDNURL + user.id + "/" + image.name
+              images: [image1, image2, image3]
+          */}
+                <Row xs={1} md={3} className="g-4">
+                  <div className="flex flex-col items-center sm:flex-col sm:items-center">
+                    <br></br>
+                    {console.log('zipFileName: ', zipFileName)}
+                    {zipFileName && (
+                      <Button
+                        variant="slim"
+                        onClick={() => trainModel(instancePrompt, classPrompt)}
+                      >
+                        Train Model
+                      </Button>
+                    )}
+                  </div>
+                </Row>
+                <br></br>
+              </div>
+            )}
           </div>
         </div>
       </section>
     );
+    /*} else {
+      return (
+        <section className="bg-white mb-32">
+          <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+            <div className="sm:flex sm:flex-col sm:align-center">
+              <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+                Training page
+              </h1>
+              <br></br>
+              <br></br>
+              <h1 className="text-black">You are not subscribed yet!</h1>
+            </div>
+          </div>
+        </section>
+      );
+    }*/
   }
 
   return <div className="App">{renderView()}</div>;
