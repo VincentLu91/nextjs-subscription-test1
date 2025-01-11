@@ -7,6 +7,8 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Logo from '../components/icons/Logo';
 import GitHub from '../components/icons/GitHub';
+import Google from '../components/icons/Google';
+import { supabase } from '../utils/initSupabase';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -38,7 +40,10 @@ const SignIn = () => {
 
   const handleOAuthSignIn = async (provider) => {
     setLoading(true);
-    const { error } = await signIn({ provider });
+    //const { error } = await signIn({ provider });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google'
+    });
     if (error) {
       setMessage({ type: 'error', content: error.message });
     }
@@ -158,7 +163,7 @@ const SignIn = () => {
           </span>
         </div>
 
-        {/*<div className="flex items-center my-6">
+        <div className="flex items-center my-6">
           <div
             className="border-t border-accents-2 flex-grow mr-3"
             aria-hidden="true"
@@ -169,16 +174,22 @@ const SignIn = () => {
             aria-hidden="true"
           ></div>
         </div>
-
+        {/* cash incentive */}
+        <span className="pt-1 text-center text-sm">
+          <span className="text-secondary">
+            Sign up with Google and receive $15
+          </span>
+        </span>
+        {/* end of comment */}
         <Button
           variant="slim"
           type="submit"
           disabled={loading}
-          onClick={() => handleOAuthSignIn('github')}
+          onClick={() => handleOAuthSignIn('google')}
         >
-          <GitHub />
-          <span className="ml-2">Continue with GitHub</span>
-            </Button>*/}
+          <Google />
+          <span className="ml-2">Continue with Google</span>
+        </Button>
       </div>
     );
 
