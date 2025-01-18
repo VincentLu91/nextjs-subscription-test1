@@ -6,10 +6,12 @@ import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
-import { Card } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import Select from 'react-select';
 import styles from '../styles/Home.module.css';
 import Input from '../components/ui/Input';
+import { supabase } from '../utils/initSupabase';
+import { v4 as uuidv4 } from 'uuid';
 
 // import trainML's config code
 import contentTypes from './api/contentTypes';
@@ -73,8 +75,29 @@ export default function ViewContent() {
   };
 
   const displayContent = imageLink && (
-    //<img alt="uploaded" src={`data:image/png;base64,${ganBase64}`} />
-    <div className={styles['display-image']}>
+    <div className={styles['display-image']} style={{ position: 'relative' }}>
+      {/* Close button */}
+      <button
+        onClick={() => setImageLink(null)} // Assuming setImageLink updates the state
+        style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          backgroundColor: 'red',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '30px',
+          height: '30px',
+          cursor: 'pointer',
+          fontSize: '16px',
+          lineHeight: '30px',
+          textAlign: 'center'
+        }}
+      >
+        X
+      </button>
+
       <img alt="uploaded" src={imageLink} />
       <br />
       <Button variant="slim" onClick={() => download(imageLink)}>
@@ -82,6 +105,33 @@ export default function ViewContent() {
       </Button>
     </div>
   );
+
+  async function uploadFile(e) {
+    let file = e.target.files[0];
+    console.log('file: ', file);
+    if (file == undefined) {
+      return; // don't upload an empty file!
+    }
+
+    const filePath = `${user.id}/${uuidv4()}.png`;
+
+    const { data, error } = await supabase.storage
+      .from('images')
+      .upload(filePath, file); // add .png extension otherwise storage will complain
+
+    if (data) {
+      // Get the public URL of the uploaded file
+      const { data: publicUrlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      if (publicUrlData) {
+        setImageLink(publicUrlData.publicUrl); // Set the image link
+      }
+    } else {
+      console.log(error);
+    }
+  }
 
   const download = (url) => {
     saveAs(url, 'image');
@@ -229,10 +279,20 @@ export default function ViewContent() {
               </p>
               <br />
               {displayContent || (
+                <div>
                 <p className="text-black">
                   You do not have image! Go back to Dashboard and select an
-                  image first!
+                  image first, or, upload an image of your own
                 </p>
+                <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+                  <Form.Control
+                    type="file"
+                    accept="image/png, image/jpeg"
+                    //accept="*"
+                    onChange={(e) => uploadFile(e)}
+                  />
+                </Form.Group>
+              </div>
               )}
               <br></br>
               <p>
@@ -288,10 +348,20 @@ export default function ViewContent() {
             </p>
             <br />
             {displayContent || (
-              <p className="text-black">
-                You do not have image! Go back to Dashboard and select an image
-                first!
-              </p>
+              <div>
+                <p className="text-black">
+                  You do not have image! Go back to Dashboard and select an
+                  image first, or, upload an image of your own
+                </p>
+                <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+                  <Form.Control
+                    type="file"
+                    accept="image/png, image/jpeg"
+                    //accept="*"
+                    onChange={(e) => uploadFile(e)}
+                  />
+                </Form.Group>
+              </div>
             )}
             <br></br>
             <p>
