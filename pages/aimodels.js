@@ -116,50 +116,54 @@ export default function AIModels() {
   return (
     <div className="App">
       <section className="bg-white mb-32">
+        {/*
         {subscription ? (
-          <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-center sm:flex-col sm:items-center">
-              <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-                List of Product Names
-              </h1>
-              <br></br>
-              <p className="text-black sm:text-center">
-                Here are the AI models that you trained and saved.
-              </p>
-              <p className="text-black sm:text-center">
-                If not needed, you can choose to delete them.
-              </p>
-              <br></br>
-              <Button
-                className="w-60 center-items"
-                variant="slim"
-                onClick={() => fetchAndStoreInstances(true)}
+*/}
+        <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center sm:flex-col sm:items-center">
+            <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+              List of Product Names
+            </h1>
+            <br></br>
+            <p className="text-black sm:text-center">
+              Here are the AI models that you trained and saved.
+            </p>
+            <p className="text-black sm:text-center">
+              If not needed, you can choose to delete them.
+            </p>
+            <br></br>
+            <Button
+              className="w-60 center-items"
+              variant="slim"
+              onClick={() => fetchAndStoreInstances(true)}
+            >
+              Sync Product AIs
+            </Button>
+            <br></br>
+            {instanceList.map((instance) => (
+              <div
+                key={instance.id}
+                className="flex items-center text-4xl text-black sm:text-center sm:text-2xl"
               >
-                Sync Product AIs
-              </Button>
-              <br></br>
-              {instanceList.map((instance) => (
-                <div
-                  key={instance.id}
-                  className="flex items-center text-4xl text-black sm:text-center sm:text-2xl"
-                >
-                  <p>
-                    {instance.instance_prompt} - {instance.class_prompt}:
-                  </p>
-                  <div className="ml-2">
-                    {' '}
-                    {/* Adjust the spacing as needed */}
-                    <button onClick={() => deleteInstance(instance)}>
-                      Delete
-                    </button>
-                  </div>
+                <p>
+                  {instance.instance_prompt} - {instance.class_prompt}:
+                </p>
+                <div className="ml-2">
+                  {' '}
+                  {/* Adjust the spacing as needed */}
+                  <button onClick={() => deleteInstance(instance)}>
+                    Delete
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+        </div>
+        {/*
         ) : (
           <h1 className="text-black">You are not subscribed yet!</h1>
         )}
+*/}
       </section>
     </div>
   );
