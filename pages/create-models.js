@@ -60,6 +60,15 @@ export default function CreateModels() {
   const fileInputRef = useRef(null);
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    input1: '',
+    input2: '',
+    input3: ''
+  });
+
+  const handleNext = () => setStep((prev) => Math.min(prev + 1, 3));
+  const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const zip = new JSZip(); // instance of JSZip
 
@@ -269,6 +278,10 @@ export default function CreateModels() {
       setZipFiles([]);
     }
   }
+
+  const handleChangeForm = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleChangeInstancePrompt = (e) => {
     setInstancePrompt(e.target.value);
@@ -595,6 +608,146 @@ export default function CreateModels() {
     }
   };
 
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div>
+            <h2>Step 1</h2>
+            <div style={{ textAlign: 'center' }}>
+              <br />
+              <label
+                htmlFor="instancePrompt"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Name of Product/Brand:
+              </label>
+              <input
+                type="text"
+                id="instancePrompt"
+                name="instancePrompt"
+                onChange={handleChangeInstancePrompt}
+                value={instancePrompt || ''}
+                //defaultValue={instancePrompt}
+                placeholder="Enter name of product/brand to train"
+                style={{ width: '420px' }}
+                className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
+              />
+              <br></br>
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h2>Step 2</h2>
+            <div style={{ textAlign: 'center' }}>
+              <br />
+              <label
+                htmlFor="classPrompt"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Category of Product/Brand:
+              </label>
+              <input
+                type="text"
+                id="classPrompt"
+                name="classPrompt"
+                onChange={handleChangeClassPrompt}
+                value={classPrompt || ''}
+                //defaultValue={classPrompt}
+                placeholder="Enter product category e.g., VR headset, lotion, etc"
+                style={{ width: '420px' }}
+                className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
+              />
+              <br></br>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div>
+            <h2>Step 3</h2>
+            <div className={styles['image-card']}>
+              <p className="sm:text-center">
+                Upload 3-20+ images of your product in various angles,
+                perspectives, and lighting.
+              </p>
+              <div className={styles['image-top']}></div>
+              <div
+                className={styles['drag-area']}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+              >
+                {isDragging ? (
+                  <span className={styles['select']}>Drop files here</span>
+                ) : (
+                  <>
+                    Drag & Drop image here or{' '}
+                    <span
+                      className={styles['select']}
+                      role="button"
+                      onClick={selectFiles}
+                    >
+                      Browse
+                    </span>
+                  </>
+                )}
+
+                <input
+                  name="file"
+                  type="file"
+                  className={styles['file']}
+                  multiple
+                  ref={fileInputRef}
+                  onChange={onFileSelect}
+                ></input>
+              </div>
+              <div className={styles['image-container']}>
+                {uploadedImages.map((images, index) => (
+                  <div className={styles['image']} key={index}>
+                    <span
+                      className={styles['delete']}
+                      onClick={() => deleteImage(index)}
+                    >
+                      &times;
+                    </span>
+                    <Image
+                      src={images.url}
+                      alt={images.name}
+                      width={300}
+                      height={200}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* replace the HTML below */}
+              <button
+                type="button"
+                onClick={uploadImages}
+                disabled={isImagesButtonClicked}
+                style={{
+                  backgroundColor: isImagesButtonClicked
+                    ? 'gray'
+                    : 'var(--secondary)'
+                }}
+              >
+                {isImagesButtonClicked
+                  ? zipFileName
+                    ? "Click 'Train Model' below when ready"
+                    : 'Please wait'
+                  : 'Upload'}
+              </button>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   function renderView() {
     // currently working with free users
     //if (subscription) {
@@ -636,128 +789,7 @@ export default function CreateModels() {
               </div>
             ) : (
               <div>
-                <div style={{ textAlign: 'center' }}>
-                  <br />
-                  <label
-                    htmlFor="instancePrompt"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Name of Product/Brand:
-                  </label>
-                  <input
-                    type="text"
-                    id="instancePrompt"
-                    name="instancePrompt"
-                    onChange={handleChangeInstancePrompt}
-                    value={instancePrompt || ''}
-                    //defaultValue={instancePrompt}
-                    placeholder="Enter name of product/brand to train"
-                    style={{ width: '420px' }}
-                    className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
-                  />
-                  <br></br>
-                  <br></br>
-                  <label
-                    htmlFor="classPrompt"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Category of Product/Brand:
-                  </label>
-                  <input
-                    type="text"
-                    id="classPrompt"
-                    name="classPrompt"
-                    onChange={handleChangeClassPrompt}
-                    value={classPrompt || ''}
-                    //defaultValue={classPrompt}
-                    placeholder="Enter product category e.g., VR headset, lotion, etc"
-                    style={{ width: '420px' }}
-                    className="border-2 border-gray-300 rounded-md placeholder:pl-1 text-black"
-                  />
-                </div>
-                <br></br>
-                {/** ignore this below */}
-                {/* <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-                <Form.Control
-                  type="file"
-                  //accept="image/png, image/jpeg"
-                  accept="*"
-                  onChange={(e) => uploadFile(e)}
-                />
-          </Form.Group>*/}
-                <div className={styles['image-card']}>
-                  <p className="sm:text-center">
-                    Upload 3-20+ images of your product in various angles,
-                    perspectives, and lighting.
-                  </p>
-                  <div className={styles['image-top']}></div>
-                  <div
-                    className={styles['drag-area']}
-                    onDragOver={onDragOver}
-                    onDragLeave={onDragLeave}
-                    onDrop={onDrop}
-                  >
-                    {isDragging ? (
-                      <span className={styles['select']}>Drop files here</span>
-                    ) : (
-                      <>
-                        Drag & Drop image here or{' '}
-                        <span
-                          className={styles['select']}
-                          role="button"
-                          onClick={selectFiles}
-                        >
-                          Browse
-                        </span>
-                      </>
-                    )}
-
-                    <input
-                      name="file"
-                      type="file"
-                      className={styles['file']}
-                      multiple
-                      ref={fileInputRef}
-                      onChange={onFileSelect}
-                    ></input>
-                  </div>
-                  <div className={styles['image-container']}>
-                    {uploadedImages.map((images, index) => (
-                      <div className={styles['image']} key={index}>
-                        <span
-                          className={styles['delete']}
-                          onClick={() => deleteImage(index)}
-                        >
-                          &times;
-                        </span>
-                        <Image
-                          src={images.url}
-                          alt={images.name}
-                          width={300}
-                          height={200}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* replace the HTML below */}
-                  <button
-                    type="button"
-                    onClick={uploadImages}
-                    disabled={isImagesButtonClicked}
-                    style={{
-                      backgroundColor: isImagesButtonClicked
-                        ? 'gray'
-                        : 'var(--secondary)'
-                    }}
-                  >
-                    {isImagesButtonClicked
-                      ? zipFileName
-                        ? 'Go train'
-                        : 'Please wait'
-                      : 'Upload'}
-                  </button>
-                </div>
+                {renderStep()}
                 {/* 
               to get an image: CDNURL + user.id + "/" + image.name
               images: [image1, image2, image3]
@@ -766,14 +798,14 @@ export default function CreateModels() {
                   <div className="flex flex-col items-center sm:flex-col sm:items-center">
                     <br></br>
                     {console.log('zipFileName: ', zipFileName)}
-                    {zipFileName && (
+                    {/*zipFileName && (
                       <Button
                         variant="slim"
                         onClick={() => trainModel(instancePrompt, classPrompt)}
                       >
                         Train Model
                       </Button>
-                    )}
+                    )*/}
                   </div>
                 </Row>
                 <br></br>
@@ -801,5 +833,23 @@ export default function CreateModels() {
     }*/
   }
 
-  return <div className="App">{renderView()}</div>;
+  return (
+    <div className="App">
+      {renderView()}
+      <div>
+        {!isTraining && ( // Show buttons only when isTraining is false
+          <>
+            {step > 1 && <button onClick={handleBack}>Back</button>}
+            {step < 3 ? (
+              <button onClick={handleNext}>Next</button>
+            ) : (
+              <button onClick={() => trainModel(instancePrompt, classPrompt)}>
+                Train Model
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
