@@ -61,11 +61,6 @@ export default function CreateModels() {
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    input1: '',
-    input2: '',
-    input3: ''
-  });
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, 3));
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -278,10 +273,6 @@ export default function CreateModels() {
       setZipFiles([]);
     }
   }
-
-  const handleChangeForm = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleChangeInstancePrompt = (e) => {
     setInstancePrompt(e.target.value);
