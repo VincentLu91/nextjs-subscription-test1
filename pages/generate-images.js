@@ -26,6 +26,7 @@ export default function Train() {
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
   const [photoData, setPhotoData] = useState(null);
+  const [step, setStep] = useState(1);
   const router = useRouter();
   const {
     userLoaded,
@@ -65,6 +66,14 @@ export default function Train() {
     { value: 'grayscale', label: 'Grayscale' }
   ];
 
+  const handleNext = () => {
+    if (step < 2) setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
   const getImage = async (attempt, contentPrompt) => {
     let productIdentifier = '';
     if (modelName) {
@@ -102,7 +111,7 @@ export default function Train() {
       return resp.data;
     } catch (err) {
       setIsLoading(false);
-      alert('Doesnt have enought tokens');
+      alert('Not have enough tokens');
     }
   };
 
@@ -381,90 +390,107 @@ export default function Train() {
       minimumFractionDigits: 0
     }).format(subscription.prices.unit_amount / 100);
 
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div>
+            <h2>Step 1</h2>
+            <p style={{ color: 'var(--accent-1)' }}>
+              Product to generate: {modelName} {modelClass}
+            </p>
+            <br />
+            {isGeneratingImages ? (
+              <p style={{ color: 'var(--accent-1)' }}>
+                Generating product: {modelName} {modelClass}
+              </p>
+            ) : (
+              <div className="flex flex-row center-items p-2">
+                <Select
+                  placeholder="Select Option"
+                  value={instanceList.find((obj) => obj.value === modelName)} // set selected value
+                  options={instanceList} // set list of the data
+                  onChange={handleSelectChange} // assign onChange function
+                  className="mr-4" // Add right margin for spacing
+                />
+                <Select
+                  placeholder="Select image style"
+                  options={imageStyles} // set list of the data
+                  onChange={selectImageStyle} // assign onChange function
+                />
+              </div>
+            )}
+            <br />
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h2>Step 2</h2>
+            {!isGeneratingImages && (
+              <div className="flex flex-col items-center p-2">
+                <p>
+                  <strong>Tip:</strong> Use the exact product name in your
+                  instructions.
+                </p>
+                <p>
+                  Example: For "myProduct cup," write: "myProduct cup on a brown
+                  table."
+                </p>
+                <br />
+                <textarea
+                  type="text"
+                  id="contentPrompt"
+                  name="contentPrompt"
+                  onChange={handleChange}
+                  value={contentPrompt || ''}
+                  cols="80"
+                  rows="15"
+                  placeholder="Enter text to generate your product/brand image. Be descriptive!"
+                  className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+                />
+                <br></br>
+
+                <Button
+                  variant="slim"
+                  onClick={async () => {
+                    if (
+                      contentPrompt == null ||
+                      contentPrompt.trim() == '' ||
+                      !imageStyle
+                    ) {
+                      alert('Please complete all fields');
+                    } else {
+                      clearInterval(interval.current);
+                      setPredictions({});
+                      setImageList([]); // when generation begins, list of images is empty
+                      setIsLoading(true);
+                      setFinishMessage('');
+                      for (let i = 0; i < ATTEMPTS; i++) {
+                        // 2 is a placeholder, later I plan to generate 16 images
+                        getImage(i, contentPrompt);
+                      }
+                    }
+                  }}
+                >
+                  Generate Image
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   function subscribedAndModelChosen() {
     // currently working with free users
     //if (subscription) {
 
     return (
       <div className={styles['get-image-button']}>
-        <p style={{ color: 'var(--accent-1)' }}>
-          Product to generate: {modelName} {modelClass}
-        </p>
-        <br />
-        {isGeneratingImages ? (
-          <p style={{ color: 'var(--accent-1)' }}>
-            Generating product: {modelName} {modelClass}
-          </p>
-        ) : (
-          <div className="flex flex-row center-items p-2">
-            <Select
-              placeholder="Select Option"
-              value={instanceList.find((obj) => obj.value === modelName)} // set selected value
-              options={instanceList} // set list of the data
-              onChange={handleSelectChange} // assign onChange function
-              className="mr-4" // Add right margin for spacing
-            />
-            <Select
-              placeholder="Select image style"
-              options={imageStyles} // set list of the data
-              onChange={selectImageStyle} // assign onChange function
-            />
-          </div>
-        )}
-        <br />
-
-        <br />
-        {!isGeneratingImages && (
-          <div className="flex flex-col items-center p-2">
-            <p>
-              <strong>Tip:</strong> Use the exact product name in your
-              instructions.
-            </p>
-            <p>
-              Example: For "myProduct cup," write: "myProduct cup on a brown
-              table."
-            </p>
-            <br />
-            <textarea
-              type="text"
-              id="contentPrompt"
-              name="contentPrompt"
-              onChange={handleChange}
-              value={contentPrompt || ''}
-              cols="80"
-              rows="15"
-              placeholder="Enter text to generate your product/brand image. Be descriptive!"
-              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-            />
-            <br></br>
-
-            <Button
-              variant="slim"
-              onClick={async () => {
-                if (
-                  contentPrompt == null ||
-                  contentPrompt.trim() == '' ||
-                  !imageStyle
-                ) {
-                  alert('Please complete all fields');
-                } else {
-                  clearInterval(interval.current);
-                  setPredictions({});
-                  setImageList([]); // when generation begins, list of images is empty
-                  setIsLoading(true);
-                  setFinishMessage('');
-                  for (let i = 0; i < ATTEMPTS; i++) {
-                    // 2 is a placeholder, later I plan to generate 16 images
-                    getImage(i, contentPrompt);
-                  }
-                }
-              }}
-            >
-              Generate Image
-            </Button>
-          </div>
-        )}
-        <br></br>
+        {renderStep()}
         {loadingWithContentPrompt}
         {finishMessage}
         <div className={styles['grid']}>{imageList.map(renderCard)}</div>
@@ -497,6 +523,8 @@ export default function Train() {
             Each generation creates {ATTEMPTS} images, saved to the gallery.
           </p>
           {subscribedAndModelChosen()}
+          {step > 1 && <button onClick={handleBack}>Back</button>}
+          {step < 2 && <button onClick={handleNext}>Next</button>}
         </div>
       </div>
     </section>
