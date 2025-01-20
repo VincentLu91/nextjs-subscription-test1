@@ -31,6 +31,8 @@ export default function Dashboard2() {
     userDetails,
     subscription,
     setImageLink,
+    imageForBg,
+    setImageForBg,
     backgroundImageList,
     setBackgroundImageList,
     isBGImagesLoading,
@@ -254,6 +256,7 @@ export default function Dashboard2() {
           />
         </Form.Group>
         <br />
+        {displayContent}
         {!isGeneratingBGImages && (
           <div className="flex flex-col items-center p-2">
             <textarea
@@ -354,18 +357,33 @@ export default function Dashboard2() {
     // Cooper/
     // Cooper/myNameOfImage.png
     // Lindsay/myNameOfImage.png
+    const filePath = `${user.id}/${uuidv4()}.png`;
 
     const { data, error } = await supabase.storage
       .from('images')
-      .upload(user.id + '/' + uuidv4() + '.png', file); // add .png extension otherwise storage will complain
+      .upload(filePath, file); // add .png extension otherwise storage will complain
 
     if (data) {
+      const { data: publicUrlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      if (publicUrlData) {
+        setImageForBg(publicUrlData.publicUrl); // Set the image link
+      }
       setIsImageUploaded(true);
       getFiles();
     } else {
       console.log(error);
     }
   }
+
+  const displayContent = imageForBg && (
+    <div className={styles['display-image']} style={{ position: 'relative' }}>
+      <img alt="uploaded" src={imageForBg} />
+      <br />
+    </div>
+  );
 
   async function getImageTokenData() {
     console.log('user is: ', user.id);
