@@ -401,9 +401,7 @@ export default function Train() {
             </p>
             <br />
             {isGeneratingImages ? (
-              <p style={{ color: 'var(--accent-1)' }}>
-                Generating product: {modelName} {modelClass}
-              </p>
+              <p style={{ color: 'var(--accent-1)' }}>Generating product...</p>
             ) : (
               <div className="flex flex-row center-items p-2">
                 <Select
@@ -429,14 +427,26 @@ export default function Train() {
             <h2>Step 2</h2>
             {!isGeneratingImages && (
               <div className="flex flex-col items-center p-2">
-                <p>
-                  <strong>Tip:</strong> Use the exact product name in your
-                  instructions.
+                <p style={{ color: 'var(--accent-1)' }}>
+                  Tell the AI how to create your product image
                 </p>
                 <p>
-                  Example: For "myProduct cup," write: "myProduct cup on a brown
-                  table."
+                  <strong>Tip:</strong> Include the exact product name.
                 </p>
+                {modelName && modelClass && (
+                  <p>
+                    Example: For "
+                    <strong>
+                      {modelName} {modelClass}
+                    </strong>
+                    ," write: "
+                    <strong>
+                      {modelName} {modelClass}
+                    </strong>{' '}
+                    on a brown table."
+                  </p>
+                )}
+
                 <br />
                 <textarea
                   type="text"
@@ -519,9 +529,6 @@ export default function Train() {
           {/* Display the custom message */}
           <p className="text-black sm:text-center">{message}</p>
           <br></br>
-          <p className="text-black sm:text-center">
-            Each generation creates {ATTEMPTS} images, saved to the gallery.
-          </p>
           {subscribedAndModelChosen()}
           {step > 1 && <button onClick={handleBack}>Back</button>}
           {step < 2 && <button onClick={handleNext}>Next</button>}

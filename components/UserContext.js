@@ -12,6 +12,7 @@ export const UserContextProvider = (props) => {
   const [subscription, setSubscription] = useState(null);
 
   const [imageLink, setImageLink] = useState(null);
+  const [imageForBg, setImageForBg] = useState(null);
   const [imageList, setImageList] = useState([]);
   const [backgroundImageList, setBackgroundImageList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -108,6 +109,8 @@ export const UserContextProvider = (props) => {
     },
     imageLink,
     setImageLink,
+    imageForBg,
+    setImageForBg,
     imageList,
     setImageList,
     isLoading,
