@@ -18,26 +18,16 @@ export default async function handler(req, res) {
       const resp = await axios.post(
         // send prediction to dashboard but it takes time to generate image
         //'https://dreambooth-api-experimental.replicate.com/v1/trainings',
-        'https://api.replicate.com/v1/models/ostris/flux-dev-lora-trainer/versions/' +
-          trainer_version +
-          '/trainings',
+        'https://queue.fal.run/fal-ai/flux-lora-fast-training',
         {
-          destination: 'vincentlu91/flux-tuning',
-          input: {
-            trigger_word: instance_prompt,
-            learning_rate: 0.0004,
-            input_images: instance_data,
-            autocaption_prefix: `a photo of a ${instance_prompt} ${class_prompt}`,
-            lora_rank: 16,
-            steps: parseInt(steps) // Use the environment variable for steps
-          }
-          //model: 'vincentlu91/vincelubooth',
-          //trainer_version,
-          //webhook_completed: 'https://example.com/dreambooth-webhook'
+          steps: steps,
+          create_masks: true,
+          trigger_word: instance_prompt,
+          images_data_url: instance_data
         },
         {
           headers: {
-            Authorization: 'Token ebb9f6477f7b0b106b3e7140c141cb35431ba8ce',
+            Authorization: 'Key ' + process.env['NEXT_FAL_KEY'],
             'Content-Type': 'application/json'
           }
         }

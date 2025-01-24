@@ -9,18 +9,21 @@ export default async function handler(req, res) {
     // first, make an api call to GENERATE a prediction (HTTP method is POST):
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
-      'https://api.replicate.com/v1/predictions',
+      'https://queue.fal.run/fal-ai/flux-lora',
       {
-        version,
-        input: {
-          prompt: contentPrompt + ' image style: ' + imageStyle,
-          negative_prompt:
-            '(fruits, deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4), (deformed, distorted, disfigured:1.3), poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, mutation, mutated, ugly, disgusting, amputation'
-        }
+        prompt: contentPrompt + ' imageStyle: ' + imageStyle,
+        model_name: null,
+        loras: [
+          {
+            path: version,
+            scale: 1
+          }
+        ],
+        embeddings: []
       },
       {
         headers: {
-          Authorization: 'Token ebb9f6477f7b0b106b3e7140c141cb35431ba8ce',
+          Authorization: 'Key ' + process.env['NEXT_FAL_KEY'],
           'Content-Type': 'application/json'
         }
       }
@@ -39,7 +42,7 @@ export default async function handler(req, res) {
     // also, the http method this time is GET
     //let output = null;
     //let processing = true;
-    res.json(resp.data.urls);
+    res.json(resp.data);
   } else {
     res.status(403).json({
       error: 'User doesnothave permission'

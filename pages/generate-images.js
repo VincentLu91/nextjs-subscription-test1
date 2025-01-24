@@ -143,11 +143,15 @@ export default function Train() {
   const getImageResults = async (attempt, url) => {
     const output = await axios.get('/api/imageresults?url=' + url);
 
-    if (output.data.status === 'succeeded') {
-      const result = output.data.output[0];
-
+    if (output.data.status === 'COMPLETED') {
+      const result = await axios.get(
+        '/api/imageresults?url=' + output.data.response_url
+      );
+      console.log('result.data.images[0].url is: ', result.data.images[0].url);
       // Wait for the image to be copied and get the unique filename
-      const uniqueFileName = await copyImageToSupabase(result);
+      const uniqueFileName = await copyImageToSupabase(
+        result.data.images[0].url
+      );
 
       if (uniqueFileName) {
         // Get the public URL using the same unique file name
@@ -188,7 +192,7 @@ export default function Train() {
 
       setPredictions((state) => ({
         ...state,
-        [attempt]: { ...state[attempt], status: 'succeeded' }
+        [attempt]: { ...state[attempt], status: 'COMPLETED' }
       }));
 
       setcontentPrompt(null);
@@ -199,7 +203,7 @@ export default function Train() {
 
   useEffect(() => {
     const list = Object.values(predictions);
-    if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
+    if (list.length > 0 && list.every((item) => item.status === 'COMPLETED')) {
       clearInterval(interval.current);
       setIsLoading(false);
       setIsGeneratingImages(false);
@@ -213,14 +217,14 @@ export default function Train() {
   useEffect(() => {
     // [ [0, {get: 'sss.com' , cancel: 'ssswe.com', status: 'training'}],  ]
     const predictionAry = Object.entries(predictions).filter(
-      ([attempt, item]) => item.status !== 'succeeded'
+      ([attempt, item]) => item.status !== 'COMPLETED'
     );
     console.log(predictionAry);
 
     if (predictionAry.length > 0) {
       interval.current = setInterval(() => {
         predictionAry.forEach(([attempt, item]) => {
-          getImageResults(attempt, item.get);
+          getImageResults(attempt, item.status_url);
         });
       }, 3000);
     }

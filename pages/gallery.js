@@ -96,12 +96,15 @@ export default function Gallery() {
 
   const getImageResults = async (attempt, url) => {
     const output = await axios.get('/api/imageresults?url=' + url);
-    if (output.data.status === 'succeeded') {
+    if (output.data.status === 'COMPLETED') {
+      const result = await axios.get(
+        '/api/imageresults?url=' + output.data.response_url
+      );
       await supabase.from('photos').insert({
         customer_id: user.identities[0].id,
-        photo_url: output.data.output[0]
+        photo_url: result.data.images[0].url
       });
-      const result = output.data.output[0];
+
       if (result) {
         setImageList((current) => [
           ...current,
@@ -112,7 +115,7 @@ export default function Gallery() {
       }
       setPredictions((state) => ({
         ...state,
-        [attempt]: { ...state[attempt], status: 'succeeded' }
+        [attempt]: { ...state[attempt], status: 'COMPLETED' }
       }));
       setcontentPrompt(null);
     }
@@ -121,7 +124,7 @@ export default function Gallery() {
 
   useEffect(() => {
     const list = Object.values(predictions);
-    if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
+    if (list.length > 0 && list.every((item) => item.status === 'COMPLETED')) {
       clearInterval(interval.current);
       setIsLoading(false);
       setIsGeneratingImages(false);
@@ -131,13 +134,13 @@ export default function Gallery() {
   useEffect(() => {
     // [ [0, {get: 'sss.com' , cancel: 'ssswe.com', status: 'training'}],  ]
     const predictionAry = Object.entries(predictions).filter(
-      ([attempt, item]) => item.status !== 'succeeded'
+      ([attempt, item]) => item.status !== 'COMPLETED'
     );
 
     if (predictionAry.length > 0) {
       interval.current = setInterval(() => {
         predictionAry.forEach(([attempt, item]) => {
-          getImageResults(attempt, item.get);
+          getImageResults(attempt, item.status_url);
         });
       }, 3000);
     }
@@ -225,7 +228,7 @@ export default function Gallery() {
 
   useEffect(() => {
     // Fetch and store photos when the component mounts
-    fetchAndStorePhotos();
+    fetchAndStorePhotos(true);
   }, []);
 
   // Clear localStorage on route change
