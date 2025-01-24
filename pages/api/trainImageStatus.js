@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   try {
     const resp = await axios.get(training_query, {
       headers: {
-        Authorization: 'Key ' + process.env['NEXT_FAL_KEY']
+        Authorization: 'Key ' + process.env['FAL_KEY']
       }
     });
     console.log('training id response', resp); // this will print all the entire object in the console.

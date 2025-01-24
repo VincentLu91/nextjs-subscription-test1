@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     // we need to check if status of prev request is finished.
     // without the token, you couldn't get any information from the server. I tried.
     headers: {
-      Authorization: 'Key ' + process.env['NEXT_FAL_KEY']
+      Authorization: 'Key ' + process.env['FAL_KEY']
     }
   });
   res.json(output.data);
