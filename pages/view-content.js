@@ -78,7 +78,10 @@ export default function ViewContent() {
     <div className={styles['display-image']} style={{ position: 'relative' }}>
       {/* Close button */}
       <button
-        onClick={() => setImageLink(null)} // Assuming setImageLink updates the state
+        onClick={() => {
+          setImageLink(null); // Clear the state
+          localStorage.removeItem('imageLink'); // Remove the key from localStorage
+        }}
         style={{
           position: 'absolute',
           top: '10px',
