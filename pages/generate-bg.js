@@ -102,11 +102,15 @@ export default function Dashboard2() {
 
   const getImageResults = async (attempt, url) => {
     const output = await axios.get('/api/imageresults?url=' + url);
-    if (output.data.status === 'succeeded') {
-      const result = output.data.output.image;
-
+    if (output.data.status === 'COMPLETED') {
+      const result = await axios.get(
+        '/api/imageresults?url=' + output.data.response_url
+      );
+      console.log('result.data.images[0].url is: ', result.data.images[0].url);
       // Wait for the image to be copied and get the unique filename
-      const uniqueFileName = await copyImageToSupabase(result);
+      const uniqueFileName = await copyImageToSupabase(
+        result.data.images[0].url
+      );
 
       if (uniqueFileName) {
         console.log('uniqueFileName: ', uniqueFileName);
@@ -141,7 +145,7 @@ export default function Dashboard2() {
         ]);
         setBackgroundImagePredictions((state) => ({
           ...state,
-          [attempt]: { ...state[attempt], status: 'succeeded' }
+          [attempt]: { ...state[attempt], status: 'COMPLETED' }
         }));
         setBackgroundPrompt(null);
       }
@@ -150,7 +154,7 @@ export default function Dashboard2() {
 
   useEffect(() => {
     const list = Object.values(backgroundImagePredictions);
-    if (list.length > 0 && list.every((item) => item.status === 'succeeded')) {
+    if (list.length > 0 && list.every((item) => item.status === 'COMPLETED')) {
       console.log('background ', backgroundImagePredictions);
       clearInterval(intervalImage.current);
       setisBGImagesLoading(false);
@@ -164,12 +168,12 @@ export default function Dashboard2() {
 
   useEffect(() => {
     const predictionAry = Object.entries(backgroundImagePredictions).filter(
-      ([attempt, item]) => item.status !== 'succeeded'
+      ([attempt, item]) => item.status !== 'COMPLETED'
     );
     if (predictionAry.length > 0) {
       intervalImage.current = setInterval(() => {
         predictionAry.forEach(([attempt, item]) => {
-          getImageResults(attempt, item.get);
+          getImageResults(attempt, item.status_url);
         });
       }, 3000);
     }

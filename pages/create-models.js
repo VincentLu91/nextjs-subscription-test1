@@ -388,10 +388,10 @@ export default function CreateModels() {
           )
           .then((resp) => {
             console.log('resp training: ', resp);
-            console.log('resp.data.id: ', resp.data.id);
+            console.log('resp.data.request_id: ', resp.data.request_id);
             console.log('resp.data.status: ', resp.data.status);
-            setTrainingID(resp.data.id);
-            setStatus(resp.data.status);
+            setTrainingID(resp);
+            setStatus(resp?.data?.status);
           })
           .finally(() => {
             setIsTraining(true);
@@ -437,11 +437,11 @@ export default function CreateModels() {
   async function getTrainingStatus() {
     if (trainingID) {
       const trainingStatus = await axios.get(
-        '/api/trainImageStatus?training_id=' + trainingID
+        '/api/trainImageStatus?training_query=' + trainingID?.data?.status_url
       );
       if (trainingStatus) {
         //console.log('trainingStatus: ', trainingStatus.data.status);
-        if (trainingStatus.data.logs) {
+        /*if (trainingStatus.data.logs) {
           let logs = trainingStatus.data.logs;
           const lines = logs.split('\n');
 
@@ -472,8 +472,8 @@ export default function CreateModels() {
           if (percentages.length > 0) {
             setStatusPercentage(percentages[percentages.length - 1]);
           }
-        }
-        if (trainingStatus.data.status === 'succeeded') {
+        }*/
+        if (trainingStatus.data.status === 'COMPLETED') {
           clearInterval(interval.current);
 
           //setTrainingText('Training completed!');
@@ -481,7 +481,7 @@ export default function CreateModels() {
           console.log('success');
           // version is something like
           // vincentlu91/sdxl-tuning:eb6a135512a977d328ecfd5e615afc509ebc605816154a6c8a0b0be39cf2e0cc
-          const inputString = trainingStatus.data.output.version;
+          /*const inputString = trainingStatus.data.output.version;
           const delimiter = ':';
           const parts = inputString.split(delimiter);
           const result = '';
@@ -490,11 +490,19 @@ export default function CreateModels() {
             console.log(parts[1]); // Output: eb6a135512a977d328ecfd5e615afc509ebc605816154a6c8a0b0be39cf2e0cc
           } else {
             console.log('Delimiter not found in the string.');
+          }*/
+          const model_weight_output = await axios.get(
+            '/api/trainImageStatus?training_query=' +
+              trainingID.data.response_url
+          );
+          let model_weight = null;
+          if (model_weight_output?.data?.diffusers_lora_file?.url) {
+            model_weight = model_weight_output.data.diffusers_lora_file.url;
           }
           // now store the version number
           const trainingStatusResponse = await supabase
             .from('ai-models')
-            .update({ model_version: parts[1] })
+            .update({ model_version: model_weight })
             .eq(
               'instance_data',
               CDNURL + user.identities[0].id + '/' + zipFileName
@@ -541,7 +549,7 @@ export default function CreateModels() {
 
   useEffect(() => {
     // if !(status == null || status == 'canceled' || status == 'succeeded')
-    if (![null, 'canceled', 'succeeded'].includes(status)) {
+    if (![null, 'COMPLETED'].includes(status)) {
       interval.current = setInterval(() => {
         console.log('status: ', status);
         getTrainingStatus();
@@ -555,7 +563,7 @@ export default function CreateModels() {
 
   const loadingWhileTraining = isTraining && (
     <div className={styles['black-text']}>
-      <LoadingDots /> {statusPercentage}%
+      <LoadingDots /> {/*statusPercentage*/}
       <p>Please do not refresh or you will lose all progress!</p>
     </div>
   );
@@ -586,13 +594,11 @@ export default function CreateModels() {
   }, [trainingText]);
 
   const updateTrainingText = () => {
-    if (status === 'queued') {
+    if (status === 'IN_QUEUE') {
       setTrainingText('Getting Ready...');
-    } else if (status === 'processing') {
+    } else if (status === 'IN_PROGRESS') {
       setTrainingText('Training Now...');
-    } else if (status === 'pushing') {
-      setTrainingText('Finalizing...');
-    } else if (status === 'succeeded') {
+    } else if (status === 'COMPLETED') {
       setTrainingText('Training completed!');
     } else {
       setTrainingText('Upload images');
