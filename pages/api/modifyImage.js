@@ -28,7 +28,7 @@ export default async function GET(req, res) {
       },
       {
         headers: {
-          Authorization: 'Key ' + process.env['NEXT_FAL_KEY'],
+          Authorization: 'Key ' + process.env['FAL_KEY'],
           'Content-Type': 'application/json'
         }
       }
