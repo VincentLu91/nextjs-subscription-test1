@@ -671,36 +671,38 @@ export default function CreateModels() {
                 perspectives, and lighting.
               </p>
               <div className={styles['image-top']}></div>
-              <div
-                className={styles['drag-area']}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-              >
-                {isDragging ? (
-                  <span className={styles['select']}>Drop files here</span>
-                ) : (
-                  <>
-                    Drag & Drop image here or{' '}
-                    <span
-                      className={styles['select']}
-                      role="button"
-                      onClick={selectFiles}
-                    >
-                      Browse
-                    </span>
-                  </>
-                )}
+              {!isImagesButtonClicked && (
+                <div
+                  className={styles['drag-area']}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                >
+                  {isDragging ? (
+                    <span className={styles['select']}>Drop files here</span>
+                  ) : (
+                    <>
+                      Drag & Drop image here or{' '}
+                      <span
+                        className={styles['select']}
+                        role="button"
+                        onClick={selectFiles}
+                      >
+                        Browse
+                      </span>
+                    </>
+                  )}
 
-                <input
-                  name="file"
-                  type="file"
-                  className={styles['file']}
-                  multiple
-                  ref={fileInputRef}
-                  onChange={onFileSelect}
-                ></input>
-              </div>
+                  <input
+                    name="file"
+                    type="file"
+                    className={styles['file']}
+                    multiple
+                    ref={fileInputRef}
+                    onChange={onFileSelect}
+                  ></input>
+                </div>
+              )}
               {!isImagesButtonClicked && uploadedImages.length > 0 && (
                 <div className={styles['image-container']}>
                   {uploadedImages.map((images, index) => (
