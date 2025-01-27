@@ -2,7 +2,7 @@ import axios from 'axios';
 import { deductUserImageGenerationToken } from '../../utils/useDatabase';
 
 export default async function handler(req, res) {
-  const { contentPrompt, imageStyle, version, user } = req.query;
+  const { contentPrompt, /*imageStyle,*/ version, user } = req.query;
   //let result = await deductUserImageGenerationToken(user, 1);
   if (user) {
     // should be if (result) but disabling paywall
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       // send prediction to dashboard but it takes time to generate image
       'https://queue.fal.run/fal-ai/flux-lora',
       {
-        prompt: contentPrompt + ' imageStyle: ' + imageStyle,
+        prompt: contentPrompt,
         model_name: null,
         loras: [
           {
