@@ -35,6 +35,7 @@ export const UserContextProvider = (props) => {
     'Upload zip file and begin training.'
   );
   const [modelName, setModelName] = useState(null);
+  const [imageStyle, setImageStyle] = useState(null);
   const [modelVersion, setModelVersion] = useState(null);
   const [modelClass, setModelClass] = useState(null);
 
@@ -143,6 +144,8 @@ export const UserContextProvider = (props) => {
     setTrainingText,
     modelName,
     setModelName,
+    imageStyle,
+    setImageStyle,
     modelVersion,
     setModelVersion,
     modelClass,

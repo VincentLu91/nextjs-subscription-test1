@@ -21,7 +21,6 @@ const ATTEMPTS = 2;
 export default function Train() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
-  const [imageStyle, setImageStyle] = useState(null);
   const [finishMessage, setFinishMessage] = useState('');
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
@@ -45,6 +44,8 @@ export default function Train() {
     setTrainingText,
     modelName,
     setModelName,
+    imageStyle,
+    setImageStyle,
     modelVersion,
     setModelVersion,
     modelClass,
@@ -63,7 +64,7 @@ export default function Train() {
 
   const imageStyles = [
     { value: 'lifestyle', label: 'Lifestyle' },
-    { value: 'grayscale', label: 'Grayscale' }
+    { value: 'grayscale', label: 'black and white' }
   ];
 
   const handleNext = () => {
@@ -98,10 +99,10 @@ export default function Train() {
       const resp = await axios.get(
         '/api/imagepredictions?contentPrompt=' +
           contentPrompt +
-          ' ' +
+          /*' ' +
           productIdentifier +
           '&imageStyle=' +
-          imageStyle +
+          imageStyle +*/
           '&version=' +
           modelVersion +
           `&user=${user.id}`
@@ -407,19 +408,20 @@ export default function Train() {
             {isGeneratingImages ? (
               <p style={{ color: 'var(--accent-1)' }}>Generating product...</p>
             ) : (
-              <div className="flex flex-row center-items p-2">
+              <div className="flex flex-row items-center justify-center p-2">
                 <Select
                   placeholder="Select Option"
-                  value={instanceList.find((obj) => obj.value === modelName)} // set selected value
+                  value={instanceList.find((obj) => obj.label === modelName)} // set selected value
                   options={instanceList} // set list of the data
                   onChange={handleSelectChange} // assign onChange function
                   className="mr-4" // Add right margin for spacing
                 />
-                <Select
+                {/*<Select
                   placeholder="Select image style"
+                  value={imageStyles.find((obj) => obj.label === imageStyle)} // set selected value
                   options={imageStyles} // set list of the data
                   onChange={selectImageStyle} // assign onChange function
-                />
+                />*/}
               </div>
             )}
             <br />
