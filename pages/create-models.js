@@ -609,7 +609,7 @@ export default function CreateModels() {
     switch (step) {
       case 1:
         return (
-          <div>
+          <div className="text-black sm:text-center">
             <h2>Step 1</h2>
             <div style={{ textAlign: 'center' }}>
               <br />
@@ -617,7 +617,7 @@ export default function CreateModels() {
                 htmlFor="instancePrompt"
                 className="block text-sm font-medium text-gray-700"
               >
-                Name of Product/Brand:
+                Unique Name of Your Product:
               </label>
               <input
                 type="text"
@@ -636,7 +636,7 @@ export default function CreateModels() {
         );
       case 2:
         return (
-          <div>
+          <div className="text-black sm:text-center">
             <h2>Step 2</h2>
             <div style={{ textAlign: 'center' }}>
               <br />
@@ -644,7 +644,7 @@ export default function CreateModels() {
                 htmlFor="classPrompt"
                 className="block text-sm font-medium text-gray-700"
               >
-                Category of Product/Brand:
+                Category of Product:
               </label>
               <input
                 type="text"
@@ -663,11 +663,11 @@ export default function CreateModels() {
         );
       case 3:
         return (
-          <div>
+          <div className="text-black sm:text-center">
             <h2>Step 3</h2>
             <div className={styles['image-card']}>
               <p className="sm:text-center">
-                Upload 3-20+ images of your product in various angles,
+                Upload 3-5 images of your product in various angles,
                 perspectives, and lighting.
               </p>
               <div className={styles['image-top']}></div>
@@ -701,39 +701,47 @@ export default function CreateModels() {
                   onChange={onFileSelect}
                 ></input>
               </div>
-              <div className={styles['image-container']}>
-                {uploadedImages.map((images, index) => (
-                  <div className={styles['image']} key={index}>
-                    <span
-                      className={styles['delete']}
-                      onClick={() => deleteImage(index)}
-                    >
-                      &times;
-                    </span>
-                    <Image
-                      src={images.url}
-                      alt={images.name}
-                      width={300}
-                      height={200}
-                    />
-                  </div>
-                ))}
-              </div>
+              {!isImagesButtonClicked && uploadedImages.length > 0 && (
+                <div className={styles['image-container']}>
+                  {uploadedImages.map((images, index) => (
+                    <div className={styles['image']} key={index}>
+                      <span
+                        className={styles['delete']}
+                        onClick={() => deleteImage(index)}
+                      >
+                        &times;
+                      </span>
+                      <Image
+                        src={images.url}
+                        alt={images.name}
+                        width={300}
+                        height={200}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* replace the HTML below */}
               <button
                 type="button"
-                onClick={uploadImages}
-                disabled={isImagesButtonClicked}
+                onClick={
+                  isImagesButtonClicked && zipFileName
+                    ? () => trainModel(instancePrompt, classPrompt)
+                    : uploadImages
+                }
+                disabled={isImagesButtonClicked && !zipFileName}
                 style={{
                   backgroundColor: isImagesButtonClicked
-                    ? 'gray'
-                    : 'var(--secondary)'
+                    ? zipFileName
+                      ? 'var(--secondary)' // When showing "Train Now
+                      : 'gray' // When showing "Please wait"
+                    : 'var(--secondary)' // When showing "Upload"
                 }}
               >
                 {isImagesButtonClicked
                   ? zipFileName
-                    ? "Click 'Train Model' below when ready"
+                    ? 'Train Now'
                     : 'Please wait'
                   : 'Upload'}
               </button>
@@ -767,9 +775,8 @@ export default function CreateModels() {
             </p>
             <br></br>
             <p className="text-black sm:text-center">
-              Training takes <strong>30-60 mins</strong>—perfect time for a
-              coffee break! When done, you'll be redirected to "Generate
-              Images."
+              Training takes <strong>5-10 mins</strong>. When done, you'll be
+              redirected to "Generate Images."
             </p>
 
             <br></br>
@@ -834,18 +841,28 @@ export default function CreateModels() {
     <div className="App">
       {renderView()}
       <div>
-        {!isTraining && ( // Show buttons only when isTraining is false
-          <>
-            {step > 1 && <button onClick={handleBack}>Back</button>}
-            {step < 3 ? (
-              <button onClick={handleNext}>Next</button>
-            ) : (
-              <button onClick={() => trainModel(instancePrompt, classPrompt)}>
-                Train Model
-              </button>
-            )}
-          </>
-        )}
+        <p className="text-black sm:text-center">
+          {!isTraining && ( // Show buttons only when isTraining is false
+            <>
+              {step > 1 && (
+                <button
+                  onClick={handleBack}
+                  style={{ marginLeft: '10px', color: 'blue' }}
+                >
+                  Back
+                </button>
+              )}
+              {step < 3 ? (
+                <button
+                  onClick={handleNext}
+                  style={{ marginLeft: '10px', color: 'blue' }}
+                >
+                  Next
+                </button>
+              ) : null}
+            </>
+          )}
+        </p>
       </div>
     </div>
   );

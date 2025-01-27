@@ -398,7 +398,7 @@ export default function Train() {
     switch (step) {
       case 1:
         return (
-          <div>
+          <div className="text-black sm:text-center">
             <h2>Step 1</h2>
             <p style={{ color: 'var(--accent-1)' }}>
               Product to generate: {modelName} {modelClass}
@@ -427,7 +427,7 @@ export default function Train() {
         );
       case 2:
         return (
-          <div>
+          <div className="text-black sm:text-center">
             <h2>Step 2</h2>
             {!isGeneratingImages && (
               <div className="flex flex-col items-center p-2">
@@ -534,8 +534,22 @@ export default function Train() {
           <p className="text-black sm:text-center">{message}</p>
           <br></br>
           {subscribedAndModelChosen()}
-          {step > 1 && <button onClick={handleBack}>Back</button>}
-          {step < 2 && <button onClick={handleNext}>Next</button>}
+          {step > 1 && (
+            <button
+              onClick={handleBack}
+              style={{ marginLeft: '10px', color: 'blue' }}
+            >
+              Back
+            </button>
+          )}
+          {step < 2 && (
+            <button
+              onClick={handleNext}
+              style={{ marginLeft: '10px', color: 'blue' }}
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
     </section>

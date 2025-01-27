@@ -22,7 +22,7 @@ export default async function GET(req, res) {
         optimize_description: true,
         num_results: 1,
         fast: true,
-        placement_type: 'manual_placement',
+        placement_type: 'automatic',
         shot_size: [1000, 1000],
         manual_placement_selection: 'bottom_center'
       },
