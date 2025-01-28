@@ -22,6 +22,9 @@ export default function Dashboard2() {
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
   const [photoData, setPhotoData] = useState(null);
+  const [resultImages, setResultImages] = useState([]);
+  const [uploadedFilePath, setUploadedFilePath] = useState([]);
+
   const router = useRouter();
   const {
     userLoaded,
@@ -59,6 +62,7 @@ export default function Dashboard2() {
   const intervalImage = useRef();
 
   const getImage = async (attempt, backgroundPrompt) => {
+    setResultImages([]);
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
         backgroundPrompt +
@@ -101,53 +105,62 @@ export default function Dashboard2() {
   }
 
   const getImageResults = async (attempt, url) => {
-    const output = await axios.get('/api/imageresults?url=' + url);
-    if (output.data.status === 'COMPLETED') {
-      const result = await axios.get(
-        '/api/imageresults?url=' + output.data.response_url
-      );
-      console.log('result.data.images[0].url is: ', result.data.images[0].url);
-      // Wait for the image to be copied and get the unique filename
-      const uniqueFileName = await copyImageToSupabase(
-        result.data.images[0].url
-      );
+    try {
+      const output = await axios.get('/api/imageresults?url=' + url);
+      if (output.data.status === 'COMPLETED') {
+        const result = await axios.get(
+          '/api/imageresults?url=' + output.data.response_url
+        );
+        console.log('Result images:', result.data.images);
+        setResultImages(result.data.images);
 
+        // Mark prediction as completed
+        setBackgroundImagePredictions((state) => ({
+          ...state,
+          [attempt]: { ...state[attempt], status: 'COMPLETED' }
+        }));
+
+        return result.data.images;
+      }
+    } catch (error) {
+      console.error('Error in getImageResults:', error.message);
+    }
+    return [];
+  };
+
+  const addImages = async (images) => {
+    for (const imageObj of images) {
+      console.log('Processing image:', imageObj.url);
+
+      const uniqueFileName = await copyImageToSupabase(imageObj.url);
       if (uniqueFileName) {
-        console.log('uniqueFileName: ', uniqueFileName);
         const { data, error: urlError } = supabase.storage
           .from('images')
           .getPublicUrl(uniqueFileName);
 
         if (urlError) {
           console.error('Error generating public URL:', urlError.message);
-          return;
+          continue; // Skip this image
         }
-        // Save the uploaded URL to the database
+
+        // Save to database and local state
         await supabase.from('photos').insert({
           customer_id: user.identities[0].id,
           photo_url: data.publicUrl
         });
 
-        setPhotoData(data);
-        // Save the uploaded URL to localStorage
         const localPhotos = localStorage.getItem('generatedPhotos');
-        if (localPhotos) {
-          const localPhotosJson = JSON.parse(localPhotos);
-          localPhotosJson.push(output.data.output.image);
-          localStorage.setItem(
-            'generatedPhotos',
-            JSON.stringify(localPhotosJson)
-          );
-        }
+        const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
+        localPhotosJson.push(data.publicUrl);
+        localStorage.setItem(
+          'generatedPhotos',
+          JSON.stringify(localPhotosJson)
+        );
+
         setBackgroundImageList((current) => [
           ...current,
-          { url: data.publicUrl, text: '' } // placeholder text is empty for optional caption generation
+          { url: data.publicUrl, text: '' }
         ]);
-        setBackgroundImagePredictions((state) => ({
-          ...state,
-          [attempt]: { ...state[attempt], status: 'COMPLETED' }
-        }));
-        setBackgroundPrompt(null);
       }
     }
   };
@@ -165,6 +178,12 @@ export default function Dashboard2() {
       );
     }
   }, [backgroundImagePredictions]);
+
+  useEffect(() => {
+    if (resultImages) {
+      addImages(resultImages);
+    }
+  }, [resultImages]);
 
   useEffect(() => {
     const predictionAry = Object.entries(backgroundImagePredictions).filter(
@@ -319,12 +338,7 @@ export default function Dashboard2() {
     console.log('isImageUploaded: ', isImageUploaded);
     const { data, error } = await supabase.storage
       .from('images')
-      .list(user?.id + '/', {
-        limit: 1,
-        offset: 0,
-        //sortBy: { column: 'name', order: 'asc' }
-        sortBy: { column: 'updated_at', order: 'desc' }
-      }); // Cooper/
+      .getPublicUrl(uploadedFilePath); // Cooper/
     // data: [image1, image2, image3]
     // image1: {name: "subscribeToCooperCodes.png"}
 
@@ -332,12 +346,9 @@ export default function Dashboard2() {
 
     if (data != null) {
       setImageFile(data);
-      setImageFileName(CDNURL + user.identities[0].id + '/' + data[0].name);
+      setImageFileName(data.publicUrl);
       console.log('data: ', data);
-      console.log(
-        'name of the img file is: ',
-        CDNURL + user.identities[0].id + '/' + data[0].name
-      );
+      console.log('name of the img file is: ', data.publicUrl);
     } else {
       alert('Error loading images');
       console.log(error);
@@ -374,6 +385,7 @@ export default function Dashboard2() {
 
       if (publicUrlData) {
         setImageForBg(publicUrlData.publicUrl); // Set the image link
+        setUploadedFilePath(filePath);
       }
       setIsImageUploaded(true);
       getFiles();
