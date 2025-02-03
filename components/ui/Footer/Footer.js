@@ -75,6 +75,18 @@ export default function Footer() {
             </li>
           </ul>
         </div>
+        <div className="col-span-1 lg:col-span-2">
+          <ul className="flex flex-initial flex-col md:flex-1">
+            <li className="py-3 md:py-0 md:pb-4">
+              <Link
+                href="/faq"
+                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+              >
+                FAQ
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
       <div className="py-12 flex flex-col md:flex-row justify-between items-center space-y-4 bg-primary-2">
         <div>
