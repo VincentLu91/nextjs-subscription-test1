@@ -174,13 +174,6 @@ const SignIn = () => {
             aria-hidden="true"
           ></div>
         </div>
-        {/* cash incentive */}
-        <span className="pt-1 text-center text-sm">
-          <span className="text-secondary">
-            Sign up with Google and receive $15
-          </span>
-        </span>
-        {/* end of comment */}
         <Button
           variant="slim"
           type="submit"
