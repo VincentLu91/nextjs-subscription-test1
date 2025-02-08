@@ -23,7 +23,7 @@ export default function Contact() {
             </div>
             <div className="text-4xl text-black sm:text-center sm:text-2xl">
               <br />
-              <p>To reach out for support, please email brandpixai@gmail.com</p>
+              <p>To reach out for support, please email vince@brandpix.ai</p>
               <br />
               <p>Social Media:</p>
               <p>Instagram: @brandpix.ai</p>
