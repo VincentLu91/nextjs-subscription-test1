@@ -178,7 +178,7 @@ export default function ViewContent() {
   };
 
   const getCaptionResults = async (url) => {
-    const output = await axios.get('/api/imageresults?url=' + url);
+    const output = await axios.get('/api/captionresults?url=' + url);
     if (output.data.status === 'succeeded') {
       setCaptionStatus(output.data.status); // should be "succeeded"
       const result = output.data.output;
