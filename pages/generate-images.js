@@ -472,8 +472,7 @@ export default function Train() {
                   onClick={async () => {
                     if (
                       contentPrompt == null ||
-                      contentPrompt.trim() == '' ||
-                      !imageStyle
+                      contentPrompt.trim() == '' // || !imageStyle
                     ) {
                       alert('Please complete all fields');
                     } else {
