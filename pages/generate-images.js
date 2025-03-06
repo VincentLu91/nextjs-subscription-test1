@@ -293,7 +293,7 @@ export default function Train() {
     }
     let instanceArr = [
       {
-        label: 'default',
+        label: 'default (non-product images)',
         value:
           'https://v3.fal.media/files/penguin/A_nTG8OlTjMBwbFvm7DlT_pytorch_lora_weights.safetensors'
         // placeholder model, my model ^^. quick and dirty workaround for end users to generate generic images

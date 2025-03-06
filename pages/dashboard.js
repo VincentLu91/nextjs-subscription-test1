@@ -14,32 +14,86 @@ export default function Dashboard() {
             </h1>
             <br></br>
             <p className="text-black sm:text-center">
-              Get started creating content for your brand!
+              Create social media content in seconds—visuals and captions
+              included.
             </p>
             <div
               className={`${styles.grid} text-black sm:text-center mx-auto justify-center`}
             >
-              <Link href="/create-models" className={styles.card}>
-                <h2>Train AI Models &rarr;</h2>
-                <p>Upload product images to create AI models.</p>
-              </Link>
-
-              <Link href="/generate-images" className={styles.card}>
-                <h2>Create original visuals &rarr;</h2>
-                <p>Use the AI models to create original images.</p>
-              </Link>
+              <div className="w-full">
+                <h1 className="text-2xl text-black mb-4">
+                  New here? Start creating stunning, AI-generated backgrounds
+                  today.
+                </h1>
+              </div>
               <Link href="/generate-bg" className={styles.card}>
                 <h2>Change Backgrounds &rarr;</h2>
                 <p>Use one product image to place it in new settings.</p>
               </Link>
+            </div>
+
+            <div
+              className={`${styles.grid} text-black sm:text-center mx-auto justify-center`}
+            >
+              <h1 className="text-2xl text-black mb-4">
+                Happy with your AI generated image? Create accompanying text in
+                seconds to reduce writers' block.
+              </h1>
               <Link href="/view-content" className={styles.card}>
                 <h2>Generate Captions &rarr;</h2>
                 <p>Create text for your social media posts.</p>
               </Link>
-              <Link href="/gallery" className={styles.card}>
+            </div>
+
+            <div
+              className={`${styles.grid} text-black sm:text-center mx-auto justify-center flex flex-col`}
+            >
+              <h1 className="text-2xl text-black mb-4">
+                View all your AI images in one place.
+              </h1>
+              <Link href="/gallery" className={`${styles.card} mt-4`}>
                 <h2>View Your Creations &rarr;</h2>
                 <p>Check the Gallery for all your generated images.</p>
               </Link>
+            </div>
+
+            <div
+              className={`${styles.grid} text-black sm:text-center mx-auto justify-center`}
+            >
+              <h1 className="text-2xl text-black mb-4">
+                Want more than just background swaps? Train AI to learn your
+                product and generate unique images with any prompt you give!
+                (you could also use a 'default' model to generate )
+              </h1>
+              <Link href="/create-models" className={styles.card}>
+                <h2>Train AI Models &rarr;</h2>
+                <p>Upload product images to create AI models.</p>
+              </Link>
+              <Link href="/generate-images" className={styles.card}>
+                <h2>Create original visuals &rarr;</h2>
+                <p>Use the AI models to create original images.</p>
+              </Link>
+            </div>
+
+            <div
+              className={`${styles.grid} text-black sm:text-center mx-auto justify-center`}
+            >
+              <h1 className="text-2xl text-black mb-4">
+                Looking for inspo? Create images of anything—scenes, mood
+                boards, or landscapes—without needing to upload a product.
+              </h1>
+              <Link href="/generate-images" className={styles.card}>
+                <h2>Create original visuals &rarr;</h2>
+                <p>Same as above, but select the 'default' model.</p>
+              </Link>
+            </div>
+
+            <div
+              className={`${styles.grid} text-black sm:text-center mx-auto justify-center`}
+            >
+              <h1 className="text-2xl text-black mb-4">
+                Check out all the custom AIs you created.
+              </h1>
               <Link href="/aimodels" className={styles.card}>
                 <h2>View Your AI Models &rarr;</h2>
                 <p>See all the AI models you created for generating images.</p>
