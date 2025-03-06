@@ -354,7 +354,7 @@ export default function CreateModels() {
       // assign the model_version for training, so long as it exists, otherwise keep the initialized value
       /*if (prevModelInfo.data[0].model_version != null) {
         trainerVersion = prevModelInfo.data[0].model_version;
-      }*/ console.log('trainerVersion: ', trainerVersion); // // I think dreambooth model version only allows versions from replicate dreambooth, not MY dreambooth
+      }*/ console.log('trainerVersion: ', trainerVersion);
       const trainingInfo = await supabase
         .from('ai-models')
         .insert({
@@ -370,7 +370,7 @@ export default function CreateModels() {
       } else {
         // moved local storage away from here
         console.log('training data: ', trainingInfo.data);
-        // start making the call to Replicate API to train the model to save model_version
+        // start making the call to model API to train the model to save model_version
         const resp = axios
           .get(
             '/api/trainImageGen?instance_prompt=' +
