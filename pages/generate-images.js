@@ -295,7 +295,8 @@ export default function Train() {
       {
         label: 'default',
         value:
-          'd98c28497f972c7a6a90ee4f9052aab8ede8be5768a6ef42c6c7af5e42bd7608'
+          'https://v3.fal.media/files/penguin/A_nTG8OlTjMBwbFvm7DlT_pytorch_lora_weights.safetensors'
+        // placeholder model, my model ^^. quick and dirty workaround for end users to generate generic images
       }
     ];
     const instancePromptsInfo = await supabase
