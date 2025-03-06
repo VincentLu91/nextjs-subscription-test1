@@ -40,27 +40,6 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <Link
-                  href="/create-models"
-                  //onClick={() => router.push('/dashboard')}
-                  className={s.link}
-                >
-                  Create Models
-                </Link>
-                <Link
-                  href="/aimodels"
-                  //onClick={() => router.push('/dashboard')}
-                  className={s.link}
-                >
-                  AI Models
-                </Link>
-                <Link
-                  href="/generate-images"
-                  //onClick={() => router.push('/train')}
-                  className={s.link}
-                >
-                  Generate Images
-                </Link>
-                <Link
                   href="/generate-bg"
                   //onClick={() => router.push('/dashboard2')}
                   className={s.link}
@@ -73,6 +52,27 @@ const Navbar = () => {
                   className={s.link}
                 >
                   View Content
+                </Link>
+                <Link
+                  href="/create-models"
+                  //onClick={() => router.push('/dashboard')}
+                  className={s.link}
+                >
+                  Create Models
+                </Link>
+                <Link
+                  href="/generate-images"
+                  //onClick={() => router.push('/train')}
+                  className={s.link}
+                >
+                  Generate Images
+                </Link>
+                <Link
+                  href="/aimodels"
+                  //onClick={() => router.push('/dashboard')}
+                  className={s.link}
+                >
+                  AI Models
                 </Link>
                 <Link
                   href="/gallery"
