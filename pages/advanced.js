@@ -17,16 +17,16 @@ export default function Advanced() {
               className={`${styles.grid} text-black sm:text-center mx-auto justify-center`}
             >
               <h1 className="text-2xl text-black mb-4">
-                Want more than just background swaps? Train AI to learn your
-                product and generate unique images with any prompt you give!
-                (you could also use a 'default' model to generate )
+                Want more than just background swaps? Train AI to generate
+                original images of your product in different styles, angles, and
+                lighting.
               </h1>
               <Link href="/create-models" className={styles.card}>
                 <h2>Train AI Models &rarr;</h2>
                 <p>Upload product images to create AI models.</p>
               </Link>
-              <Link href="/generate-images" className={styles.card}>
-                <h2>Create original visuals &rarr;</h2>
+              <Link href="/ai-studio" className={styles.card}>
+                <h2>AI Studio &rarr;</h2>
                 <p>Use the AI models to create original images.</p>
               </Link>
             </div>
@@ -38,8 +38,8 @@ export default function Advanced() {
                 Looking for inspo? Create images of anything—scenes, mood
                 boards, or landscapes—without needing to upload a product.
               </h1>
-              <Link href="/generate-images" className={styles.card}>
-                <h2>Create original visuals &rarr;</h2>
+              <Link href="/ai-studio" className={styles.card}>
+                <h2>AI Studio &rarr;</h2>
                 <p>Same as above, but select the 'default' model.</p>
               </Link>
             </div>
