@@ -22,13 +22,12 @@ export default function Dashboard() {
             >
               <div className="w-full">
                 <h1 className="text-2xl text-black mb-4">
-                  New here? Start creating stunning, AI-generated backgrounds
-                  today.
+                  New here? Start creating stunning, AI-generated images today.
                 </h1>
               </div>
-              <Link href="/generate-bg" className={styles.card}>
-                <h2>Change Backgrounds &rarr;</h2>
-                <p>Use one product image to place it in new settings.</p>
+              <Link href="/generate-images" className={styles.card}>
+                <h2>Generate Images &rarr;</h2>
+                <p>Use one product image to place it in new backgrounds.</p>
               </Link>
             </div>
 
