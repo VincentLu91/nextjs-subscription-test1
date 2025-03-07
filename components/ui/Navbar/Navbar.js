@@ -53,26 +53,33 @@ const Navbar = () => {
                 >
                   View Content
                 </Link>
-                <Link
+                {/*<Link
                   href="/create-models"
                   //onClick={() => router.push('/dashboard')}
                   className={s.link}
                 >
                   Create Models
-                </Link>
-                <Link
+                </Link>*/}
+                {/*<Link
                   href="/generate-images"
                   //onClick={() => router.push('/train')}
                   className={s.link}
                 >
                   Generate Images
-                </Link>
-                <Link
+                </Link>*/}
+                {/*<Link
                   href="/aimodels"
                   //onClick={() => router.push('/dashboard')}
                   className={s.link}
                 >
                   AI Models
+                </Link>*/}
+                <Link
+                  href="/advanced"
+                  //onClick={() => router.push('/view-content')}
+                  className={s.link}
+                >
+                  Advanced Users
                 </Link>
                 <Link
                   href="/gallery"
