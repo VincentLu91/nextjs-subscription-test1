@@ -434,13 +434,23 @@ export default function Train() {
             <h2>Step 2</h2>
             {!isGeneratingImages && (
               <div className="flex flex-col items-center p-2">
-                <p style={{ color: 'var(--accent-1)' }}>
-                  Tell the AI how to create your product image
-                </p>
-                <p>
-                  <strong>Tip:</strong> Include the exact product name.
-                </p>
-                {modelName && modelClass && (
+                {modelName === 'default (non-product images)' || !modelName ? (
+                  <p style={{ color: 'var(--accent-1)' }}>
+                    Create non-product image
+                  </p>
+                ) : modelName !== 'default (non-product images)' &&
+                  modelClass ? (
+                  <>
+                    <p style={{ color: 'var(--accent-1)' }}>
+                      Tell the AI how to create your product image
+                    </p>
+                    <p>
+                      <strong>Tip:</strong> Include the exact product name.
+                    </p>
+                  </>
+                ) : null}
+
+                {modelName !== 'default (non-product images)' && modelClass && (
                   <p>
                     Example: For "
                     <strong>
