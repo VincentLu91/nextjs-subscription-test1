@@ -62,6 +62,12 @@ export default function Dashboard2() {
   const intervalImage = useRef();
 
   const getImage = async (attempt, backgroundPrompt) => {
+    if (!imageFileName) {
+      console.error('No image file uploaded');
+      setisGeneratingBGImages(false);
+      setisBGImagesLoading(false);
+      return;
+    }
     setResultImages([]);
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
