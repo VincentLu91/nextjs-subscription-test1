@@ -40,11 +40,11 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <Link
-                  href="/generate-bg"
+                  href="/generate-images"
                   //onClick={() => router.push('/dashboard2')}
                   className={s.link}
                 >
-                  Generate Background
+                  Generate Images
                 </Link>
                 <Link
                   href="/view-content"
@@ -61,11 +61,11 @@ const Navbar = () => {
                   Create Models
                 </Link>*/}
                 {/*<Link
-                  href="/generate-images"
+                  href="/ai-studio"
                   //onClick={() => router.push('/train')}
                   className={s.link}
                 >
-                  Generate Images
+                  AI Studio
                 </Link>*/}
                 {/*<Link
                   href="/aimodels"
