@@ -23,7 +23,7 @@ export default function GenerateImages() {
   const [numTieredTokens, setNumTieredTokens] = useState(null);
   const [photoData, setPhotoData] = useState(null);
   const [resultImages, setResultImages] = useState([]);
-  const [uploadedFilePath, setUploadedFilePath] = useState([]);
+  const [uploadedFilePath, setUploadedFilePath] = useState('');
 
   const router = useRouter();
   const {
@@ -62,18 +62,30 @@ export default function GenerateImages() {
   const intervalImage = useRef();
 
   const getImage = async (attempt, backgroundPrompt) => {
-    if (!imageFileName) {
-      console.error('No image file uploaded');
+    if (!imageFileName || !uploadedFilePath) {
+      console.error('No image file uploaded or file path missing');
       setisGeneratingBGImages(false);
       setisBGImagesLoading(false);
       return;
     }
     setResultImages([]);
+    // Get fresh public URL before making API call
+    const { data: freshUrlData } = supabase.storage
+      .from('images')
+      .getPublicUrl(uploadedFilePath);
+
+    if (!freshUrlData) {
+      console.error('Could not get fresh URL for image');
+      setisGeneratingBGImages(false);
+      setisBGImagesLoading(false);
+      return;
+    }
+
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
         backgroundPrompt +
         '&image=' +
-        imageFileName +
+        freshUrlData.publicUrl +
         `&user=${user.id}`
     );
     setBackgroundImagePredictions((state) => ({
@@ -89,7 +101,9 @@ export default function GenerateImages() {
     try {
       const response = await fetch(img_url);
       const blob = await response.blob();
-      const uniqueFileName = `${user.id}/${uuidv4()}.png`;
+      // Get file extension from the URL or default to png
+      const fileExt = img_url.split('.').pop().toLowerCase() || 'png';
+      const uniqueFileName = `${user.id}/${uuidv4()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('images') // Specify the bucket name
@@ -342,13 +356,10 @@ export default function GenerateImages() {
 
   async function getFiles() {
     console.log('isImageUploaded: ', isImageUploaded);
+    // Get public URL for the uploaded file
     const { data, error } = await supabase.storage
       .from('images')
-      .getPublicUrl(uploadedFilePath); // Cooper/
-    // data: [image1, image2, image3]
-    // image1: {name: "subscribeToCooperCodes.png"}
-
-    // to load image1: CDNURL.com/subscribeToCooperCodes.png -> hosted image
+      .getPublicUrl(uploadedFilePath);
 
     if (data != null) {
       setImageFile(data);
@@ -374,15 +385,13 @@ export default function GenerateImages() {
       return; // don't upload an empty file!
     }
 
-    // userid: Cooper
-    // Cooper/
-    // Cooper/myNameOfImage.png
-    // Lindsay/myNameOfImage.png
-    const filePath = `${user.id}/${uuidv4()}.png`;
+    // Get file extension and create a unique path with user ID
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
 
     const { data, error } = await supabase.storage
       .from('images')
-      .upload(filePath, file); // add .png extension otherwise storage will complain
+      .upload(filePath, file);
 
     if (data) {
       const { data: publicUrlData } = supabase.storage
@@ -396,7 +405,9 @@ export default function GenerateImages() {
       setIsImageUploaded(true);
       getFiles();
     } else {
-      console.log(error);
+      console.error('Error uploading file:', error);
+      alert('Failed to upload image. Please try again.');
+      setIsImageUploaded(false);
     }
   }
 
