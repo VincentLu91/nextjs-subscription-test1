@@ -112,7 +112,10 @@ export default function AIStudio() {
       return resp.data;
     } catch (err) {
       setIsLoading(false);
-      alert('Not have enough tokens');
+      setIsGeneratingImages(false);
+      const errorMessage =
+        err.response?.data?.details || err.response?.data?.error || err.message;
+      alert(`Failed to generate image: ${errorMessage}`);
     }
   };
 
