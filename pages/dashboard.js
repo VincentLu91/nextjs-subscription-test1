@@ -22,7 +22,7 @@ export default function Dashboard() {
             >
               <div className="w-full">
                 <h1 className="text-2xl text-black mb-4">
-                  New here? Start creating stunning, AI-generated images today.
+                  New here? Start creating AI-generated images today.
                 </h1>
               </div>
               <Link href="/generate-images" className={styles.card}>
