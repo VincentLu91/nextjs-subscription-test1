@@ -62,7 +62,7 @@ export default function GenerateImages() {
   const intervalImage = useRef();
 
   const getImage = async (attempt, backgroundPrompt) => {
-    if (!imageFileName || !uploadedFilePath) {
+    if (!uploadedFilePath) {
       console.error('No image file uploaded or file path missing');
       setisGeneratingBGImages(false);
       setisBGImagesLoading(false);
@@ -221,8 +221,17 @@ export default function GenerateImages() {
   }, [backgroundImagePredictions]);
 
   useEffect(() => {
-    if (!isLoadingUser && !user) router.replace('/signin');
-  }, [user]);
+    if (!isLoadingUser && !user) {
+      router.replace('/signin');
+    } else if (user) {
+      // Restore uploadedFilePath from localStorage if it exists
+      const savedFilePath = localStorage.getItem('uploadedFilePath');
+      if (savedFilePath) {
+        setUploadedFilePath(savedFilePath);
+        setIsImageUploaded(true);
+      }
+    }
+  }, [user, isLoadingUser]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);
@@ -402,6 +411,7 @@ export default function GenerateImages() {
       if (publicUrlData) {
         setImageForBg(publicUrlData.publicUrl); // Set the image link
         setUploadedFilePath(filePath);
+        localStorage.setItem('uploadedFilePath', filePath); // Persist the file path
       }
       setIsImageUploaded(true);
       getFiles();
