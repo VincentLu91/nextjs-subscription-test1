@@ -29,6 +29,10 @@ export default function Dashboard() {
                 <h2>Generate Images &rarr;</h2>
                 <p>Use one product image to create lifestyle shots.</p>
               </Link>
+              <Link href="/generate-apparel" className={styles.card}>
+                <h2>Virtual Try-On &rarr;</h2>
+                <p>Create new shots of models wearing your fashion pieces</p>
+              </Link>
             </div>
 
             <div

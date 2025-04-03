@@ -46,6 +46,11 @@ export const UserContextProvider = (props) => {
   );
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isGeneratingBGImages, setisGeneratingBGImages] = useState(false);
+  const [isApparelLoading, setisApparelLoading] = useState(false);
+  const [isGeneratingApparel, setisGeneratingApparel] = useState(false);
+  const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
+  const [tryOnImageList, setTryOnImageList] = useState([]);
+  const [tryOnPredictions, setTryOnPredictions] = useState({});
 
   const [isImagesButtonClicked, setIsImagesButtonClicked] = useState(false);
   const [statusPercentage, setStatusPercentage] = useState(0);
@@ -171,7 +176,17 @@ export const UserContextProvider = (props) => {
     statusPercentage,
     setStatusPercentage,
     generatedPhotos,
-    setGeneratedPhotos
+    setGeneratedPhotos,
+    isApparelLoading,
+    setisApparelLoading,
+    isGeneratingApparel,
+    setisGeneratingApparel,
+    isGeneratingTryOn,
+    setIsGeneratingTryOn,
+    tryOnImageList,
+    setTryOnImageList,
+    tryOnPredictions,
+    setTryOnPredictions
   };
   return <UserContext.Provider value={value} {...props} />;
 };
