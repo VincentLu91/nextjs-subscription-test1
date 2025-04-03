@@ -271,7 +271,9 @@ export default function GenerateApparel() {
           />
         </Form.Group>
         <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-          <Form.Label>Upload Garment Image (Clothing)</Form.Label>
+          <Form.Label>
+            Upload Garment Image (Clothing - shirts, pants)
+          </Form.Label>
           <Form.Control
             type="file"
             accept="image/png, image/jpeg"
@@ -282,9 +284,10 @@ export default function GenerateApparel() {
         {displayContent}
         {!isGeneratingTryOn && (
           <div className="flex flex-col items-center p-2">
+            <p>Garment to swap:</p>
             <select value={selectedOption} onChange={handleOptionChange}>
-              <option value="tops">Upper</option>
-              <option value="bottoms">Lower</option>
+              <option value="tops">Upper (shirts, jackets etc)</option>
+              <option value="bottoms">Lower (pants, jeans etc)</option>
               <option value="one-pieces">Single Piece</option>
             </select>
             {/*<p>Selected: {selectedOption}</p>*/}
