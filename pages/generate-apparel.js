@@ -284,11 +284,11 @@ export default function GenerateApparel() {
         {displayContent}
         {!isGeneratingTryOn && (
           <div className="flex flex-col items-center p-2">
-            <p>Garment to swap:</p>
+            <p>Category:</p>
             <select value={selectedOption} onChange={handleOptionChange}>
-              <option value="tops">Upper (shirts, jackets etc)</option>
-              <option value="bottoms">Lower (pants, jeans etc)</option>
-              <option value="one-pieces">Single Piece</option>
+              <option value="tops">Top</option>
+              <option value="bottoms">Bottom</option>
+              <option value="one-pieces">Full-Body</option>
             </select>
             {/*<p>Selected: {selectedOption}</p>*/}
             <Button
