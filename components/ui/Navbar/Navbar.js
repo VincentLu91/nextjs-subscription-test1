@@ -51,7 +51,7 @@ const Navbar = () => {
                   //onClick={() => router.push('/dashboard2')}
                   className={s.link}
                 >
-                  Virtual Try-On
+                  Clothes Swapping
                 </Link>
                 <Link
                   href="/view-content"
