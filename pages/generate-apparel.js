@@ -189,8 +189,8 @@ export default function GenerateApparel() {
       clearInterval(intervalImage.current);
       setIsGeneratingTryOn(false);
       setFinishMessage(
-        'Virtual try-on complete! The results have been saved to your gallery.\n' +
-          'Please go to the Gallery page to see your virtual try-on results.'
+        'Clothes swapping complete! The results have been saved to your gallery.\n' +
+          'Please go to the Gallery page to see your clothes swapping results.'
       );
     }
   }, [tryOnPredictions]);
@@ -233,7 +233,7 @@ export default function GenerateApparel() {
   const loadingMessage = isGeneratingTryOn && (
     <div className={styles['black-text']}>
       <p>
-        Generating virtual try-on
+        Generating...
         <LoadingDots />
       </p>
       <p>Please do not refresh or you will lose all progress!</p>
@@ -308,7 +308,7 @@ export default function GenerateApparel() {
                 }
               }}
             >
-              Generate Virtual Try-On
+              Generate Now
             </Button>
           </div>
         )}
@@ -409,7 +409,7 @@ export default function GenerateApparel() {
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Virtual Try-On
+            Clothes Swapping
           </h1>
           {console.log('isGeneratingTryOn: ', isGeneratingTryOn)}
           <br></br>
