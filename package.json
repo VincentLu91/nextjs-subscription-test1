@@ -24,7 +24,7 @@
     "posthog-js": "^1.235.6",
     "raw-body": "^3.0.0",
     "react": "^18.3.1",
-    "react-aria": "^3.38.1",
+    "react-aria": "^3.39.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.5.2",
