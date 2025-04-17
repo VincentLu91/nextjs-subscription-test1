@@ -16,7 +16,7 @@
     "@swc/helpers": "^0.5.17",
     "axios": "^1.8.4",
     "classnames": "^2.5.1",
-    "cohere-ai": "^7.17.0",
+    "cohere-ai": "^7.17.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "next": "^15.0.4",
