@@ -28,7 +28,7 @@
     "react-bootstrap": "^2.10.9",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.5.2",
-    "react-merge-refs": "^3.0.0",
+    "react-merge-refs": "^2.1.1",
     "react-select": "^5.10.1",
     "stripe": "^18.0.0",
     "swr": "2.3.3",
