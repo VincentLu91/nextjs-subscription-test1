@@ -1,17 +1,19 @@
+@reference "tailwindcss";
+
 .root {
-  @apply sticky top-0 bg-primary z-40 transition-all duration-150;
+  @apply sticky top-0 bg-[var(--primary)] z-40 transition-all duration-150;
 }
 
 .link {
-  @apply inline-flex items-center text-primary leading-6 font-medium transition ease-in-out duration-75 cursor-pointer /*text-accents-6*/ text-secondary rounded-lg p-1;
+  @apply inline-flex items-center leading-6 font-medium transition ease-in-out duration-75 cursor-pointer text-black hover:text-[#943bdc] rounded-lg p-1;
 }
 
 .link:hover {
-  @apply /*text-accents-9*/ text-primary;
+  /* @apply  text-primary; */
 }
 
 .link:focus {
-  @apply outline-none /*text-accents-8*/ ring-2 /* ring-pink */ring-blue ring-opacity-50;
+  @apply outline-none ring-2 ring-[#943bdc];
 }
 
 .logo {

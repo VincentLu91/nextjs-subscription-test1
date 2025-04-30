@@ -1,7 +1,9 @@
+@reference "tailwindcss";
+
 .root {
-  @apply bg-primary py-2 px-6 w-full appearance-none transition duration-150 ease-in-out pr-10 border border-accents-3 /*text-accents-6*/text-accents-1;
+  @apply bg-white py-2 px-6 w-full appearance-none transition duration-150 ease-in-out pr-10 border border-gray-200 rounded-md;
 }
 
 .root:focus {
-  @apply outline-none;
+  @apply outline-none ring-2 ring-[#943bdc] border-[#943bdc];
 }

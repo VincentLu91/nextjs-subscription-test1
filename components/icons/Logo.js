@@ -9,7 +9,7 @@ const Logo = ({ className = '', ...props }) => {
             src="/brandpix.AI.blue.png"
             width={32}
             height={32}
-            objectFit="cover"
+            // objectFit="cover"
             className="rounded-full"
             alt="App"
           />
