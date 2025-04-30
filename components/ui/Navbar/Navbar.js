@@ -9,7 +9,7 @@ const Navbar = () => {
   const { user, signOut } = useUser();
 
   return (
-    <nav className={s.root}>
+    <nav className="sticky top-0 bg-[#fff] z-40 transition-all duration-150">
       <a href="#skip" className="sr-only focus:not-sr-only">
         Skip to content
       </a>

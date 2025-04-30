@@ -113,7 +113,7 @@ const SignIn = () => {
                 required
               />
               <Button
-                className="mt-1"
+                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
                 variant="slim"
                 type="submit"
                 loading={loading}
@@ -127,7 +127,7 @@ const SignIn = () => {
           <span className="pt-1 text-center text-sm">
             <a
               href="#"
-              className="text-accents-7 text-accent-9 hover:underline cursor-pointer"
+              className="text-blue-600 hover:underline cursor-pointer"
               onClick={() => {
                 if (showPasswordInput) setPassword('');
                 setShowPasswordInput(!showPasswordInput);
@@ -141,22 +141,22 @@ const SignIn = () => {
           </span>
 
           <span className="pt-1 text-center text-sm">
-            <span className="text-secondary">Don't have an account?</span>
+            <span className="text-gray-600">Don't have an account?</span>
             {` `}
             <Link
               href="/signup"
-              className="text-accent-9 font-bold hover:underline cursor-pointer"
+              className="text-blue-600 font-bold hover:underline cursor-pointer"
             >
               Sign up.
             </Link>
           </span>
 
           <span className="pt-1 text-center text-sm">
-            <span className="text-secondary">Forgot your password?</span>
+            <span className="text-gray-600">Forgot your password?</span>
             {` `}
             <Link
               href="/reset"
-              className="text-accent-9 font-bold hover:underline cursor-pointer"
+              className="text-blue-600 font-bold hover:underline cursor-pointer"
             >
               Request a reset.
             </Link>
@@ -165,16 +165,17 @@ const SignIn = () => {
 
         <div className="flex items-center my-6">
           <div
-            className="border-t border-accents-2 flex-grow mr-3"
+            className="border-t border-blue-200 flex-grow mr-3"
             aria-hidden="true"
           ></div>
-          <div className="text-accents-4 italic">Or</div>
+          <div className="text-gray-600 italic">Or</div>
           <div
-            className="border-t border-accents-2 flex-grow ml-3"
+            className="border-t border-blue-200 flex-grow ml-3"
             aria-hidden="true"
           ></div>
         </div>
         <Button
+          className="bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
           variant="slim"
           type="submit"
           disabled={loading}

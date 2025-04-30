@@ -1,17 +1,18 @@
+@reference "tailwindcss";
 .main {
-	margin: auto;
-	width: 750px;
-	max-width: calc(100vw - 50px);
+  margin: auto;
+  width: 750px;
+  max-width: calc(100vw - 50px);
 }
 
 .mainImage {
-	width: 100%;
+  width: 100%;
 }
 
 .body p {
-	font-size: 24px;
-	text-indent: 50px;
-	line-height: 45px;
-	text-align: justify;
-	letter-spacing:1.5px;
+  font-size: 24px;
+  text-indent: 50px;
+  line-height: 45px;
+  text-align: justify;
+  letter-spacing: 1.5px;
 }

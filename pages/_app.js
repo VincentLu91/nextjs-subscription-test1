@@ -1,5 +1,6 @@
-import '../assets/main.css';
+import '../styles/globals.css';
 import '../assets/chrome-bug.css';
+import '../assets/base.css';
 
 import { useEffect } from 'react';
 import Layout from '../components/Layout';
@@ -38,7 +39,7 @@ export default function MyApp({
   return (
     <>
       <PostHogProvider client={posthog}>
-        <div className="bg-primary">
+        <div className="bg-white">
           <UserContextProvider>
             <Layout>
               <Component {...pageProps} />

@@ -32,18 +32,15 @@
   --violet-light: #7048e8;
   --violet: #5f3dc4;
 
-  --font-sans: -apple-system, system-ui, BlinkMacSystemFont, 'Helvetica Neue',
-    'Helvetica', sans-serif;
+  --font-sans:
+    -apple-system, system-ui, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica',
+    sans-serif;
 }
 
 *,
 *:before,
 *:after {
   box-sizing: inherit;
-}
-
-*:focus {
-  @apply outline-none ring-2 ring-blue ring-opacity-50;
 }
 
 html {
