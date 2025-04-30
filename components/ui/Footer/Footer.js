@@ -5,8 +5,8 @@ import s from './Footer.module.css';
 
 export default function Footer() {
   return (
-    <footer className="mx-auto max-w-8xl px-6 bg-primary-2">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 border-b border-accents-2 py-12 text-base transition-colors duration-150 bg-primary-2">
+    <footer className="mx-auto max-w-8xl px-6 bg-[#383454]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 border-b border-blue-200 py-12 text-base transition-colors duration-150 bg-[#383454] text-white">
         <div className="col-span-1 lg:col-span-2">
           <Link
             href="/"
@@ -27,7 +27,7 @@ export default function Footer() {
             <li className="py-3 md:py-0 md:pb-4">
               <Link
                 href="/"
-                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+                className="text-base hover:text-[#943bdc] transition ease-in-out duration-150"
               >
                 Home
               </Link>
@@ -35,7 +35,7 @@ export default function Footer() {
             <li className="py-3 md:py-0 md:pb-4">
               <Link
                 href="/contact"
-                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+                className="text-base hover:text-[#943bdc] transition ease-in-out duration-150"
               >
                 Contact
               </Link>
@@ -43,7 +43,7 @@ export default function Footer() {
             <li className="py-3 md:py-0 md:pb-4">
               <Link
                 href="/blog"
-                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+                className="text-base hover:text-[#943bdc] transition ease-in-out duration-150"
               >
                 Blog
               </Link>
@@ -53,14 +53,12 @@ export default function Footer() {
         <div className="col-span-1 lg:col-span-2">
           <ul className="flex flex-initial flex-col md:flex-1">
             <li className="py-3 md:py-0 md:pb-4">
-              <p className="text-base font-bold hover:text-accents-6 transition ease-in-out duration-150">
-                LEGAL
-              </p>
+              <p className="text-base font-bold">LEGAL</p>
             </li>
             <li className="py-3 md:py-0 md:pb-4">
               <Link
                 href="/privacypolicy"
-                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+                className="text-base hover:text-[#943bdc] transition ease-in-out duration-150"
               >
                 Privacy Policy
               </Link>
@@ -68,7 +66,7 @@ export default function Footer() {
             <li className="py-3 md:py-0 md:pb-4">
               <Link
                 href="/termsofuse"
-                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+                className="text-base hover:text-[#943bdc] transition ease-in-out duration-150"
               >
                 Terms of Use
               </Link>
@@ -80,7 +78,7 @@ export default function Footer() {
             <li className="py-3 md:py-0 md:pb-4">
               <Link
                 href="/faq"
-                className="text-base hover:text-accents-6 transition ease-in-out duration-150"
+                className="text-base hover:text-[#943bdc] transition ease-in-out duration-150"
               >
                 FAQ
               </Link>
@@ -88,7 +86,7 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="py-12 flex flex-col md:flex-row justify-between items-center space-y-4 bg-primary-2">
+      <div className="py-12 flex flex-col md:flex-row justify-between items-center space-y-4 bg-[#383454] text-white">
         <div>
           <span className="text-base">
             &copy; 2024 brandpix.ai, Inc. All rights reserved.

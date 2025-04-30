@@ -14,7 +14,7 @@ function Card({ title, description, footer, children }) {
         <p className="text-black">{description}</p>
         {children}
       </div>
-      <div className="border-t border-accents-1 bg-primary-2 p-4 text-accents-3 rounded-b-lg">
+      <div className="border-t border-accents-1 bg-red-100-2 p-4 text-blue-300 rounded-b-lg">
         {footer}
       </div>
     </div>

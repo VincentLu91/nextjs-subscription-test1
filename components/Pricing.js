@@ -74,15 +74,15 @@ export default function Pricing({ products }) {
           <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
             For Ultimate yearly plan, pay once for lifetime access.
           </p>
-          <div className="relative self-center mt-6 bg-primary-2 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
+          <div className="relative self-center mt-6 bg-red-100-2 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
             <button
               onClick={() => setBillingInterval('month')}
               type="button"
               className={`${
                 billingInterval === 'month'
-                  ? 'relative w-1/2 bg-accents-1 border-accents-0 shadow-sm text-white'
-                  : 'ml-0.5 relative w-1/2 border border-transparent text-accents-4'
-              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+                  ? 'relative w-1/2 bg-red-100 border-accents-0 shadow-sm text-white'
+                  : 'ml-0.5 relative w-1/2 border border-transparent text-red-400'
+              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8`}
             >
               Monthly billing
             </button>
@@ -91,9 +91,9 @@ export default function Pricing({ products }) {
               type="button"
               className={`${
                 billingInterval === 'year'
-                  ? 'relative w-1/2 bg-accents-1 border-accents-0 shadow-sm text-white'
-                  : 'ml-0.5 relative w-1/2 border border-transparent text-accents-4'
-              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+                  ? 'relative w-1/2 bg-red-100 border-accents-0 shadow-sm text-white'
+                  : 'ml-0.5 relative w-1/2 border border-transparent text-red-400'
+              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8`}
             >
               Yearly billing
             </button>
@@ -120,7 +120,7 @@ export default function Pricing({ products }) {
               <div
                 key={product.id}
                 className={cn(
-                  'rounded-lg shadow-sm divide-y divide-accents-2 bg-primary-2',
+                  'rounded-lg shadow-sm divide-y divide-accents-2 bg-red-100-2',
                   {
                     'border border-pink': subscription
                       ? product.name === subscription?.prices?.products.name
@@ -168,7 +168,7 @@ export default function Pricing({ products }) {
           })}
         </div>
         <div>
-          <p className="mt-24 text-xs uppercase text-accents-3 text-center font-bold tracking-widest">
+          <p className="mt-24 text-xs uppercase text-blue-300 text-center font-bold tracking-widest">
             Here is what the plans will do for you:
           </p>
           <ul>
