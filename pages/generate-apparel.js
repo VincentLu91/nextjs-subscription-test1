@@ -264,21 +264,47 @@ export default function GenerateApparel() {
       <div className={styles['get-image-button']}>
         <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
           <Form.Label>Upload Model Image (Person)</Form.Label>
-          <Form.Control
-            type="file"
-            accept="image/png, image/jpeg"
-            onChange={(e) => uploadFile(e, 'model')}
-          />
+          <div>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/png, image/jpeg"
+                onChange={(e) => uploadFile(e, 'model')}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                Choose File
+              </div>
+            </div>
+            {modelImagePath && (
+              <div className="mt-2 text-sm text-gray-600">
+                Selected: {modelImagePath.split('/').pop()}
+              </div>
+            )}
+          </div>
         </Form.Group>
         <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
           <Form.Label>
             Upload Garment Image (Clothing - shirts, pants)
           </Form.Label>
-          <Form.Control
-            type="file"
-            accept="image/png, image/jpeg"
-            onChange={(e) => uploadFile(e, 'garment')}
-          />
+          <div>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/png, image/jpeg"
+                onChange={(e) => uploadFile(e, 'garment')}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                Choose File
+              </div>
+            </div>
+            {garmentImagePath && (
+              <div className="mt-2 text-sm text-gray-600">
+                Selected: {garmentImagePath.split('/').pop()}
+              </div>
+            )}
+          </div>
         </Form.Group>
         <br />
         {displayContent}
@@ -292,6 +318,7 @@ export default function GenerateApparel() {
             </select>
             {/*<p>Selected: {selectedOption}</p>*/}
             <Button
+              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
               variant="slim"
               onClick={async () => {
                 if (!modelImagePath || !garmentImagePath) {

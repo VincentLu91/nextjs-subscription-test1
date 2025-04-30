@@ -103,7 +103,11 @@ export default function ViewContent() {
 
       <img alt="uploaded" src={imageLink} />
       <br />
-      <Button variant="slim" onClick={() => download(imageLink)}>
+      <Button
+        variant="slim"
+        onClick={() => download(imageLink)}
+        className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+      >
         Download Content
       </Button>
     </div>
@@ -392,6 +396,7 @@ export default function ViewContent() {
             <Button
               variant="slim"
               onClick={() => generateCaptionsReplicate(prompt, imageLink)}
+              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
             >
               Generate Caption
             </Button>
