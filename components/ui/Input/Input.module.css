@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
 .root {
-  @apply bg-white py-2 px-6 w-full appearance-none transition duration-150 ease-in-out pr-10 border border-gray-200 rounded-md;
+  @apply bg-white py-2 px-6 w-full appearance-none transition duration-150 ease-in-out pr-10 border border-gray-200 rounded-md text-black;
 }
 
 .root:focus {
