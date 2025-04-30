@@ -1,23 +1,25 @@
-import imageUrlBuilder from '@sanity/image-url';
-import { useState, useEffect } from 'react';
 import styles from '../../styles/Post.module.css';
 import BlockContent from '@sanity/block-content-to-react';
-import Image from 'next/image'; // src prop isn't recognized in Image component
+import Image from 'next/image';
 import Toolbar from '../../components/toolbar';
+import imageUrlBuilder from '@sanity/image-url';
+import { useState, useEffect } from 'react';
+
+const config = {
+  projectId: 'ano453va',
+  dataset: 'production'
+};
 
 export const Post = ({ title, body, image }) => {
   const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
-    const imgBuilder = imageUrlBuilder({
-      projectId: 'ano453va',
-      dataset: 'production'
-    });
-
-    setImageUrl(imgBuilder.image(image).url());
+    if (image) {
+      const imgBuilder = imageUrlBuilder(config);
+      setImageUrl(imgBuilder.image(image).url());
+    }
   }, [image]);
 
-  const url = image[0]?.url;
   return (
     <div style={{ color: 'var(--text-secondary)' }}>
       <Toolbar />
@@ -27,15 +29,28 @@ export const Post = ({ title, body, image }) => {
           <Image
             className={styles.mainImage}
             src={imageUrl}
-            alt="main image"
-            width="100"
-            height="100"
+            alt={title || 'Blog post image'}
+            width={100}
+            height={100}
             layout="responsive"
           />
         )}
-
         <div className={styles.body}>
-          <BlockContent blocks={body} />
+          {body && (
+            <BlockContent
+              blocks={body}
+              {...config}
+              serializers={{
+                types: {
+                  block: (props) => {
+                    const { style = 'normal' } = props.node;
+                    if (style === 'normal') return <p>{props.children}</p>;
+                    return BlockContent.defaultSerializers.types.block(props);
+                  }
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -52,26 +67,26 @@ export const getServerSideProps = async (pageContext) => {
   }
 
   const query = encodeURIComponent(
-    `*[ _type == "post" && slug.current == "${pageSlug}" ]`
+    `*[ _type == "post" && slug.current == "${pageSlug}" ][0]`
   );
   const url = `https://ano453va.api.sanity.io/v1/data/query/production?query=${query}`;
 
   const result = await fetch(url).then((res) => res.json());
-  const post = result.result[0];
+  const post = result.result;
 
   if (!post) {
     return {
       notFound: true
     };
-  } else {
-    return {
-      props: {
-        title: post.title,
-        body: post.body,
-        image: post.mainImage
-      }
-    };
   }
+
+  return {
+    props: {
+      title: post.title || '',
+      body: post.body || [],
+      image: post.mainImage
+    }
+  };
 };
 
 export default Post;

@@ -50,16 +50,15 @@ export default function Home({ posts }) {
                   {console.log('test', p)}
                   <h3>{p.title}</h3>
                   <Image
-                    //loader={myLoader}
                     src={p.mainImage}
                     alt="main image"
                     width={500}
                     height={300}
-                    //layout="fill"
+                    layout="responsive"
                   />
                 </div>
               ))
-              .reverse() // this is to display the most recent post at the top. This fnc wasn't needed in the tutorial.
+              .reverse()
           ) : (
             <>No Posts Yet</>
           )}
@@ -71,8 +70,10 @@ export default function Home({ posts }) {
 
 export const getServerSideProps = async (pageContext) => {
   const query = encodeURIComponent(`*[ _type == "post" ]{
-  ...,
-  mainImage->
+  title,
+  slug,
+  mainImage,
+  body
 }`);
   const url = `https://ano453va.api.sanity.io/v1/data/query/production?query=${query}`;
   const result = await fetch(url).then((res) => res.json());
