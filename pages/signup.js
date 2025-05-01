@@ -88,6 +88,7 @@ const SignUp = () => {
         <Input type="password" placeholder="Password" onChange={setPassword} />
         <div className="pt-2 w-full flex flex-col">
           <Button
+            className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
             variant="slim"
             type="submit"
             loading={loading}
@@ -119,6 +120,7 @@ const SignUp = () => {
           ></div>
         </div>
         <Button
+          className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
           variant="slim"
           type="submit"
           disabled={loading}
