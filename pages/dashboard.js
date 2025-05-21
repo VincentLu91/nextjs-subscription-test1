@@ -26,7 +26,7 @@ export default function Dashboard() {
                 </h1>
               </div>
               <Link href="/generate-images" className={styles.card}>
-                <h2>Generate Images &rarr;</h2>
+                <h2>Replace backgrounds &rarr;</h2>
                 <p>Use one product image to create lifestyle shots.</p>
               </Link>
               <Link href="/generate-apparel" className={styles.card}>
