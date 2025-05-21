@@ -13,18 +13,13 @@ export default async function GET(req, res) {
 
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
-      'https://queue.fal.run/fal-ai/bria/product-shot',
+      'https://queue.fal.run/fal-ai/ideogram/v3/replace-background',
       {
         image_url: image,
-        scene_description: prompt,
+        prompt: prompt,
         /*ref_image_url:
           'https://storage.googleapis.com/falserverless/bria/bria_product_bg.jpg',*/
-        optimize_description: true,
-        num_results: 1,
-        fast: true,
-        placement_type: 'automatic',
-        shot_size: [1000, 1000],
-        manual_placement_selection: 'bottom_center'
+        num_results: 1
       },
       {
         headers: {

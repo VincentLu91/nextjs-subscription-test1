@@ -11,7 +11,7 @@ import { supabase } from '../utils/initSupabase';
 import Select from 'react-select';
 import { v4 as uuidv4 } from 'uuid';
 
-const ATTEMPTS = 1;
+const ATTEMPTS = 7;
 
 const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
 
@@ -465,7 +465,7 @@ export default function GenerateImages() {
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Generate Images
+            Replace Backgrounds
           </h1>
           {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
           <br></br>
@@ -477,7 +477,10 @@ export default function GenerateImages() {
           <br></br>
           <p className="text-black sm:text-center">
             Choose a photo of <strong>1</strong> product. Tell the AI what
-            background to generate.
+            background to replace.
+          </p>
+          <p className="text-black sm:text-center">
+            This will generate lifestyle product shots.
           </p>
           <br />
           {subscribedAndModelChosen()}

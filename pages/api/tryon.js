@@ -13,7 +13,7 @@ export default async function GET(req, res) {
 
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
-      'https://queue.fal.run/fashn/tryon',
+      'https://queue.fal.run/fal-ai/fashn/tryon/v1.5',
       {
         model_image: model_image,
         garment_image: garment_image,

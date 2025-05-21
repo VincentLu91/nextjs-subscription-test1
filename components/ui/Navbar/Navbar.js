@@ -44,7 +44,7 @@ const Navbar = () => {
                   //onClick={() => router.push('/dashboard2')}
                   className={s.link}
                 >
-                  Generate Images
+                  Replace Backgrounds
                 </Link>
                 <Link
                   href="/generate-apparel"
