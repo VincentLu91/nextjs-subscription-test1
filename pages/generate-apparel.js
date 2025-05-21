@@ -284,9 +284,7 @@ export default function GenerateApparel() {
           </div>
         </Form.Group>
         <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-          <Form.Label>
-            Upload Garment Image (Clothing - shirts, pants)
-          </Form.Label>
+          <Form.Label>Upload Clothing Piece (shirts, pants)</Form.Label>
           <div>
             <div className="relative">
               <input
