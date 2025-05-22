@@ -11,7 +11,7 @@ import { supabase } from '../utils/initSupabase';
 import Select from 'react-select';
 import { v4 as uuidv4 } from 'uuid';
 
-const ATTEMPTS = 7;
+const ATTEMPTS = 1;
 
 const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
 
