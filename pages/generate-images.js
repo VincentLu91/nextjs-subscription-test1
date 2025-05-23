@@ -476,11 +476,15 @@ export default function GenerateImages() {
           </p>*/}
           <br></br>
           <p className="text-black sm:text-center">
-            Choose a photo of <strong>1</strong> product. Tell the AI what
-            background to replace.
+            Upload a photo of your product and tell the AI what background to
+            create.
           </p>
           <p className="text-black sm:text-center">
-            This will generate lifestyle product shots.
+            In seconds, get stunning lifestyle shots—ready for your store or
+            socials.
+          </p>
+          <p className="text-black sm:text-center">
+            Ideal for: eCommerce, DTC brands, and luxury goods.
           </p>
           <br />
           {subscribedAndModelChosen()}
