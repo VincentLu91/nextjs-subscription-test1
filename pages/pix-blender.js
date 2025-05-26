@@ -549,7 +549,7 @@ export default function GenerateImages() {
           <br></br>
           <br></br>
           <p className="text-black sm:text-center">
-            Combine Multiple Product Images Into One.
+            Our most flexible option: Combine multiple product images into one.
           </p>
           <p className="text-black sm:text-center">
             <strong>For Best Results:</strong> Avoid uploading images with
