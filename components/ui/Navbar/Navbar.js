@@ -47,6 +47,13 @@ const Navbar = () => {
                   Replace Backgrounds
                 </Link>
                 <Link
+                  href="/pix-blender"
+                  //onClick={() => router.push('/dashboard2')}
+                  className={s.link}
+                >
+                  Pix Blender
+                </Link>
+                <Link
                   href="/generate-apparel"
                   //onClick={() => router.push('/dashboard2')}
                   className={s.link}
