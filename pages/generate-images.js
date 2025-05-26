@@ -24,6 +24,8 @@ export default function GenerateImages() {
   const [photoData, setPhotoData] = useState(null);
   const [resultImages, setResultImages] = useState([]);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
+  const [promptObject, setPromptObject] = useState(null);
+  const [promptStatus, setPromptStatus] = useState(null);
 
   const router = useRouter();
   const {
@@ -59,6 +61,7 @@ export default function GenerateImages() {
     setisGeneratingBGImages
   } = useUser();
 
+  const intervalPrompt = useRef();
   const intervalImage = useRef();
 
   const getImage = async (attempt, backgroundPrompt) => {
@@ -147,6 +150,60 @@ export default function GenerateImages() {
     }
     return [];
   };
+
+  const suggestPromptReplicate = async (imageLink) => {
+    if (!imageLink) {
+      alert("You haven't uploaded an image or there is an error!");
+    } else {
+      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+      const rawPrompt = await axios.post(
+        '/api/suggestPrompt?imageLink=' + imageLink + `&user=${user.id}`
+      );
+      console.log('raw prompt', rawPrompt);
+      setPromptObject(rawPrompt);
+      setPromptStatus(rawPrompt.data.status); // should be "starting"
+      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
+      //console.log(rawCaption.data.text);
+      //setCaption(rawCaption.data.text.trim());
+    }
+  };
+
+  const getPromptResults = async (url) => {
+    const output = await axios.get('/api/captionresults?url=' + url);
+    if (output.data.status === 'succeeded') {
+      setPromptStatus(output.data.status); // should be "succeeded"
+      const result = output.data.output;
+      if (result) {
+        console.log('caption result: ', result); // this prints array of words
+        const joinedPrompt = result.join('');
+        const joinedPromptWithoutQuotes = joinedPrompt.slice(1, -1);
+        console.log(joinedPromptWithoutQuotes);
+        setBackgroundPrompt(joinedPromptWithoutQuotes);
+        setPromptStatus(null);
+      } else {
+        alert('nothing generated');
+      }
+      /*setPredictions((state) => ({
+        ...state,
+        [attempt]: { ...state[attempt], status: 'succeeded' }
+      }));*/
+    }
+    //console.log('output data is: ', output);
+  };
+
+  useEffect(() => {
+    if (promptStatus) {
+      intervalPrompt.current = setInterval(() => {
+        console.log(promptStatus);
+        getPromptResults(promptObject.data.urls.get);
+      }, 3000);
+    }
+    // at every 2 seconds, an 'interval' is created via calling setInterval().
+    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
+    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
+    return () => clearInterval(intervalPrompt.current);
+    // why is the useEffect running continuously, even though it's finished?
+  }, [promptStatus]);
 
   const addImages = async (images) => {
     for (const imageObj of images) {
@@ -312,6 +369,16 @@ export default function GenerateImages() {
         {displayContent}
         {!isGeneratingBGImages && (
           <div className="flex flex-col items-center p-2">
+            <Button
+              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+              variant="slim"
+              onClick={async () => {
+                suggestPromptReplicate(imageForBg);
+              }}
+            >
+              Generate Prompt
+            </Button>
+            <br></br>
             <textarea
               type="text"
               id="backgroundPrompt"
