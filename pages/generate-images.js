@@ -369,6 +369,10 @@ export default function GenerateImages() {
         {displayContent}
         {!isGeneratingBGImages && (
           <div className="flex flex-col items-center p-2">
+            <p className="text-black sm:text-center">
+              No idea what content to generate? Click 'Generate Prompt' for some
+              ideas.
+            </p>
             <Button
               className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
               variant="slim"
@@ -551,7 +555,7 @@ export default function GenerateImages() {
             socials.
           </p>
           <p className="text-black sm:text-center">
-            Ideal for: eCommerce, DTC brands, and luxury goods.
+            Ideal for: eCommerce, DTC brands, and labeled products.
           </p>
           <br />
           {subscribedAndModelChosen()}
