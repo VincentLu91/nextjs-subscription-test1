@@ -25,9 +25,15 @@ export default function Dashboard() {
                   New here? Start creating AI-generated images today.
                 </h1>
               </div>
-              <Link href="/generate-images" className={styles.card}>
+              <Link href="/replace-bg" className={styles.card}>
                 <h2>Replace backgrounds &rarr;</h2>
                 <p>Use one product image to create lifestyle shots.</p>
+              </Link>
+              <Link href="/pix-blender" className={styles.card}>
+                <h2>Pix Blender &rarr;</h2>
+                <p>
+                  Showcase multiple products and subjects into a single image
+                </p>
               </Link>
               <Link href="/generate-apparel" className={styles.card}>
                 <h2>Clothes swapping &rarr;</h2>
