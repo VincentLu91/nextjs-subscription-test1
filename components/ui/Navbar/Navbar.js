@@ -3,10 +3,12 @@ import s from './Navbar.module.css';
 import Logo from '../../icons/Logo';
 import { useUser } from '../../UserContext';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 const Navbar = () => {
   const router = useRouter();
   const { user, signOut } = useUser();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 bg-[#fff] z-40 transition-all duration-150">
@@ -39,27 +41,38 @@ const Navbar = () => {
                 >
                   Dashboard
                 </Link>
-                <Link
-                  href="/generate-images"
-                  //onClick={() => router.push('/dashboard2')}
-                  className={s.link}
-                >
-                  Replace Backgrounds
-                </Link>
-                <Link
-                  href="/pix-blender"
-                  //onClick={() => router.push('/dashboard2')}
-                  className={s.link}
-                >
-                  Pix Blender
-                </Link>
-                <Link
-                  href="/generate-apparel"
-                  //onClick={() => router.push('/dashboard2')}
-                  className={s.link}
-                >
-                  Clothes Swapping
-                </Link>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={s.link}
+                    onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+                  >
+                    Generate Images
+                  </button>
+                  {isOpen && (
+                    <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
+                      <Link
+                        href="/replace-bg"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        Replace Backgrounds
+                      </Link>
+                      <Link
+                        href="/pix-blender"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        Pix Blender
+                      </Link>
+                      <Link
+                        href="/generate-apparel"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        Clothes Swapping
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
                 <Link
                   href="/view-content"
                   //onClick={() => router.push('/view-content')}
