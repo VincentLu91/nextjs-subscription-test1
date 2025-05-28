@@ -469,7 +469,7 @@ export default function GenerateImages() {
 
             {isImageUploaded && (
               <>
-                <p className="text-black sm:text-center mt-8">
+                {/*<p className="text-black sm:text-center mt-8">
                   No idea what content to generate? Click 'Generate Prompt' for
                   some ideas.
                 </p>
@@ -481,7 +481,7 @@ export default function GenerateImages() {
                   }}
                 >
                   Generate Prompt
-                </Button>
+                </Button>*/}
                 <br></br>
                 <textarea
                   type="text"
