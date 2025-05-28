@@ -10,6 +10,7 @@ import styles from '../styles/Home.module.css';
 import { supabase } from '../utils/initSupabase';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
+import { forEach } from 'jszip';
 
 const ATTEMPTS = 1;
 const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
@@ -242,16 +243,118 @@ export default function GenerateImages() {
     return [];
   };
 
-  const suggestPromptReplicate = async (imageLink) => {
-    if (!imageLink) {
-      alert("You haven't uploaded an image or there is an error!");
-    } else {
-      const rawPrompt = await axios.post(
-        '/api/suggestPrompt?imageLink=' + imageLink + `&user=${user.id}`
-      );
-      console.log('raw prompt', rawPrompt);
-      setPromptObject(rawPrompt);
-      setPromptStatus(rawPrompt.data.status);
+  const suggestPromptMultiImages = async (uploadedUrls) => {
+    if (!uploadedUrls || uploadedUrls.length === 0) {
+      alert('No images have been uploaded!');
+      return [];
+    }
+
+    const prompts = [];
+
+    for (const imageUrl of uploadedUrls) {
+      console.log('Processing image URL:', imageUrl);
+      try {
+        const rawPrompt = await axios.post(
+          '/api/extractSubject?imageLink=' + imageUrl + `&user=${user.id}`
+        );
+        console.log('Raw prompt response:', rawPrompt.data);
+
+        if (!rawPrompt.data.status_url) {
+          console.error('No status URL received from extractSubject API');
+          continue;
+        }
+
+        // Poll until we get the result
+        let attempts = 0;
+        let output;
+        while (attempts < 10) {
+          // Maximum 10 attempts
+          output = await axios.get(
+            '/api/imageresults?url=' + rawPrompt.data.status_url
+          );
+          console.log(
+            'Image processing results (attempt ' + (attempts + 1) + '):',
+            output.data
+          );
+
+          if (output.data.status === 'COMPLETED' && output.data.response_url) {
+            const result = await axios.get(
+              '/api/imageresults?url=' + output.data.response_url
+            );
+            console.log('Final image processing result:', result.data);
+
+            if (result.data.output) {
+              let promptText;
+              if (Array.isArray(result.data.output)) {
+                promptText = result.data.output.join('');
+                // Only remove quotes if they exist at start and end
+                if (promptText.startsWith('"') && promptText.endsWith('"')) {
+                  promptText = promptText.slice(1, -1);
+                }
+              } else {
+                promptText = result.data.output;
+              }
+              console.log('Generated prompt text:', promptText);
+              prompts.push(promptText);
+            }
+            break;
+          }
+
+          // Wait 3 seconds before next attempt
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          attempts++;
+        }
+
+        if (!output?.data?.status === 'COMPLETED') {
+          console.error(
+            'Failed to process image after all attempts for image:',
+            imageUrl
+          );
+        }
+      } catch (error) {
+        console.error('Error processing image:', imageUrl, error);
+      }
+    }
+
+    // Send prompts to anyLlm API and poll for result
+    try {
+      const response = await axios.post('/api/anyLlm', null, {
+        params: {
+          promptArray: prompts.join(', '),
+          user: user.id
+        }
+      });
+      console.log('Initial AnyLlm API Response:', response.data);
+
+      // Poll until we get the final result
+      let attempts = 0;
+      let output;
+      while (attempts < 10) {
+        // Maximum 10 attempts
+        output = await axios.get(
+          '/api/imageresults?url=' + response.data.status_url
+        );
+        console.log('AnyLlm poll attempt ' + (attempts + 1) + ':', output.data);
+
+        if (output.data.status === 'COMPLETED') {
+          const result = await axios.get(
+            '/api/imageresults?url=' + output.data.response_url
+          );
+          console.log('Final AnyLlm result:', result.data);
+          setBackgroundPrompt(result.data.output);
+          return result.data;
+        }
+
+        // Wait 3 seconds before next attempt
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        attempts++;
+      }
+
+      console.log('Failed to get AnyLlm result after all attempts');
+      return prompts;
+    } catch (error) {
+      console.error('Error with AnyLlm API:', error);
+      return prompts;
     }
   };
 
@@ -469,7 +572,7 @@ export default function GenerateImages() {
 
             {isImageUploaded && (
               <>
-                {/*<p className="text-black sm:text-center mt-8">
+                <p className="text-black sm:text-center mt-8">
                   No idea what content to generate? Click 'Generate Prompt' for
                   some ideas.
                 </p>
@@ -477,11 +580,13 @@ export default function GenerateImages() {
                   className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
                   variant="slim"
                   onClick={async () => {
-                    suggestPromptReplicate(imageForBg);
+                    const generatedPrompts =
+                      await suggestPromptMultiImages(uploadedUrls);
+                    console.log('Generated prompts:', generatedPrompts);
                   }}
                 >
                   Generate Prompt
-                </Button>*/}
+                </Button>
                 <br></br>
                 <textarea
                   type="text"
