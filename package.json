@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^15.3.3",
     "npm-check-updates": "^18.0.1",
-    "posthog-js": "^1.249.1",
+    "posthog-js": "^1.249.2",
     "raw-body": "^3.0.0",
     "react": "^19.1.0",
     "react-aria": "^3.40.0",
