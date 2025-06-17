@@ -431,6 +431,10 @@ export default function GenerateApparel() {
 
   return (
     <section className="bg-white mb-32">
+      <p className="text-black sm:text-center">
+        Heads up! brandpix.ai is moving out of beta and will soon become a paid
+        service.
+      </p>
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
