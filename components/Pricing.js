@@ -106,18 +106,19 @@ export default function Pricing({ products }) {
                 price.interval === billingInterval &&
                 price.product_id !== 'prod_SW7dE3i2msnicA' // $0 subscription plan for early users
             );
+
+            // Skip rendering this product if no valid price is found
+            if (!price) return null;
+
             const priceString = new Intl.NumberFormat('en-US', {
               style: 'currency',
-              currency: price?.currency,
+              currency: price.currency,
               minimumFractionDigits: 0
             }).format(price.unit_amount / 100);
-            // Check if price and image_tokens are defined before accessing image_tokens
-            const imageTokens =
-              price && price.image_tokens ? price.image_tokens : [];
-            const trainingTokens =
-              price && price.training_tokens ? price.training_tokens : [];
-            const captionTokens =
-              price && price.caption_tokens ? price.caption_tokens : [];
+            // Default to 0 if token counts are not defined
+            const imageTokens = price.image_tokens || 0;
+            const trainingTokens = price.training_tokens || 0;
+            const captionTokens = price.caption_tokens || 0;
             return (
               <div
                 key={product.id}
