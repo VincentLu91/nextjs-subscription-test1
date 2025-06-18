@@ -108,7 +108,7 @@ export default function Pricing({ products }) {
             );
             const priceString = new Intl.NumberFormat('en-US', {
               style: 'currency',
-              currency: price.currency,
+              currency: price?.currency,
               minimumFractionDigits: 0
             }).format(price.unit_amount / 100);
             // Check if price and image_tokens are defined before accessing image_tokens
