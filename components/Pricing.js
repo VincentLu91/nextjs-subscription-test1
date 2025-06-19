@@ -68,20 +68,14 @@ export default function Pricing({ products }) {
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
             Choose a Plan.
           </h1>
-          <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
-            You could start generating quality images for 30 days.
-          </p>
-          <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
-            For Ultimate yearly plan, pay once for lifetime access.
-          </p>
-          <div className="relative self-center mt-6 bg-red-100-2 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
+          <div className="relative self-center mt-6 bg-blue-50 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
             <button
               onClick={() => setBillingInterval('month')}
               type="button"
               className={`${
                 billingInterval === 'month'
-                  ? 'relative w-1/2 bg-red-100 border-accents-0 shadow-sm text-white'
-                  : 'ml-0.5 relative w-1/2 border border-transparent text-red-400'
+                  ? 'relative w-1/2 bg-blue-500 border-accents-0 shadow-sm text-white'
+                  : 'ml-0.5 relative w-1/2 border border-transparent text-blue-400'
               } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8`}
             >
               Monthly billing
@@ -91,8 +85,8 @@ export default function Pricing({ products }) {
               type="button"
               className={`${
                 billingInterval === 'year'
-                  ? 'relative w-1/2 bg-red-100 border-accents-0 shadow-sm text-white'
-                  : 'ml-0.5 relative w-1/2 border border-transparent text-red-400'
+                  ? 'relative w-1/2 bg-blue-500 border-accents-0 shadow-sm text-white'
+                  : 'ml-0.5 relative w-1/2 border border-transparent text-blue-400'
               } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8`}
             >
               Yearly billing
@@ -132,24 +126,26 @@ export default function Pricing({ products }) {
                 )}
               >
                 <div className="p-6">
-                  <h2 className="text-2xl leading-6 font-semibold text-white">
+                  <h2 className="text-2xl leading-6 font-semibold text-black">
                     {product.name}
                   </h2>
-                  <p className="mt-4 text-accents-5">{product.description}</p>
-                  <p className="mt-4 text-accents-5">
+                  <p className="mt-4 text-accents-5 text-black">
+                    {product.description}
+                  </p>
+                  <p className="mt-4 text-accents-5 text-black">
                     {imageTokens} image renders
                   </p>
-                  <p className="mt-4 text-accents-5">
-                    {trainingTokens} training sessions
+                  <p className="mt-4 text-accents-5 text-black">
+                    AI Video generation - coming soon
                   </p>
-                  <p className="mt-4 text-accents-5">
+                  <p className="mt-4 text-accents-5 text-black">
                     {captionTokens} caption creation credits
                   </p>
                   <p className="mt-8">
-                    <span className="text-5xl font-extrabold white">
+                    <span className="text-5xl font-extrabold white text-black">
                       {priceString}
                     </span>
-                    <span className="text-base font-medium text-accents-8">
+                    <span className="text-base font-medium text-accents-8 text-black">
                       /{billingInterval}
                     </span>
                   </p>
@@ -159,7 +155,7 @@ export default function Pricing({ products }) {
                     disabled={session && !userLoaded}
                     loading={loading}
                     onClick={() => handleCheckout(price.id)}
-                    className="mt-8 block w-full rounded-lg py-2 text-sm font-semibold text-white text-center hover:bg-gray-900"
+                    className="mt-8 block w-full rounded-lg py-2 text-sm font-semibold text-center bg-gray-900 text-white border border-gray-900 hover:bg-white hover:text-gray-900 transition-colors duration-200"
                   >
                     {product.name === subscription?.prices?.products.name
                       ? 'Manage'
@@ -169,24 +165,6 @@ export default function Pricing({ products }) {
               </div>
             );
           })}
-        </div>
-        <div>
-          <p className="mt-24 text-xs uppercase text-blue-300 text-center font-bold tracking-widest">
-            Here is what the plans will do for you:
-          </p>
-          <ul>
-            <li className="text-xs uppercase text-center">
-              - unique, quality images generated by AI
-            </li>
-            <li className="text-xs uppercase text-center">
-              - Use them on your landing page, social media, website, and other
-              marketing materials
-            </li>
-            <li className="text-xs uppercase text-center">
-              - Save you hours and thousands of dollars of your time. Good for
-              new entrepreneurs starting out
-            </li>
-          </ul>
         </div>
       </div>
     </section>

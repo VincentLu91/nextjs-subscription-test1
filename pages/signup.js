@@ -59,7 +59,7 @@ const SignUp = () => {
 
   useEffect(() => {
     if (user) {
-      router.replace('/account');
+      router.replace('/pricing'); // used to be account.
     }
   }, [user]);
 
