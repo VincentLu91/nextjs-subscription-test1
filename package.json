@@ -20,7 +20,7 @@
     "cohere-ai": "^7.17.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "next": "^15.3.3",
+    "next": "^15.3.4",
     "npm-check-updates": "^18.0.1",
     "posthog-js": "^1.255.0",
     "raw-body": "^3.0.0",
