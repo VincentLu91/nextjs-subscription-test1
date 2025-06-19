@@ -53,7 +53,7 @@ const SignIn = () => {
   useEffect(() => {
     if (user) {
       // originally account route
-      router.replace('/dashboard');
+      router.replace('/pricing'); // used to be dashboard
     }
   }, [user]);
 
