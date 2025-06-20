@@ -43,7 +43,7 @@ export default function PricingPage({ products }) {
               </p>
               <p className="mt-8">
                 <span className="text-5xl font-extrabold text-red-500 line-through ml-2">
-                  $550 / yr
+                  $55 / month
                 </span>{' '}
                 <span className="text-5xl font-extrabold text-black">
                   $100 one-time
