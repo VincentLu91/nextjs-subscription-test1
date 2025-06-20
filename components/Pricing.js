@@ -66,7 +66,7 @@ export default function Pricing({ products }) {
       <div className="max-w-6xl mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Choose a Plan.
+            Other Plans below.
           </h1>
           <div className="relative self-center mt-6 bg-blue-50 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
             <button
@@ -133,10 +133,10 @@ export default function Pricing({ products }) {
                     {product.description}
                   </p>
                   <p className="mt-4 text-accents-5 text-black">
-                    {imageTokens} image renders
+                    {imageTokens} product image renders
                   </p>
                   <p className="mt-4 text-accents-5 text-black">
-                    AI Video generation - coming soon
+                    AI Videos of your product - coming soon
                   </p>
                   <p className="mt-4 text-accents-5 text-black">
                     {captionTokens} caption creation credits
