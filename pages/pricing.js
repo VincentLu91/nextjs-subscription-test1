@@ -17,24 +17,26 @@ export default function PricingPage({ products }) {
           <div className="rounded-lg shadow-sm divide-y divide-accents-2 bg-red-100-2">
             <div className="p-6 text-center">
               <h2 className="text-2xl leading-6 font-semibold text-black">
-                Ultimate -{' '}
-                <span className="text-red-500">One Time Payment</span> and it's
-                yours{' '}
-                <span className="text-red-500 font-bold italic">forever</span>
+                Creating content for your online business has never been easier.
+              </h2>
+              <br />
+              <h2 className="text-2xl leading-6 font-semibold text-black">
+                Own the Ultimate Plan{' '}
+                <span className="text-red-500 font-bold italic">Forever</span>
               </h2>
               <p className="mt-4 text-accents-5 text-black">
-                Unlock lifetime access to the Ultimate plan...limited to the
-                first 100 users!
+                Pay once. Unlock lifetime access to the Ultimate plan...limited
+                to the first 100 users!
               </p>
               <p className="mt-4 text-accents-5 text-black">
                 We’ll email you as soon as your account is ready.
               </p>
               <p className="mt-4 text-accents-5 text-black">Features:</p>
               <p className="mt-4 text-accents-5 text-black">
-                120 image renders / month
+                120 product image renders / month
               </p>
               <p className="mt-4 text-accents-5 text-black">
-                AI Video generation - coming soon
+                AI Videos of your product - coming soon
               </p>
               <p className="mt-4 text-accents-5 text-black">
                 240 caption creation credits / month
@@ -60,12 +62,13 @@ export default function PricingPage({ products }) {
                 }
                 className="mt-8 block w-full rounded-lg py-2 text-sm font-semibold text-center bg-gray-900 text-white border border-gray-900 hover:bg-white hover:text-gray-900 transition-colors duration-200"
               >
-                Subscribe
+                Join the 100 - Lifetime Access Awaits
               </Button>
             </div>
           </div>
         </div>
       </div>
+      <Pricing products={products} />
     </>
   );
   //return <Pricing products={products} />;
