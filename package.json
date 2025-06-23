@@ -43,7 +43,7 @@
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^13.0.2",
     "postcss-preset-env": "^10.2.3",
-    "prettier": "^3.5.3"
+    "prettier": "^3.6.0"
   },
   "prettier": {
     "arrowParens": "always",
