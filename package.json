@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.1.0",
     "@stripe/stripe-js": "^7.4.0",
-    "@supabase/supabase-js": "^2.50.1",
+    "@supabase/supabase-js": "^2.50.2",
     "@swc/helpers": "^0.5.17",
     "@tailwindcss/postcss": "^4.1.10",
     "axios": "^1.10.0",
@@ -43,7 +43,7 @@
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^13.0.2",
     "postcss-preset-env": "^10.2.3",
-    "prettier": "^3.6.0"
+    "prettier": "^3.6.1"
   },
   "prettier": {
     "arrowParens": "always",
