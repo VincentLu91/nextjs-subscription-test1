@@ -68,7 +68,6 @@ export default function PricingPage({ products }) {
           </div>
         </div>
       </div>
-      <Pricing products={products} />
     </>
   );
   //return <Pricing products={products} />;
