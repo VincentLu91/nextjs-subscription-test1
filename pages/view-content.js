@@ -227,14 +227,11 @@ export default function ViewContent() {
     setNumTokens(captionTokenData.data);
   }
 
-  {
-    /** working with free users */
-  }
-  /*useEffect(() => {
+  useEffect(() => {
     if (user) {
       getCaptionTokenData();
     }
-  }, [user]);*/
+  }, [user]);
 
   async function getTieredTokenData() {
     console.log('user is: ', user.id);
@@ -245,14 +242,11 @@ export default function ViewContent() {
     setNumTieredTokens(captionTieredData.data);
   }
 
-  {
-    /** working with free users */
-  }
-  /*useEffect(() => {
+  useEffect(() => {
     if (user && subscription) {
       getTieredTokenData();
     }
-  }, [user]);*/
+  }, [user]);
 
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
@@ -275,13 +269,12 @@ export default function ViewContent() {
             View Content and Generate Captions
           </h1>
           <br></br>
-          {/** working with free users */}
-          {/*<p className="sm:text-center text-black">
+          <p className="sm:text-center text-black">
             Number of caption creation credits available: {numTokens} /{' '}
             {numTieredTokens}
-          </p>*/}
+          </p>
           <br />
-          {/*subscription ? ( // goal of this is to restrict content to subscribers.
+          {subscription ? ( // goal of this is to restrict content to subscribers.
             <div className={styles['display-image']}>
               {isLoading && <LoadingDots />}
               <p>
@@ -291,19 +284,19 @@ export default function ViewContent() {
               <br />
               {displayContent || (
                 <div>
-                <p className="text-black">
-                  You do not have image! Go back to Dashboard and select an
-                  image first, or, upload an image of your own
-                </p>
-                <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-                  <Form.Control
-                    type="file"
-                    accept="image/png, image/jpeg"
-                    //accept="*"
-                    onChange={(e) => uploadFile(e)}
-                  />
-                </Form.Group>
-              </div>
+                  <p className="text-black">
+                    You do not have image! Go back to Dashboard and select an
+                    image first, or, upload an image of your own
+                  </p>
+                  <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+                    <Form.Control
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      //accept="*"
+                      onChange={(e) => uploadFile(e)}
+                    />
+                  </Form.Group>
+                </div>
               )}
               <br></br>
               <p>
@@ -330,6 +323,7 @@ export default function ViewContent() {
               <br></br>
               <Button
                 variant="slim"
+                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
                 onClick={() => generateCaptionsReplicate(prompt, imageLink)}
               >
                 Generate Caption
@@ -349,74 +343,7 @@ export default function ViewContent() {
             </div>
           ) : (
             <h1 className="text-black">You are not subscribed yet!</h1>
-          )*/}
-          {/** working with free users, so commented above logic */}
-          <div className={styles['display-image']}>
-            {isLoading && <LoadingDots />}
-            <p>
-              Download the image selected and generate caption for your social
-              media post.
-            </p>
-            <br />
-            {displayContent || (
-              <div>
-                <p className="text-black">
-                  You do not have image! Go back to Dashboard and select an
-                  image first, or, upload an image of your own
-                </p>
-                <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-                  <Form.Control
-                    type="file"
-                    accept="image/png, image/jpeg"
-                    //accept="*"
-                    onChange={(e) => uploadFile(e)}
-                  />
-                </Form.Group>
-              </div>
-            )}
-            <br></br>
-            <p>
-              Enter your instruction for the AI to generate a caption, including
-              any product details or relevant context.
-            </p>
-            <br></br>
-            <p>
-              e.g., Write a 300-word caption for our honey brand above. Try to
-              encourage followers to check out our store storename.com. Also our
-              IG handle is @store_name
-            </p>
-            <br></br>
-            <input
-              type="text"
-              id="prompt"
-              name="prompt"
-              onChange={handleChange}
-              value={prompt}
-              placeholder="Describe caption you want generated"
-              style={{ width: '600px' }}
-              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-            />
-            <br></br>
-            <Button
-              variant="slim"
-              onClick={() => generateCaptionsReplicate(prompt, imageLink)}
-              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-            >
-              Generate Caption
-            </Button>
-            <br></br>
-            <textarea
-              type="text"
-              id="caption"
-              name="caption"
-              onChange={handleChangeCaption}
-              value={caption}
-              cols="80"
-              rows="15"
-              placeholder="Caption generating or you could type it yourself..."
-              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-            />
-          </div>
+          )}
         </div>
       </div>
     </section>
