@@ -310,36 +310,35 @@ export default function Gallery() {
     }).format(subscription.prices.unit_amount / 100);
 
   function subscribedAndModelChosen() {
-    // currently working with free users
-    //if (subscription) {
-    return (
-      <div className="sm:flex sm:flex-col sm:align-center sm:items-center">
-        <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-          Gallery
-        </h1>
-        <br />
-        <Button
-          className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-          variant="slim"
-          onClick={() => fetchAndStorePhotos(true)}
-        >
-          Sync AI Imagery
-        </Button>
-        <br />
-        <p className="text-black sm:text-center">
-          All your generated images are saved here. To delete an image, click
-          'X' at the top left corner.
-        </p>
-        <p className="text-black sm:text-center">{message}</p>
-        <br></br>
-        <div className="flex flex-wrap justify-center">
-          {generatedPhotos.map(renderCard)}
+    if (subscription) {
+      return (
+        <div className="sm:flex sm:flex-col sm:align-center sm:items-center">
+          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+            Gallery
+          </h1>
+          <br />
+          <Button
+            className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+            variant="slim"
+            onClick={() => fetchAndStorePhotos(true)}
+          >
+            Sync AI Imagery
+          </Button>
+          <br />
+          <p className="text-black sm:text-center">
+            All your generated images are saved here. To delete an image, click
+            'X' at the top left corner.
+          </p>
+          <p className="text-black sm:text-center">{message}</p>
+          <br></br>
+          <div className="flex flex-wrap justify-center">
+            {generatedPhotos.map(renderCard)}
+          </div>
         </div>
-      </div>
-    );
-    /*} else {
+      );
+    } else {
       return <h1 className="text-black">You are not a paid member yet!!</h1>;
-    }*/
+    }
   }
 
   return (

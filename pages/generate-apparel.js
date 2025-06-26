@@ -18,6 +18,8 @@ export default function GenerateApparel() {
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
   const [photoData, setPhotoData] = useState(null);
+  const [numTokens, setNumTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(null);
   const [resultImages, setResultImages] = useState([]);
   const [modelImagePath, setModelImagePath] = useState('');
   const [garmentImagePath, setGarmentImagePath] = useState('');
@@ -178,6 +180,7 @@ export default function GenerateApparel() {
         );
 
         setTryOnImageList((current) => [...current, { url: data.publicUrl }]);
+        await getImageTokenData();
       }
     }
   };
@@ -230,6 +233,36 @@ export default function GenerateApparel() {
     setLoading(false);
   };
 
+  async function getImageTokenData() {
+    console.log('user is: ', user.id);
+    const imageTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTokenData: ', imageTokenData.data);
+    setNumTokens(imageTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getImageTokenData();
+    }
+  }, [user]);
+
+  async function getTieredImageData() {
+    console.log('user is: ', user.id);
+    const imageTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTieredData: ', imageTieredData.data);
+    setNumTieredTokens(imageTieredData.data);
+  }
+
+  useEffect(() => {
+    if (user && subscription) {
+      getTieredImageData();
+    }
+  }, [user]);
+
   const loadingMessage = isGeneratingTryOn && (
     <div className={styles['black-text']}>
       <p>
@@ -260,89 +293,94 @@ export default function GenerateApparel() {
   };
 
   function subscribedAndModelChosen() {
-    return (
-      <div className={styles['get-image-button']}>
-        <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-          <Form.Label>Upload Model Image (Person)</Form.Label>
-          <div>
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/png, image/jpeg"
-                onChange={(e) => uploadFile(e, 'model')}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
-                Choose File
+    if (subscription) {
+      return (
+        <div className={styles['get-image-button']}>
+          <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+            <Form.Label>Upload Model Image (Person)</Form.Label>
+            <div>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  onChange={(e) => uploadFile(e, 'model')}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                  Choose File
+                </div>
               </div>
+              {modelImagePath && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Selected: {modelImagePath.split('/').pop()}
+                </div>
+              )}
             </div>
-            {modelImagePath && (
-              <div className="mt-2 text-sm text-gray-600">
-                Selected: {modelImagePath.split('/').pop()}
+          </Form.Group>
+          <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+            <Form.Label>Upload Clothing Piece (shirts, pants)</Form.Label>
+            <div>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  onChange={(e) => uploadFile(e, 'garment')}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                  Choose File
+                </div>
               </div>
-            )}
-          </div>
-        </Form.Group>
-        <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-          <Form.Label>Upload Clothing Piece (shirts, pants)</Form.Label>
-          <div>
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/png, image/jpeg"
-                onChange={(e) => uploadFile(e, 'garment')}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
-                Choose File
-              </div>
+              {garmentImagePath && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Selected: {garmentImagePath.split('/').pop()}
+                </div>
+              )}
             </div>
-            {garmentImagePath && (
-              <div className="mt-2 text-sm text-gray-600">
-                Selected: {garmentImagePath.split('/').pop()}
-              </div>
-            )}
-          </div>
-        </Form.Group>
-        <br />
-        {displayContent}
-        {!isGeneratingTryOn && (
-          <div className="flex flex-col items-center p-2">
-            <p>Category:</p>
-            <select value={selectedOption} onChange={handleOptionChange}>
-              <option value="tops">Top</option>
-              <option value="bottoms">Bottom</option>
-              <option value="one-pieces">Full-Body</option>
-            </select>
-            {/*<p>Selected: {selectedOption}</p>*/}
-            <Button
-              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-              variant="slim"
-              onClick={async () => {
-                if (!modelImagePath || !garmentImagePath) {
-                  alert('Please upload both model and garment images!');
-                } else {
-                  clearInterval(intervalImage.current);
-                  setTryOnPredictions({});
-                  setTryOnImageList([]);
-                  setIsGeneratingTryOn(true);
-                  setFinishMessage('');
-                  for (let i = 0; i < ATTEMPTS; i++) {
-                    getImage(i);
+          </Form.Group>
+          <br />
+          {displayContent}
+          {!isGeneratingTryOn && (
+            <div className="flex flex-col items-center p-2">
+              <p>Category:</p>
+              <select value={selectedOption} onChange={handleOptionChange}>
+                <option value="tops">Top</option>
+                <option value="bottoms">Bottom</option>
+                <option value="one-pieces">Full-Body</option>
+              </select>
+              {/*<p>Selected: {selectedOption}</p>*/}
+              <Button
+                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                variant="slim"
+                onClick={async () => {
+                  if (!modelImagePath || !garmentImagePath) {
+                    alert('Please upload both model and garment images!');
+                  } else {
+                    clearInterval(intervalImage.current);
+                    setTryOnPredictions({});
+                    setTryOnImageList([]);
+                    setIsGeneratingTryOn(true);
+                    setFinishMessage('');
+                    for (let i = 0; i < ATTEMPTS; i++) {
+                      getImage(i);
+                    }
+                    await getImageTokenData();
                   }
-                }
-              }}
-            >
-              Generate Now
-            </Button>
-          </div>
-        )}
-        <br></br>
-        {loadingMessage}
-        {finishMessage}
-        <div className={styles['grid']}>{tryOnImageList.map(renderCard)}</div>
-      </div>
-    );
+                }}
+              >
+                Generate Image
+              </Button>
+            </div>
+          )}
+          <br></br>
+          {loadingMessage}
+          {finishMessage}
+          <div className={styles['grid']}>{tryOnImageList.map(renderCard)}</div>
+        </div>
+      );
+    } else {
+      return <h1 className="text-black">You are not subscribed yet!</h1>;
+    }
   }
 
   async function getFiles() {
@@ -441,6 +479,11 @@ export default function GenerateApparel() {
             Clothes Swapping
           </h1>
           {console.log('isGeneratingTryOn: ', isGeneratingTryOn)}
+          <br></br>
+          <p className="text-black sm:text-center">
+            Number of image rendering credits available: {numTokens} /{' '}
+            {numTieredTokens}
+          </p>
           <br></br>
           <p className="text-black sm:text-center">
             Upload a photo of a person and a clothing item to try on. The AI

@@ -14,7 +14,12 @@ export default async function handler(req, res) {
 
   try {
     // Deduct token before making the API call
-    await deductUserImageGenerationToken(user);
+    let result = await deductUserImageGenerationToken(user, 1);
+
+    if (!result)
+      return res.status(403).json({
+        error: 'User doesnothave permission'
+      });
 
     const resp = await axios.post(
       'https://queue.fal.run/fal-ai/uno',

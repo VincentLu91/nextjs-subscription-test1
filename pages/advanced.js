@@ -3,8 +3,6 @@ import Link from 'next/link';
 
 export default function Advanced() {
   function renderView() {
-    // currently working with free users
-    //if (subscription) {
     return (
       <section className="bg-white mb-32">
         <p className="text-black sm:text-center">

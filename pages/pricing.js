@@ -4,8 +4,6 @@ import Button from '../components/ui/Button';
 import Script from 'next/script';
 
 export default function PricingPage({ products }) {
-  // currently working with free users
-  //return <div>Pricing TBA!</div>;
   // the return statement renders a one-time payment button. Delete it after when ready.
   return (
     <>
