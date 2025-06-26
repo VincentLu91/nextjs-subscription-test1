@@ -1,6 +1,7 @@
 import { supabase } from '../utils/initSupabase';
 import Pricing from '../components/Pricing';
 import Button from '../components/ui/Button';
+import Script from 'next/script';
 
 export default function PricingPage({ products }) {
   // currently working with free users
@@ -8,6 +9,10 @@ export default function PricingPage({ products }) {
   // the return statement renders a one-time payment button. Delete it after when ready.
   return (
     <>
+      <Script
+        src="https://assets.endorsely.com/endorsely.js"
+        data-endorsely="def6bd04-d2b5-4b31-814d-50e230cb97e0"
+      />
       <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
         Early Bird Special
       </h1>
