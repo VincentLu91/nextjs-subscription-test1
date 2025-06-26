@@ -31,6 +31,9 @@ const createCheckoutSession = async (req, res) => {
           }
         ],
         mode: 'subscription',
+        metadata: {
+          endorsely_referral: req.body.referral
+        },
         allow_promotion_codes: true,
         /*subscription_data: { // I don't know what's the use of this.
           trial_from_plan: true, // todo is this ok?
