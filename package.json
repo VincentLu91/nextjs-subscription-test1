@@ -14,7 +14,7 @@
     "@stripe/stripe-js": "^7.4.0",
     "@supabase/supabase-js": "^2.50.2",
     "@swc/helpers": "^0.5.17",
-    "@tailwindcss/postcss": "^4.1.10",
+    "@tailwindcss/postcss": "^4.1.11",
     "axios": "^1.10.0",
     "classnames": "^2.5.1",
     "cohere-ai": "^7.17.1",
@@ -33,7 +33,7 @@
     "react-select": "^5.10.1",
     "stripe": "^18.2.1",
     "swr": "2.3.3",
-    "tailwindcss": "^4.1.10",
+    "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -42,7 +42,7 @@
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^13.0.2",
-    "postcss-preset-env": "^10.2.3",
+    "postcss-preset-env": "^10.2.4",
     "prettier": "^3.6.1"
   },
   "prettier": {
