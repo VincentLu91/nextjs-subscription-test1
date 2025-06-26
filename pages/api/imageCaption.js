@@ -3,7 +3,7 @@ import { deductUserCaptionToken } from '../../utils/useDatabase';
 
 export default async function handler(req, res) {
   const { prompt, imageLink, user } = req.query;
-  //let result = await deductUserCaptionToken(user, 1);
+  let result = await deductUserCaptionToken(user, 1);
   if (user) {
     // should be if (result) but disabling paywall
     // first, make an api call to GENERATE a prediction (HTTP method is POST):

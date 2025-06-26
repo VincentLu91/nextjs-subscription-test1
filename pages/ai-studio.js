@@ -333,14 +333,11 @@ export default function AIStudio() {
     setNumTokens(imageTokenData.data);
   }
 
-  {
-    /** working with free users */
-  }
-  /*useEffect(() => {
+  useEffect(() => {
     if (user) {
       getImageTokenData();
     }
-  }, [user]);*/
+  }, [user]);
 
   async function getTieredImageData() {
     console.log('user is: ', user.id);
@@ -351,14 +348,11 @@ export default function AIStudio() {
     setNumTieredTokens(imageTieredData.data);
   }
 
-  {
-    /** working with free users */
-  }
-  /*useEffect(() => {
+  useEffect(() => {
     if (user && subscription) {
       getTieredImageData();
     }
-  }, [user]);*/
+  }, [user]);
 
   const loadingWithContentPrompt = isLoading && (
     <div className={styles['black-text']}>
@@ -516,21 +510,18 @@ export default function AIStudio() {
   };
 
   function subscribedAndModelChosen() {
-    // currently working with free users
-    //if (subscription) {
-
-    return (
-      <div className={styles['get-image-button']}>
-        {renderStep()}
-        {loadingWithContentPrompt}
-        {finishMessage}
-        <div className={styles['grid']}>{imageList.map(renderCard)}</div>
-      </div>
-    );
-
-    /*} else {
+    if (subscription) {
+      return (
+        <div className={styles['get-image-button']}>
+          {renderStep()}
+          {loadingWithContentPrompt}
+          {finishMessage}
+          <div className={styles['grid']}>{imageList.map(renderCard)}</div>
+        </div>
+      );
+    } else {
       return <h1 className="text-black">You are not subscribed yet!</h1>;
-    }*/
+    }
   }
 
   return (
@@ -548,11 +539,10 @@ export default function AIStudio() {
           <p className="text-black sm:text-center">
             Your Product, Reimagined: Original AI-Generated Images Made Smarter.
           </p>
-          {/** working with free users */}
-          {/*<p className="text-black sm:text-center">
+          <p className="text-black sm:text-center">
             Number of image rendering credits available: {numTokens} /{' '}
             {numTieredTokens}
-          </p>*/}
+          </p>
           <br />
           {/* Display the custom message */}
           <p className="text-black sm:text-center">{message}</p>

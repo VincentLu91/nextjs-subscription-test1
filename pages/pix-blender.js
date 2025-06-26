@@ -386,6 +386,47 @@ export default function GenerateImages() {
     return () => clearInterval(intervalPrompt.current);
   }, [promptStatus]);
 
+  const redirectToCustomerPortal = async () => {
+    setLoading(true);
+    const { url, error } = await postData({
+      url: '/api/createPortalLink',
+      token: session.access_token
+    });
+    if (error) return alert(error.message);
+    window.location.assign(url);
+    setLoading(false);
+  };
+
+  async function getImageTokenData() {
+    console.log('user is: ', user.id);
+    const imageTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTokenData: ', imageTokenData.data);
+    setNumTokens(imageTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getImageTokenData();
+    }
+  }, [user]);
+
+  async function getTieredImageData() {
+    console.log('user is: ', user.id);
+    const imageTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
+    );
+    console.log('imageTieredData: ', imageTieredData.data);
+    setNumTieredTokens(imageTieredData.data);
+  }
+
+  useEffect(() => {
+    if (user && subscription) {
+      getTieredImageData();
+    }
+  }, [user]);
+
   const addImages = async (images) => {
     for (const imageObj of images) {
       console.log('Processing image:', imageObj.url);
@@ -418,6 +459,9 @@ export default function GenerateImages() {
           ...current,
           { url: data.publicUrl, text: '' }
         ]);
+
+        // Update token count after successful image addition
+        await getImageTokenData();
       }
     }
   };
@@ -499,149 +543,157 @@ export default function GenerateImages() {
   };
 
   function subscribedAndModelChosen() {
-    return (
-      <div className={styles['get-image-button']}>
-        <br />
-        {!isGeneratingBGImages && (
-          <div className="flex flex-col items-center p-2">
-            <div className={styles['image-card']}>
-              <p className="text-black sm:text-center">
-                Upload your product images below
-              </p>
-              <div className={styles['image-top']}></div>
-              <div
-                className={styles['drag-area']}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-              >
-                {isDragging ? (
-                  <span className={styles['select']}>Drop files here</span>
-                ) : (
-                  <>
-                    Drag & Drop images here or{' '}
-                    <span
-                      className={styles['select']}
-                      role="button"
-                      onClick={selectFiles}
-                    >
-                      Browse
-                    </span>
-                  </>
+    if (subscription) {
+      return (
+        <div className={styles['get-image-button']}>
+          <br />
+          {!isGeneratingBGImages && (
+            <div className="flex flex-col items-center p-2">
+              <div className={styles['image-card']}>
+                <p className="text-black sm:text-center">
+                  Upload your product images below
+                </p>
+                <div className={styles['image-top']}></div>
+                <div
+                  className={styles['drag-area']}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                >
+                  {isDragging ? (
+                    <span className={styles['select']}>Drop files here</span>
+                  ) : (
+                    <>
+                      Drag & Drop images here or{' '}
+                      <span
+                        className={styles['select']}
+                        role="button"
+                        onClick={selectFiles}
+                      >
+                        Browse
+                      </span>
+                    </>
+                  )}
+
+                  <input
+                    name="file"
+                    type="file"
+                    className={styles['file']}
+                    multiple
+                    ref={fileInputRef}
+                    onChange={onFileSelect}
+                  ></input>
+                </div>
+
+                {uploadedImages.length > 0 && (
+                  <div className={styles['image-container']}>
+                    {uploadedImages.map((images, index) => (
+                      <div className={styles['image']} key={index}>
+                        <span
+                          className={styles['delete']}
+                          onClick={() => deleteImage(index)}
+                        >
+                          &times;
+                        </span>
+                        <Image
+                          src={images.url}
+                          alt={images.name}
+                          width={300}
+                          height={200}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 )}
 
-                <input
-                  name="file"
-                  type="file"
-                  className={styles['file']}
-                  multiple
-                  ref={fileInputRef}
-                  onChange={onFileSelect}
-                ></input>
+                <button
+                  type="button"
+                  onClick={uploadImages}
+                  className="mt-4 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90 px-4 py-2 rounded"
+                >
+                  Upload Images
+                </button>
               </div>
 
-              {uploadedImages.length > 0 && (
-                <div className={styles['image-container']}>
-                  {uploadedImages.map((images, index) => (
-                    <div className={styles['image']} key={index}>
-                      <span
-                        className={styles['delete']}
-                        onClick={() => deleteImage(index)}
-                      >
-                        &times;
-                      </span>
-                      <Image
-                        src={images.url}
-                        alt={images.name}
-                        width={300}
-                        height={200}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              {isImageUploaded && (
+                <>
+                  <p className="text-black sm:text-center mt-8">
+                    No idea what content to generate? Click 'Generate Prompt'
+                    for some ideas.
+                  </p>
+                  <Button
+                    className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                    variant="slim"
+                    onClick={async () => {
+                      const generatedPrompts =
+                        await suggestPromptMultiImages(uploadedUrls);
+                      console.log('Generated prompts:', generatedPrompts);
+                    }}
+                  >
+                    Generate Prompt
+                  </Button>
+                  <br></br>
+                  <textarea
+                    type="text"
+                    id="backgroundPrompt"
+                    name="backgroundPrompt"
+                    placeholder="Enter text to generate image of your product/brand"
+                    value={backgroundPrompt || ''}
+                    cols="80"
+                    rows="15"
+                    onChange={handleChange}
+                    className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+                  />
+                  <br></br>
 
-              <button
-                type="button"
-                onClick={uploadImages}
-                className="mt-4 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90 px-4 py-2 rounded"
-              >
-                Upload Images
-              </button>
-            </div>
-
-            {isImageUploaded && (
-              <>
-                <p className="text-black sm:text-center mt-8">
-                  No idea what content to generate? Click 'Generate Prompt' for
-                  some ideas.
-                </p>
-                <Button
-                  className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                  variant="slim"
-                  onClick={async () => {
-                    const generatedPrompts =
-                      await suggestPromptMultiImages(uploadedUrls);
-                    console.log('Generated prompts:', generatedPrompts);
-                  }}
-                >
-                  Generate Prompt
-                </Button>
-                <br></br>
-                <textarea
-                  type="text"
-                  id="backgroundPrompt"
-                  name="backgroundPrompt"
-                  placeholder="Enter text to generate image of your product/brand"
-                  value={backgroundPrompt || ''}
-                  cols="80"
-                  rows="15"
-                  onChange={handleChange}
-                  className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-                />
-                <br></br>
-
-                <Button
-                  className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                  variant="slim"
-                  onClick={async () => {
-                    if (
-                      backgroundPrompt == null ||
-                      backgroundPrompt.trim() == '' ||
-                      isImageUploaded == false
-                    ) {
-                      alert('Please enter all prompts and upload your images!');
-                    } else {
-                      clearInterval(intervalImage.current);
-                      setBackgroundImagePredictions({});
-                      setBackgroundImageList([]);
-                      setisBGImagesLoading(true);
-                      setFinishMessage('');
-                      for (let i = 0; i < ATTEMPTS; i++) {
-                        await getImage(i, backgroundPrompt);
+                  <Button
+                    className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                    variant="slim"
+                    onClick={async () => {
+                      if (
+                        backgroundPrompt == null ||
+                        backgroundPrompt.trim() == '' ||
+                        isImageUploaded == false
+                      ) {
+                        alert(
+                          'Please enter all prompts and upload your images!'
+                        );
+                      } else {
+                        clearInterval(intervalImage.current);
+                        setBackgroundImagePredictions({});
+                        setBackgroundImageList([]);
+                        setisBGImagesLoading(true);
+                        setFinishMessage('');
+                        for (let i = 0; i < ATTEMPTS; i++) {
+                          await getImage(i, backgroundPrompt);
+                        }
+                        // Clear states after generation
+                        setBackgroundPrompt('');
+                        setUploadedImages([]);
+                        setIsImageUploaded(false);
+                        setUploadedUrls([]);
+                        // Update token count after generation
+                        await getImageTokenData();
                       }
-                      // Clear states after generation
-                      setBackgroundPrompt('');
-                      setUploadedImages([]);
-                      setIsImageUploaded(false);
-                      setUploadedUrls([]);
-                    }
-                  }}
-                >
-                  Generate Image
-                </Button>
-              </>
-            )}
+                    }}
+                  >
+                    Generate Image
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+          <br></br>
+          {loadingWithBackgroundPrompt}
+          {finishMessage}
+          <div className={styles['grid']}>
+            {backgroundImageList.map(renderCard)}
           </div>
-        )}
-        <br></br>
-        {loadingWithBackgroundPrompt}
-        {finishMessage}
-        <div className={styles['grid']}>
-          {backgroundImageList.map(renderCard)}
         </div>
-      </div>
-    );
+      );
+    } else {
+      return <h1 className="text-black">You are not subscribed yet!</h1>;
+    }
   }
 
   return (
@@ -656,6 +708,10 @@ export default function GenerateImages() {
             Pix Blender
           </h1>
           <br></br>
+          <p className="text-black sm:text-center">
+            Number of image rendering credits available: {numTokens} /{' '}
+            {numTieredTokens}
+          </p>
           <br></br>
           <p className="text-black sm:text-center">
             Our most flexible option: Combine multiple product images into one.

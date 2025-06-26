@@ -238,6 +238,8 @@ export default function GenerateImages() {
           ...current,
           { url: data.publicUrl, text: '' }
         ]);
+
+        await getImageTokenData();
       }
     }
   };
@@ -347,93 +349,94 @@ export default function GenerateImages() {
     }).format(subscription.prices.unit_amount / 100);
 
   function subscribedAndModelChosen() {
-    // currently working with free users
-    //if (subscription) {
-    return (
-      <div className={styles['get-image-button']}>
-        {/*isGeneratingBGImages ? (
+    if (subscription) {
+      return (
+        <div className={styles['get-image-button']}>
+          {isGeneratingBGImages ? (
             <p style={{ color: 'black' }}>Generating</p>
           ) : (
             <p style={{ color: 'black' }}>Please generate</p>
-          )*/}
+          )}
 
-        <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-          <Form.Control
-            type="file"
-            accept="image/png, image/jpeg"
-            //accept="*"
-            onChange={(e) => uploadFile(e)}
-          />
-        </Form.Group>
-        <br />
-        {displayContent}
-        {!isGeneratingBGImages && (
-          <div className="flex flex-col items-center p-2">
-            <p className="text-black sm:text-center">
-              No idea what content to generate? Click 'Generate Prompt' for some
-              ideas.
-            </p>
-            <Button
-              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-              variant="slim"
-              onClick={async () => {
-                suggestPromptReplicate(imageForBg);
-              }}
-            >
-              Generate Prompt
-            </Button>
-            <br></br>
-            <textarea
-              type="text"
-              id="backgroundPrompt"
-              name="backgroundPrompt"
-              placeholder="Enter text to generate image of your product/brand"
-              value={backgroundPrompt || ''}
-              cols="80"
-              rows="15"
-              onChange={handleChange}
-              className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+          <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
+            <Form.Control
+              type="file"
+              accept="image/png, image/jpeg"
+              //accept="*"
+              onChange={(e) => uploadFile(e)}
             />
-            <br></br>
+          </Form.Group>
+          <br />
+          {displayContent}
+          {!isGeneratingBGImages && (
+            <div className="flex flex-col items-center p-2">
+              <p className="text-black sm:text-center">
+                No idea what content to generate? Click 'Generate Prompt' for
+                some ideas.
+              </p>
+              <Button
+                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                variant="slim"
+                onClick={async () => {
+                  suggestPromptReplicate(imageForBg);
+                }}
+              >
+                Generate Prompt
+              </Button>
+              <br></br>
+              <textarea
+                type="text"
+                id="backgroundPrompt"
+                name="backgroundPrompt"
+                placeholder="Enter text to generate image of your product/brand"
+                value={backgroundPrompt || ''}
+                cols="80"
+                rows="15"
+                onChange={handleChange}
+                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+              />
+              <br></br>
 
-            <Button
-              className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-              variant="slim"
-              onClick={async () => {
-                if (
-                  backgroundPrompt == null ||
-                  backgroundPrompt.trim() == '' ||
-                  isImageUploaded == false
-                ) {
-                  alert('Please enter all prompts and upload your image!');
-                } else {
-                  clearInterval(intervalImage.current);
-                  setBackgroundImagePredictions({});
-                  setBackgroundImageList([]); // when generation begins, list of images is empty
-                  setisBGImagesLoading(true); // change this. seriously
-                  setFinishMessage('');
-                  for (let i = 0; i < ATTEMPTS; i++) {
-                    // 2 is a placeholder, later I plan to generate 16 images
-                    getImage(i, backgroundPrompt);
+              <Button
+                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                variant="slim"
+                onClick={async () => {
+                  if (
+                    backgroundPrompt == null ||
+                    backgroundPrompt.trim() == '' ||
+                    isImageUploaded == false
+                  ) {
+                    alert('Please enter all prompts and upload your image!');
+                  } else {
+                    clearInterval(intervalImage.current);
+                    setBackgroundImagePredictions({});
+                    setBackgroundImageList([]); // when generation begins, list of images is empty
+                    setisBGImagesLoading(true); // change this. seriously
+                    setFinishMessage('');
+                    for (let i = 0; i < ATTEMPTS; i++) {
+                      // 2 is a placeholder, later I plan to generate 16 images
+                      getImage(i, backgroundPrompt);
+                    }
+                    // Update token count after generation
+                    await getImageTokenData();
                   }
-                }
-              }}
-            >
-              Generate Image
-            </Button>
+                }}
+              >
+                Generate Image
+              </Button>
+            </div>
+          )}
+          <br></br>
+          {loadingWithBackgroundPrompt}
+          {finishMessage}
+          <div className={styles['grid']}>
+            {backgroundImageList.map(renderCard)}
           </div>
-        )}
-        <br></br>
-        {loadingWithBackgroundPrompt}
-        {finishMessage}
-        <div className={styles['grid']}>
-          {backgroundImageList.map(renderCard)}
         </div>
-      </div>
-    );
-    /*} else {
+      );
+    } else {
       return <h1 className="text-black">You are not subscribed yet!</h1>;
-    }*/
+    }
   }
 
   async function getFiles() {
@@ -510,11 +513,11 @@ export default function GenerateImages() {
     setNumTokens(imageTokenData.data);
   }
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (user) {
       getImageTokenData();
     }
-  }, [user]);*/
+  }, [user]);
 
   async function getTieredImageData() {
     console.log('user is: ', user.id);
@@ -525,11 +528,11 @@ export default function GenerateImages() {
     setNumTieredTokens(imageTieredData.data);
   }
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (user && subscription) {
       getTieredImageData();
     }
-  }, [user]);*/
+  }, [user]);
 
   return (
     <section className="bg-white mb-32">
@@ -544,11 +547,10 @@ export default function GenerateImages() {
           </h1>
           {console.log('isGeneratingBGImages is: ', isGeneratingBGImages)}
           <br></br>
-          {/** working with free users */}
-          {/*<p className="text-black sm:text-center">
+          <p className="text-black sm:text-center">
             Number of image rendering credits available: {numTokens} /{' '}
             {numTieredTokens}
-          </p>*/}
+          </p>
           <br></br>
           <p className="text-black sm:text-center">
             Upload a photo of your product and tell the AI what background to
