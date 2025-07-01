@@ -17,7 +17,7 @@ const ATTEMPTS = 2;
 // be mindful though, that if you go to other pages and coming back, the loading dots may disappear with
 // no images re-rendered. This is because the 'predictions' and 'setPredictions' were not included in
 // components/UserContext.js
-export default function Gallery() {
+export default function ImageGallery() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const [imageStyle, setImageStyle] = useState(null);

@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import contentTypes from './api/contentTypes';
 import { saveAs } from 'file-saver';
 
-export default function ViewContent() {
+export default function ViewImage() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const router = useRouter();
@@ -159,6 +159,12 @@ export default function ViewContent() {
     }
   };*/
 
+  const goGenerateVideo = (url) => {
+    setImageLink(url);
+    localStorage.setItem('imageLink', url); // Save imageLink to localStorage
+    router.push('/image-to-video');
+  };
+
   const generateCaptionsReplicate = async (prompt, imageLink) => {
     if (prompt == null || prompt.trim() == '' || !imageLink) {
       setCaption("You haven't entered anything!");
@@ -281,6 +287,14 @@ export default function ViewContent() {
                 Download the image selected and generate caption for your social
                 media post.
               </p>
+              <br />
+              <Button
+                variant="slim"
+                onClick={() => goGenerateVideo(imageLink)}
+                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+              >
+                Go Generate Video
+              </Button>
               <br />
               {displayContent || (
                 <div>
