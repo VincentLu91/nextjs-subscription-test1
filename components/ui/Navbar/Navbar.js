@@ -9,6 +9,8 @@ const Navbar = () => {
   const router = useRouter();
   const { user, signOut } = useUser();
   const [isOpen, setIsOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isViewContentOpen, setIsViewContentOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 bg-[#fff] z-40 transition-all duration-150">
@@ -47,7 +49,7 @@ const Navbar = () => {
                     className={s.link}
                     onBlur={() => setTimeout(() => setIsOpen(false), 200)}
                   >
-                    Generate Images
+                    Generate Visuals
                   </button>
                   {isOpen && (
                     <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
@@ -69,17 +71,43 @@ const Navbar = () => {
                       >
                         Clothes Swapping
                       </Link>
+                      <Link
+                        href="/image-to-video"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        Image to Video (NEW)
+                      </Link>
                     </div>
                   )}
                 </div>
 
-                <Link
-                  href="/view-content"
-                  //onClick={() => router.push('/view-content')}
-                  className={s.link}
-                >
-                  View Content
-                </Link>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsViewContentOpen(!isViewContentOpen)}
+                    className={s.link}
+                    onBlur={() =>
+                      setTimeout(() => setIsViewContentOpen(false), 200)
+                    }
+                  >
+                    View Content
+                  </button>
+                  {isViewContentOpen && (
+                    <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
+                      <Link
+                        href="/view-image"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        View Image
+                      </Link>
+                      <Link
+                        href="/view-video"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        View Video (NEW)
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 {/*<Link
                   href="/create-models"
                   //onClick={() => router.push('/dashboard')}
@@ -101,20 +129,40 @@ const Navbar = () => {
                 >
                   AI Models
                 </Link>*/}
-                <Link
+                {/*<Link
                   href="/advanced"
                   //onClick={() => router.push('/view-content')}
                   className={s.link}
                 >
                   Advanced Users
-                </Link>
-                <Link
-                  href="/gallery"
-                  //onClick={() => router.push('/view-content')}
-                  className={s.link}
-                >
-                  Gallery
-                </Link>
+                </Link>*/}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsGalleryOpen(!isGalleryOpen)}
+                    className={s.link}
+                    onBlur={() =>
+                      setTimeout(() => setIsGalleryOpen(false), 200)
+                    }
+                  >
+                    Gallery
+                  </button>
+                  {isGalleryOpen && (
+                    <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
+                      <Link
+                        href="/image-gallery"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        Images
+                      </Link>
+                      <Link
+                        href="/video-gallery"
+                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                      >
+                        Videos (NEW)
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 <Link href="#" className={s.link} onClick={() => signOut()}>
                   Sign out
                 </Link>
