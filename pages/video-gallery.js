@@ -256,10 +256,6 @@ export default function VideoGallery() {
 
   return (
     <section className="bg-white mb-32">
-      <p className="text-black sm:text-center">
-        Heads up! brandpix.ai is moving out of beta and will soon become a paid
-        service.
-      </p>
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
         {subscribedAndModelChosen()}
       </div>
