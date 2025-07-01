@@ -12,13 +12,16 @@ export const UserContextProvider = (props) => {
   const [subscription, setSubscription] = useState(null);
 
   const [imageLink, setImageLink] = useState(null);
+  const [videoLink, setVideoLink] = useState(null);
   const [imageForBg, setImageForBg] = useState(null);
   const [imageList, setImageList] = useState([]);
+  const [videoList, setVideoList] = useState([]);
   const [backgroundImageList, setBackgroundImageList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBGImagesLoading, setisBGImagesLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
   const [backgroundPrompt, setBackgroundPrompt] = useState(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
 
   const [zipFiles, setZipFiles] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
@@ -45,6 +48,7 @@ export const UserContextProvider = (props) => {
     {}
   );
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [isGeneratingVideos, setIsGeneratingVideos] = useState(false);
   const [isGeneratingBGImages, setisGeneratingBGImages] = useState(false);
   const [isApparelLoading, setisApparelLoading] = useState(false);
   const [isGeneratingApparel, setisGeneratingApparel] = useState(false);
@@ -55,6 +59,7 @@ export const UserContextProvider = (props) => {
   const [isImagesButtonClicked, setIsImagesButtonClicked] = useState(false);
   const [statusPercentage, setStatusPercentage] = useState(0);
   const [generatedPhotos, setGeneratedPhotos] = useState([]);
+  const [generatedVideos, setGeneratedVideos] = useState([]);
 
   useEffect(async () => {
     const {
@@ -115,10 +120,14 @@ export const UserContextProvider = (props) => {
     },
     imageLink,
     setImageLink,
+    videoLink,
+    setVideoLink,
     imageForBg,
     setImageForBg,
     imageList,
     setImageList,
+    videoList,
+    setVideoList,
     isLoading,
     setIsLoading,
     contentPrompt,
@@ -159,6 +168,8 @@ export const UserContextProvider = (props) => {
     setBackgroundPrompt,
     isBGImagesLoading,
     setisBGImagesLoading,
+    isVideoLoading,
+    setIsVideoLoading,
     isGeneratingBGImages,
     setisGeneratingBGImages,
     backgroundImageList,
@@ -171,12 +182,16 @@ export const UserContextProvider = (props) => {
     setPredictions,
     isGeneratingImages,
     setIsGeneratingImages,
+    isGeneratingVideos,
+    setIsGeneratingVideos,
     isImagesButtonClicked,
     setIsImagesButtonClicked,
     statusPercentage,
     setStatusPercentage,
     generatedPhotos,
     setGeneratedPhotos,
+    generatedVideos,
+    setGeneratedVideos,
     isApparelLoading,
     setisApparelLoading,
     isGeneratingApparel,
