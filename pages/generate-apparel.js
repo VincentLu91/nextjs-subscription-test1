@@ -276,7 +276,7 @@ export default function GenerateApparel() {
   const viewGeneratedContent = (url) => {
     setImageLink(url);
     localStorage.setItem('imageLink', url);
-    router.push('/view-content');
+    router.push('/view-image');
   };
 
   const renderCard = (image, index) => {
