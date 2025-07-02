@@ -268,7 +268,7 @@ export default function ImageToVideo() {
           { url: data.publicUrl, text: '' }
         ]);*/
 
-      //await getImageTokenData();
+      await getVideoTokenData();
     }
   };
 
