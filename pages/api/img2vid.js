@@ -1,16 +1,16 @@
 import axios from 'axios';
-import { deductUserImageGenerationToken } from '../../utils/useDatabase';
+import { deductUserVideoGenerationToken } from '../../utils/useDatabase';
 
 export default async function POST(req, res) {
   // it's a POST request...
   const { prompt, image, user } = req.query;
   try {
-    /*let result = await deductUserImageGenerationToken(user, 1);
+    let result = await deductUserVideoGenerationToken(user, 1);
 
     if (!result)
       return res.status(403).json({
         error: 'User doesnothave permission'
-      });*/
+      });
 
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image

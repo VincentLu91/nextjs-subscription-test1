@@ -91,11 +91,22 @@ const manageSubscriptionStatusChange = async (
 ) => {
   // Get customer's UUID from mapping table.
   const {
-    data: { id: uuid, image_tokens, training_tokens, caption_tokens },
+    data: {
+      id: uuid,
+      image_tokens,
+      training_tokens,
+      caption_tokens,
+      video_tokens
+    },
     error: noCustomerError
   } = await supabaseAdmin
     .from('customers')
-    .select('id, image_tokens', 'training_tokens', 'caption_tokens')
+    .select(
+      'id, image_tokens',
+      'training_tokens',
+      'caption_tokens',
+      'video_tokens'
+    )
     .eq('stripe_customer_id', customerId)
     .single();
   if (noCustomerError) throw noCustomerError;
@@ -151,12 +162,13 @@ const manageSubscriptionStatusChange = async (
       data: {
         image_tokens: priceImageTokens,
         training_tokens: priceTrainTokens,
-        caption_tokens: priceCaptionTokens
+        caption_tokens: priceCaptionTokens,
+        video_tokens: priceVideoTokens
       },
       error: noCustomerError
     } = await supabaseAdmin
       .from('prices')
-      .select('image_tokens, training_tokens, caption_tokens')
+      .select('image_tokens, training_tokens, caption_tokens, video_tokens')
       .eq('id', subscription.items.data[0].price.id)
       .single();
 
@@ -165,7 +177,8 @@ const manageSubscriptionStatusChange = async (
       //image_tokens: image_tokens + 30 // this is where `image_tokens` gets updated
       image_tokens: priceImageTokens, // each time the subscription is renewed, it resets the number of tokens as expected
       training_tokens: priceTrainTokens,
-      caption_tokens: priceCaptionTokens
+      caption_tokens: priceCaptionTokens,
+      video_tokens: priceVideoTokens
     };
 
     await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
@@ -205,9 +218,39 @@ const deductUserImageGenerationToken = async (customerId, tokensToDeduct) => {
   }
 };
 
+const deductUserVideoGenerationToken = async (customerId, tokensToDeduct) => {
+  // Get customer's UUID from mapping table.
+  const {
+    data: { id: uuid, video_tokens },
+    error: noCustomerError
+  } = await supabaseAdmin
+    .from('customers')
+    .select('id,video_tokens')
+    .eq('id', customerId)
+    .single();
+  if (noCustomerError) throw new Error(noCustomerError);
+
+  if (video_tokens - tokensToDeduct >= 0) {
+    let customerTokenUpdate = {
+      id: uuid,
+      video_tokens: video_tokens - tokensToDeduct
+    };
+
+    await supabaseAdmin.from('customers').upsert(customerTokenUpdate).select();
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const getTokens = async (customerId, typeOfToken) => {
   // Validate typeOfToken
-  const validTokenTypes = ['image_tokens', 'caption_tokens', 'training_tokens'];
+  const validTokenTypes = [
+    'image_tokens',
+    'caption_tokens',
+    'training_tokens',
+    'video_tokens'
+  ];
   if (!validTokenTypes.includes(typeOfToken)) {
     throw new Error(`Invalid typeOfToken: ${typeOfToken}`);
   }
@@ -244,7 +287,12 @@ const getTieredTokens = async (customerId, typeOfToken) => {
   console.log(`price_id: `, price_id);
 
   // Validate typeOfToken
-  const validTokenTypes = ['image_tokens', 'caption_tokens', 'training_tokens'];
+  const validTokenTypes = [
+    'image_tokens',
+    'caption_tokens',
+    'training_tokens',
+    'video_tokens'
+  ];
   if (!validTokenTypes.includes(typeOfToken)) {
     throw new Error(`Invalid typeOfToken: ${typeOfToken}`);
   }
@@ -321,6 +369,7 @@ export {
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
   deductUserImageGenerationToken,
+  deductUserVideoGenerationToken,
   deductUserTrainingToken,
   deductUserCaptionToken,
   getTokens,

@@ -279,18 +279,33 @@ export default function ImageToVideo() {
     }
   }, [resultVideo]);
 
-  async function getTieredTokenData() {
+  async function getVideoTokenData() {
     console.log('user is: ', user.id);
-    const captionTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=caption_tokens`
+    const videoTokenData = await axios.get(
+      `/api/tokenInfo?user=${user.id}` + `&tokenType=video_tokens`
     );
-    console.log('captionTieredData: ', captionTieredData.data);
-    setNumTieredTokens(captionTieredData.data);
+    console.log('videoTokenData: ', videoTokenData.data);
+    setNumTokens(videoTokenData.data);
+  }
+
+  useEffect(() => {
+    if (user) {
+      getVideoTokenData();
+    }
+  }, [user]);
+
+  async function getTieredVideoData() {
+    console.log('user is: ', user.id);
+    const videoTieredData = await axios.get(
+      `/api/tieredToken?user=${user.id}` + `&tokenType=video_tokens`
+    );
+    console.log('videoTieredData: ', videoTieredData.data);
+    setNumTieredTokens(videoTieredData.data);
   }
 
   useEffect(() => {
     if (user && subscription) {
-      getTieredTokenData();
+      getTieredVideoData();
     }
   }, [user]);
 
@@ -312,8 +327,7 @@ export default function ImageToVideo() {
           </h1>
           <br></br>
           <p className="sm:text-center text-black">
-            Number of caption creation credits available: {numTokens} /{' '}
-            {numTieredTokens}
+            Number of video credits available: {numTokens} / {numTieredTokens}
           </p>
           <br />
           {subscription ? ( // goal of this is to restrict content to subscribers.
