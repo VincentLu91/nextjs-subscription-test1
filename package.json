@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.1.0",
     "@stripe/stripe-js": "^7.4.0",
-    "@supabase/supabase-js": "^2.50.2",
+    "@supabase/supabase-js": "^2.50.3",
     "@swc/helpers": "^0.5.17",
     "@tailwindcss/postcss": "^4.1.11",
     "axios": "^1.10.0",
@@ -32,7 +32,7 @@
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.1",
     "stripe": "^18.3.0",
-    "swr": "2.3.3",
+    "swr": "2.3.4",
     "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0"
   },
