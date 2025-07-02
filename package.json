@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^15.3.4",
     "npm-check-updates": "^18.0.1",
-    "posthog-js": "^1.255.1",
+    "posthog-js": "^1.256.1",
     "raw-body": "^3.0.0",
     "react": "^19.1.0",
     "react-aria": "^3.41.1",
@@ -31,7 +31,7 @@
     "react-hot-toast": "^2.5.2",
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.1",
-    "stripe": "^18.2.1",
+    "stripe": "^18.3.0",
     "swr": "2.3.3",
     "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0"
