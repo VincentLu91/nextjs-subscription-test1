@@ -256,7 +256,7 @@ export default function ImageGallery() {
   const viewGeneratedContent = (url) => {
     setImageLink(url);
     localStorage.setItem('imageLink', url); // Save imageLink to localStorage
-    router.push('/view-content');
+    router.push('/view-image');
   };
 
   async function deletePhoto(photo_url) {

@@ -368,7 +368,7 @@ export default function AIStudio() {
   const viewGeneratedContent = (url) => {
     setImageLink(url);
     localStorage.setItem('imageLink', url); // Save imageLink to localStorage
-    router.push('/view-content');
+    router.push('/view-image');
   };
 
   const renderCard = (image, index) => {
