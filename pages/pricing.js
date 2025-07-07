@@ -61,7 +61,7 @@ export default function PricingPage({ products }) {
                 //loading={loading}
                 onClick={() =>
                   (window.location.href =
-                    'https://buy.stripe.com/4gM7sL7pAdR3bmK6Np2sM06')
+                    'https://buy.stripe.com/6oU6oH4dofZb2QeefR2sM07')
                 }
                 className="mt-8 block w-full rounded-lg py-2 text-sm font-semibold text-center bg-gray-900 text-white border border-gray-900 hover:bg-white hover:text-gray-900 transition-colors duration-200"
               >
