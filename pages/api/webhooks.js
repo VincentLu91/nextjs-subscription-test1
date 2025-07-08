@@ -72,6 +72,7 @@ const webhookHandler = async (req, res) => {
             break;
           case 'invoice.paid':
             console.log('event.data.object is: ', event.data.object);
+            break;
           case 'customer.subscription.created':
           case 'customer.subscription.updated':
           case 'customer.subscription.deleted':
@@ -96,8 +97,16 @@ const webhookHandler = async (req, res) => {
             throw new Error('Unhandled relevant event!');
         }
       } catch (error) {
-        console.log(error);
-        return res.json({ error: 'Webhook handler failed. View logs.' });
+        console.log('Detailed webhook error:', {
+          type: event.type,
+          error: error.message,
+          stack: error.stack
+        });
+        return res.status(500).json({
+          error: 'Webhook handler failed',
+          message: error.message,
+          type: event.type
+        });
       }
     }
 

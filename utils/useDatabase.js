@@ -101,12 +101,7 @@ const manageSubscriptionStatusChange = async (
     error: noCustomerError
   } = await supabaseAdmin
     .from('customers')
-    .select(
-      'id, image_tokens',
-      'training_tokens',
-      'caption_tokens',
-      'video_tokens'
-    )
+    .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
     .eq('stripe_customer_id', customerId)
     .single();
   if (noCustomerError) throw noCustomerError;
