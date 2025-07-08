@@ -90,21 +90,46 @@ const manageSubscriptionStatusChange = async (
   createAction = false
 ) => {
   // Get customer's UUID from mapping table.
-  const {
-    data: {
-      id: uuid,
-      image_tokens,
-      training_tokens,
-      caption_tokens,
-      video_tokens
-    },
-    error: noCustomerError
-  } = await supabaseAdmin
+  const { data, error: noCustomerError } = await supabaseAdmin
     .from('customers')
     .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
     .eq('stripe_customer_id', customerId)
     .single();
+
   if (noCustomerError) throw noCustomerError;
+  if (!data) {
+    console.log('No customer found for Stripe customer ID:', customerId);
+    // Create a new customer record
+    const { error: insertError } = await supabaseAdmin
+      .from('customers')
+      .insert([
+        {
+          stripe_customer_id: customerId,
+          image_tokens: 0,
+          training_tokens: 0,
+          caption_tokens: 0,
+          video_tokens: 0
+        }
+      ]);
+    if (insertError) throw insertError;
+
+    // Fetch the newly created customer
+    const { data: newCustomer, error: fetchError } = await supabaseAdmin
+      .from('customers')
+      .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
+      .eq('stripe_customer_id', customerId)
+      .single();
+    if (fetchError) throw fetchError;
+    data = newCustomer;
+  }
+
+  const {
+    id: uuid,
+    image_tokens,
+    training_tokens,
+    caption_tokens,
+    video_tokens
+  } = data;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method']
