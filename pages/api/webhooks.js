@@ -53,9 +53,16 @@ const webhookHandler = async (req, res) => {
 
     try {
       event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+      console.log('Received webhook event:', {
+        type: event.type,
+        id: event.id
+      });
     } catch (err) {
-      // On error, log and return the error message.
-      console.log(`❌ Error message: ${err.message}`);
+      console.log(`❌ Webhook signature verification failed:`, {
+        error: err.message,
+        signature: sig,
+        hasSecret: !!webhookSecret
+      });
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -76,11 +83,25 @@ const webhookHandler = async (req, res) => {
           case 'customer.subscription.created':
           case 'customer.subscription.updated':
           case 'customer.subscription.deleted':
-            await manageSubscriptionStatusChange(
-              event.data.object.id,
-              event.data.object.customer,
-              event.type === 'customer.subscription.created'
-            );
+            console.log('Processing subscription event:', {
+              type: event.type,
+              subscriptionId: event.data.object.id,
+              customerId: event.data.object.customer
+            });
+            try {
+              await manageSubscriptionStatusChange(
+                event.data.object.id,
+                event.data.object.customer,
+                event.type === 'customer.subscription.created'
+              );
+              console.log('Successfully processed subscription change');
+            } catch (error) {
+              console.error('Failed to process subscription:', {
+                error: error.message,
+                stack: error.stack
+              });
+              throw error;
+            }
             break;
           case 'checkout.session.completed':
             const checkoutSession = event.data.object;
