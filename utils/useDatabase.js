@@ -122,73 +122,70 @@ const manageSubscriptionStatusChange = async (
     metadata: stripeCustomer.metadata
   });
 
-  if (!stripeCustomer.metadata?.supabaseUUID) {
-    console.error('Stripe customer has no Supabase UUID in metadata');
-    throw new Error('Stripe customer missing Supabase UUID in metadata');
-  }
-
-  const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
-
-  // Now look up the customer in Supabase using the UUID from Stripe metadata
-  const { data: customer, error: queryError } = await supabaseAdmin
-    .from('customers')
-    .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
-    .eq('id', supabaseUUID)
-    .single();
-
-  if (queryError) {
-    console.log('Customer lookup error:', queryError);
-    throw queryError;
-  }
-
-  if (!customer) {
-    console.log('Creating new customer record with UUID:', supabaseUUID);
-    const { data: newCustomer, error: insertError } = await supabaseAdmin
-      .from('customers')
-      .insert({
-        id: supabaseUUID,
-        stripe_customer_id: customerId,
-        image_tokens: 0,
-        training_tokens: 0,
-        caption_tokens: 0,
-        video_tokens: 0
-      })
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error('Failed to create customer:', insertError);
-      throw insertError;
-    }
-    console.log('Created new customer:', newCustomer);
-    return newCustomer;
-  }
-
-  console.log('Found existing customer:', customer);
-
-  const {
-    id: uuid,
-    image_tokens,
-    training_tokens,
-    caption_tokens,
-    video_tokens
-  } = customer;
-
-  console.log('Using customer data:', {
-    uuid,
-    image_tokens,
-    training_tokens,
-    caption_tokens,
-    video_tokens
-  });
-
+  // Get the subscription first to find any existing records
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method']
   });
-  // Upsert the latest status of the subscription object.
+
+  let supabaseUUID = stripeCustomer.metadata?.supabaseUUID;
+  let customer = null;
+
+  if (!supabaseUUID) {
+    console.warn('Stripe customer has no Supabase UUID in metadata');
+
+    // Try to find customer by stripe_customer_id
+    const { data: customerByStripeId, error: stripeIdError } =
+      await supabaseAdmin
+        .from('customers')
+        .select(
+          'id, image_tokens, training_tokens, caption_tokens, video_tokens'
+        )
+        .eq('stripe_customer_id', customerId)
+        .single();
+
+    if (!stripeIdError && customerByStripeId) {
+      customer = customerByStripeId;
+      supabaseUUID = customerByStripeId.id;
+      console.log('Found customer by Stripe ID:', customerByStripeId);
+    } else {
+      // If this is a deletion event, we'll just update the subscription status
+      if (subscription.status === 'canceled') {
+        console.log('Processing cancellation for unknown customer');
+        // Continue with just subscription update
+      } else {
+        console.error('Unable to find customer record');
+        throw new Error('Unable to find customer record');
+      }
+    }
+  } else {
+    // Look up the customer in Supabase using the UUID from Stripe metadata
+    const { data: customerByUUID, error: queryError } = await supabaseAdmin
+      .from('customers')
+      .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
+      .eq('id', supabaseUUID)
+      .single();
+
+    if (!queryError) {
+      customer = customerByUUID;
+    }
+  }
+
+  // If we found a customer, use their data
+  let uuid = customer?.id || supabaseUUID;
+
+  if (customer) {
+    console.log('Using customer data:', {
+      uuid: customer.id,
+      image_tokens: customer.image_tokens,
+      training_tokens: customer.training_tokens,
+      caption_tokens: customer.caption_tokens,
+      video_tokens: customer.video_tokens
+    });
+  }
+  // Always update subscription status
   const subscriptionData = {
     id: subscription.id,
-    user_id: uuid,
+    user_id: uuid || null, // Allow null for unknown customers
     metadata: subscription.metadata,
     status: subscription.status,
     price_id: subscription.items.data[0].price.id,
@@ -226,7 +223,10 @@ const manageSubscriptionStatusChange = async (
     .select();
   if (error) {
     console.log('Failed to upsert subscription:', error);
-    throw error;
+    // Don't throw error for cancellations
+    if (subscription.status !== 'canceled') {
+      throw error;
+    }
   }
   console.log(
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
