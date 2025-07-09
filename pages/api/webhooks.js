@@ -83,35 +83,89 @@ const webhookHandler = async (req, res) => {
           case 'customer.subscription.created':
           case 'customer.subscription.updated':
           case 'customer.subscription.deleted':
+            const subscriptionEvent = event.data.object;
+            console.log(
+              'Raw subscription event data:',
+              JSON.stringify(subscriptionEvent, null, 2)
+            );
+
+            if (
+              !subscriptionEvent ||
+              !subscriptionEvent.id ||
+              !subscriptionEvent.customer
+            ) {
+              console.error('Invalid subscription event data:', {
+                hasEvent: !!subscriptionEvent,
+                hasId: subscriptionEvent?.id,
+                hasCustomer: subscriptionEvent?.customer
+              });
+              throw new Error('Invalid subscription event data');
+            }
+
             console.log('Processing subscription event:', {
               type: event.type,
-              subscriptionId: event.data.object.id,
-              customerId: event.data.object.customer
+              subscriptionId: subscriptionEvent.id,
+              customerId: subscriptionEvent.customer
             });
+
             try {
+              // First verify the customer exists in Stripe
+              const stripeCustomer = await stripe.customers.retrieve(
+                subscriptionEvent.customer
+              );
+              if (!stripeCustomer) {
+                throw new Error(
+                  `No Stripe customer found for ID: ${subscriptionEvent.customer}`
+                );
+              }
+
+              console.log('Found Stripe customer:', {
+                id: stripeCustomer.id,
+                metadata: stripeCustomer.metadata,
+                email: stripeCustomer.email
+              });
+
               await manageSubscriptionStatusChange(
-                event.data.object.id,
-                event.data.object.customer,
+                subscriptionEvent.id,
+                subscriptionEvent.customer,
                 event.type === 'customer.subscription.created'
               );
               console.log('Successfully processed subscription change');
             } catch (error) {
               console.error('Failed to process subscription:', {
                 error: error.message,
-                stack: error.stack
+                stack: error.stack,
+                eventType: event.type,
+                customerId: event.data.object.customer
               });
               throw error;
             }
             break;
           case 'checkout.session.completed':
             const checkoutSession = event.data.object;
+            console.log('Processing checkout session:', {
+              mode: checkoutSession.mode,
+              customerId: checkoutSession.customer,
+              subscriptionId: checkoutSession.subscription
+            });
             if (checkoutSession.mode === 'subscription') {
               const subscriptionId = checkoutSession.subscription;
-              await manageSubscriptionStatusChange(
-                subscriptionId,
-                checkoutSession.customer,
-                true
-              );
+              try {
+                await manageSubscriptionStatusChange(
+                  subscriptionId,
+                  checkoutSession.customer,
+                  true
+                );
+                console.log('Successfully processed checkout subscription');
+              } catch (error) {
+                console.error('Failed to process checkout subscription:', {
+                  error: error.message,
+                  stack: error.stack,
+                  customerId: checkoutSession.customer,
+                  subscriptionId
+                });
+                throw error;
+              }
             }
             break;
           default:

@@ -42,12 +42,16 @@ const upsertPriceRecord = async (price) => {
 };
 
 const createOrRetrieveCustomer = async ({ email, uuid }) => {
+  console.log('Creating/retrieving customer for:', { email, uuid });
+
   const { data, error } = await supabaseAdmin
     .from('customers')
     .select('stripe_customer_id')
     .eq('id', uuid)
     .single();
+
   if (error) {
+    console.log('No existing customer found, creating new one');
     // No customer record found, let's create one.
     const customerData = {
       metadata: {
@@ -55,16 +59,35 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
       }
     };
     if (email) customerData.email = email;
+
     const customer = await stripe.customers.create(customerData);
+    console.log('Created Stripe customer:', customer.id);
+
     // Now insert the customer ID into our Supabase mapping table.
     const { error: supabaseError } = await supabaseAdmin
       .from('customers')
-      .insert([{ id: uuid, stripe_customer_id: customer.id }]);
-    if (supabaseError) throw supabaseError;
-    console.log(`New customer created and inserted for ${uuid}.`);
+      .insert([
+        {
+          id: uuid,
+          stripe_customer_id: customer.id,
+          image_tokens: 0,
+          training_tokens: 0,
+          caption_tokens: 0,
+          video_tokens: 0
+        }
+      ]);
+
+    if (supabaseError) {
+      console.error('Failed to create Supabase customer:', supabaseError);
+      throw supabaseError;
+    }
+
+    console.log(`New customer created and inserted for ${uuid}`);
     return customer.id;
   }
-  if (data) return data.stripe_customer_id;
+
+  console.log('Found existing customer:', data.stripe_customer_id);
+  return data.stripe_customer_id;
 };
 
 /**
@@ -90,38 +113,58 @@ const manageSubscriptionStatusChange = async (
   createAction = false
 ) => {
   // Get customer's UUID from mapping table.
-  const { data, error: noCustomerError } = await supabaseAdmin
+  console.log('Looking up customer with Stripe ID:', customerId);
+
+  // First get the Stripe customer to get the Supabase UUID
+  const stripeCustomer = await stripe.customers.retrieve(customerId);
+  console.log('Retrieved Stripe customer:', {
+    id: stripeCustomer.id,
+    metadata: stripeCustomer.metadata
+  });
+
+  if (!stripeCustomer.metadata?.supabaseUUID) {
+    console.error('Stripe customer has no Supabase UUID in metadata');
+    throw new Error('Stripe customer missing Supabase UUID in metadata');
+  }
+
+  const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
+
+  // Now look up the customer in Supabase using the UUID from Stripe metadata
+  const { data: customer, error: queryError } = await supabaseAdmin
     .from('customers')
     .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
-    .eq('stripe_customer_id', customerId)
+    .eq('id', supabaseUUID)
     .single();
 
-  if (noCustomerError) throw noCustomerError;
-  if (!data) {
-    console.log('No customer found for Stripe customer ID:', customerId);
-    // Create a new customer record
-    const { error: insertError } = await supabaseAdmin
-      .from('customers')
-      .insert([
-        {
-          stripe_customer_id: customerId,
-          image_tokens: 0,
-          training_tokens: 0,
-          caption_tokens: 0,
-          video_tokens: 0
-        }
-      ]);
-    if (insertError) throw insertError;
-
-    // Fetch the newly created customer
-    const { data: newCustomer, error: fetchError } = await supabaseAdmin
-      .from('customers')
-      .select('id, image_tokens, training_tokens, caption_tokens, video_tokens')
-      .eq('stripe_customer_id', customerId)
-      .single();
-    if (fetchError) throw fetchError;
-    data = newCustomer;
+  if (queryError) {
+    console.log('Customer lookup error:', queryError);
+    throw queryError;
   }
+
+  if (!customer) {
+    console.log('Creating new customer record with UUID:', supabaseUUID);
+    const { data: newCustomer, error: insertError } = await supabaseAdmin
+      .from('customers')
+      .insert({
+        id: supabaseUUID,
+        stripe_customer_id: customerId,
+        image_tokens: 0,
+        training_tokens: 0,
+        caption_tokens: 0,
+        video_tokens: 0
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Failed to create customer:', insertError);
+      throw insertError;
+    }
+    console.log('Created new customer:', newCustomer);
+    return newCustomer;
+  }
+
+  console.log('Found existing customer:', customer);
 
   const {
     id: uuid,
@@ -129,7 +172,15 @@ const manageSubscriptionStatusChange = async (
     training_tokens,
     caption_tokens,
     video_tokens
-  } = data;
+  } = customer;
+
+  console.log('Using customer data:', {
+    uuid,
+    image_tokens,
+    training_tokens,
+    caption_tokens,
+    video_tokens
+  });
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method']
@@ -168,11 +219,15 @@ const manageSubscriptionStatusChange = async (
     .insert([subscriptionData], { upsert: true });*/
 
   // the code below replaces the code above, using the Javascript 2.0 SDK
+  console.log('Upserting subscription data:', subscriptionData);
   const { error } = await supabaseAdmin
     .from('subscriptions')
     .upsert(subscriptionData)
     .select();
-  if (error) throw error;
+  if (error) {
+    console.log('Failed to upsert subscription:', error);
+    throw error;
+  }
   console.log(
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
   );
