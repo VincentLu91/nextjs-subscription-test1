@@ -30,7 +30,7 @@
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
     "react-merge-refs": "^3.0.2",
-    "react-select": "^5.10.1",
+    "react-select": "^5.10.2",
     "stripe": "^18.3.0",
     "swr": "2.3.4",
     "tailwindcss": "^4.1.11",
