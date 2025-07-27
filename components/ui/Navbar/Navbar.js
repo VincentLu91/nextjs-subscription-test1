@@ -3,7 +3,7 @@ import s from './Navbar.module.css';
 import Logo from '../../icons/Logo';
 import { useUser } from '../../UserContext';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const router = useRouter();
@@ -11,23 +11,48 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isViewContentOpen, setIsViewContentOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [scrolled]);
 
   return (
-    <nav className="sticky top-0 bg-[#fff] z-40 transition-all duration-150">
+    <nav className={`${s.root} ${scrolled ? s.scrolled : ''}`}>
       <a href="#skip" className="sr-only focus:not-sr-only">
         Skip to content
       </a>
       <div className="mx-auto max-w-6xl px-6">
-        <div className="flex justify-between align-center flex-row py-4 md:py-6 relative">
+        <div className={s.navContent}>
           <div className="flex flex-1 items-center">
             <Link href="/" /*className={s.logo}*/ aria-label="Logo">
               <Logo />
             </Link>
             <nav className="space-x-2 ml-6 hidden lg:block">
-              <Link href="/pricing" className={s.link}>
+              <Link
+                href="/pricing"
+                className={s.link}
+                aria-current={
+                  router.pathname === '/pricing' ? 'page' : undefined
+                }
+              >
                 Pricing
               </Link>
-              <Link href="/account" className={s.link}>
+              <Link
+                href="/account"
+                className={s.link}
+                aria-current={
+                  router.pathname === '/account' ? 'page' : undefined
+                }
+              >
                 Account
               </Link>
             </nav>
@@ -38,8 +63,10 @@ const Navbar = () => {
               <>
                 <Link
                   href="/dashboard"
-                  //onClick={() => router.push('/dashboard')}
                   className={s.link}
+                  aria-current={
+                    router.pathname === '/dashboard' ? 'page' : undefined
+                  }
                 >
                   Dashboard
                 </Link>
@@ -52,28 +79,28 @@ const Navbar = () => {
                     Generate Visuals
                   </button>
                   {isOpen && (
-                    <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
+                    <div className="absolute top-full left-0 bg-black/80 backdrop-blur-md shadow-lg rounded-md py-2 mt-1">
                       <Link
                         href="/replace-bg"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         Replace Backgrounds
                       </Link>
                       <Link
                         href="/pix-blender"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         Pix Blender
                       </Link>
                       <Link
                         href="/generate-apparel"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         Clothes Swapping
                       </Link>
                       <Link
                         href="/image-to-video"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         Image to Video (NEW)
                       </Link>
@@ -92,16 +119,16 @@ const Navbar = () => {
                     View Content
                   </button>
                   {isViewContentOpen && (
-                    <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
+                    <div className="absolute top-full left-0 bg-black/80 backdrop-blur-md shadow-lg rounded-md py-2 mt-1">
                       <Link
                         href="/view-image"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         View Image
                       </Link>
                       <Link
                         href="/view-video"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         View Video (NEW)
                       </Link>
@@ -147,16 +174,16 @@ const Navbar = () => {
                     Gallery
                   </button>
                   {isGalleryOpen && (
-                    <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1">
+                    <div className="absolute top-full left-0 bg-black/80 backdrop-blur-md shadow-lg rounded-md py-2 mt-1">
                       <Link
                         href="/image-gallery"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         Images
                       </Link>
                       <Link
                         href="/video-gallery"
-                        className={`${s.link} block px-4 py-2 hover:bg-gray-100`}
+                        className={`${s.link} block px-4 py-2`}
                       >
                         Videos (NEW)
                       </Link>
