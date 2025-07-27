@@ -37,10 +37,10 @@ export default function GenerateImages() {
     setImageLink,
     imageForBg,
     setImageForBg,
-    backgroundImageList,
-    setBackgroundImageList,
-    isBGImagesLoading,
-    setisBGImagesLoading,
+    pixBlenderImageList,
+    setPixBlenderImageList,
+    isBlenderImgLoading,
+    setIsBlenderImgLoading,
     backgroundPrompt,
     setBackgroundPrompt,
     setTrainingText,
@@ -54,10 +54,10 @@ export default function GenerateImages() {
     setIsImageUploaded,
     imageFileName,
     setImageFileName,
-    backgroundImagePredictions,
-    setBackgroundImagePredictions,
-    isGeneratingBGImages,
-    setisGeneratingBGImages
+    pixBlenderPredictions,
+    setPixBlenderPredictions,
+    isGeneratingBlenderImg,
+    setIsGeneratingBlenderImg
   } = useUser();
 
   const intervalPrompt = useRef();
@@ -169,17 +169,17 @@ export default function GenerateImages() {
         user: user.id
       });
 
-      setBackgroundImagePredictions((state) => ({
+      setPixBlenderPredictions((state) => ({
         ...state,
         [attempt]: resp.data
       }));
-      setisGeneratingBGImages(true);
+      setIsGeneratingBlenderImg(true);
       return resp.data;
     } catch (error) {
       console.error('Error in getImage:', error);
       alert(error.message);
-      setisGeneratingBGImages(false);
-      setisBGImagesLoading(false);
+      setIsGeneratingBlenderImg(false);
+      setIsBlenderImgLoading(false);
       return null;
     }
   };
@@ -231,7 +231,7 @@ export default function GenerateImages() {
               return newImages;
             });
 
-            setBackgroundImagePredictions((state) => ({
+            setPixBlenderPredictions((state) => ({
               ...state,
               [attempt]: {
                 ...state[attempt],
@@ -246,7 +246,7 @@ export default function GenerateImages() {
           }
         } catch (resultError) {
           console.error('Error fetching result images:', resultError);
-          setBackgroundImagePredictions((state) => ({
+          setPixBlenderPredictions((state) => ({
             ...state,
             [attempt]: {
               ...state[attempt],
@@ -262,7 +262,7 @@ export default function GenerateImages() {
       return [];
     } catch (error) {
       console.error('Error in getImageResults:', error.message);
-      setBackgroundImagePredictions((state) => ({
+      setPixBlenderPredictions((state) => ({
         ...state,
         [attempt]: {
           ...state[attempt],
@@ -527,7 +527,7 @@ export default function GenerateImages() {
           JSON.stringify(localPhotosJson)
         );
 
-        setBackgroundImageList((current) => [
+        setPixBlenderImageList((current) => [
           ...current,
           { url: data.publicUrl, text: '' }
         ]);
@@ -539,7 +539,7 @@ export default function GenerateImages() {
   };
 
   useEffect(() => {
-    const list = Object.values(backgroundImagePredictions);
+    const list = Object.values(pixBlenderPredictions);
     if (list.length > 0) {
       // Check if all attempts are either completed or errored
       const isFinished = list.every(
@@ -547,13 +547,10 @@ export default function GenerateImages() {
       );
 
       if (isFinished) {
-        console.log(
-          'Background image predictions:',
-          backgroundImagePredictions
-        );
+        console.log('Background image predictions:', pixBlenderPredictions);
         clearInterval(intervalImage.current);
-        setisBGImagesLoading(false);
-        setisGeneratingBGImages(false);
+        setIsBlenderImgLoading(false);
+        setIsGeneratingBlenderImg(false);
 
         // Count successful and failed attempts
         const completed = list.filter(
@@ -576,7 +573,7 @@ export default function GenerateImages() {
         }
       }
     }
-  }, [backgroundImagePredictions]);
+  }, [pixBlenderPredictions]);
 
   useEffect(() => {
     if (resultImages) {
@@ -586,7 +583,7 @@ export default function GenerateImages() {
   }, [resultImages]);
 
   useEffect(() => {
-    const predictionAry = Object.entries(backgroundImagePredictions).filter(
+    const predictionAry = Object.entries(pixBlenderPredictions).filter(
       ([attempt, item]) =>
         item.status !== 'COMPLETED' && item.status !== 'ERROR'
     );
@@ -605,8 +602,8 @@ export default function GenerateImages() {
         // Check if we've exceeded maximum polling duration
         if (Date.now() - startTime > MAX_POLLING_DURATION) {
           clearInterval(intervalImage.current);
-          setisBGImagesLoading(false);
-          setisGeneratingBGImages(false);
+          setIsBlenderImgLoading(false);
+          setIsGeneratingBlenderImg(false);
           setFinishMessage('Image generation timed out. Please try again.');
           return;
         }
@@ -624,7 +621,7 @@ export default function GenerateImages() {
         clearInterval(intervalImage.current);
       }
     };
-  }, [backgroundImagePredictions]);
+  }, [pixBlenderPredictions]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
@@ -760,7 +757,9 @@ export default function GenerateImages() {
                 <button
                   onClick={suggestPromptMultiImages}
                   className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={uploadedImages.length === 0 || isGeneratingBGImages}
+                  disabled={
+                    uploadedImages.length === 0 || isGeneratingBlenderImg
+                  }
                 >
                   Generate Prompt
                 </button>
@@ -775,7 +774,7 @@ export default function GenerateImages() {
                 <div className="space-y-2">
                   {uploadedImages.length === 0 &&
                     hasAttemptedGenerate &&
-                    !isGeneratingBGImages && (
+                    !isGeneratingBlenderImg && (
                       <p className="text-[#FF4444] text-sm">
                         Please upload at least one image
                       </p>
@@ -795,11 +794,11 @@ export default function GenerateImages() {
 
                       try {
                         clearInterval(intervalImage.current);
-                        setBackgroundImagePredictions({});
-                        setBackgroundImageList([]);
-                        setisBGImagesLoading(true);
+                        setPixBlenderPredictions({});
+                        setPixBlenderImageList([]);
+                        setIsBlenderImgLoading(true);
                         setFinishMessage('');
-                        setisGeneratingBGImages(true);
+                        setIsGeneratingBlenderImg(true);
 
                         // Process all images at once
                         for (let i = 0; i < ATTEMPTS; i++) {
@@ -819,18 +818,18 @@ export default function GenerateImages() {
                       } catch (error) {
                         console.error('Error generating images:', error);
                         alert('Failed to generate images. Please try again.');
-                        setisGeneratingBGImages(false);
-                        setisBGImagesLoading(false);
+                        setIsGeneratingBlenderImg(false);
+                        setIsBlenderImgLoading(false);
                       }
                     }}
                     disabled={
-                      isGeneratingBGImages ||
+                      isGeneratingBlenderImg ||
                       !backgroundPrompt?.trim() ||
                       uploadedImages.length === 0
                     }
-                    className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${uploadedImages.length === 0 ? 'bg-[#4A4A4A] cursor-not-allowed' : ''} ${isGeneratingBGImages ? 'bg-[#4A4A4A] cursor-not-allowed' : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'}`}
+                    className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${uploadedImages.length === 0 ? 'bg-[#4A4A4A] cursor-not-allowed' : ''} ${isGeneratingBlenderImg ? 'bg-[#4A4A4A] cursor-not-allowed' : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'}`}
                   >
-                    {isGeneratingBGImages ? (
+                    {isGeneratingBlenderImg ? (
                       <span className="flex items-center justify-center">
                         Generating
                         <LoadingDots />
@@ -842,7 +841,7 @@ export default function GenerateImages() {
                 </div>
               </div>
 
-              {isBGImagesLoading && (
+              {isBlenderImgLoading && (
                 <div className="mt-4 text-[#A1A1AA]">
                   <p>Processing your request...</p>
                   <p className="text-sm">Please do not refresh the page</p>
@@ -859,13 +858,13 @@ export default function GenerateImages() {
         </div>
 
         {/* Results Grid */}
-        {backgroundImageList.length > 0 && (
+        {pixBlenderImageList.length > 0 && (
           <>
             <h2 className="text-2xl font-bold mt-10 mb-6">
               Your Generated Images
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {backgroundImageList.map((image, index) => (
+              {pixBlenderImageList.map((image, index) => (
                 <div
                   key={index}
                   className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
