@@ -31,7 +31,7 @@ export default function Home({ posts }) {
   }, [posts]);
 
   return (
-    <div>
+    <div className="bg-[#0C0C0C]">
       <Toolbar />
       <div className={`${styles.main} ${styles.secondaryTextColor}`}>
         <h1>Welcome To My Blog</h1>
