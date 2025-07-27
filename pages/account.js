@@ -11,7 +11,7 @@ function Card({ title, description, footer, children }) {
     <div className="border border-accents-1	max-w-3xl w-full p rounded-lg m-auto my-8">
       <div className="px-5 py-4">
         <h3 className="text-2xl mb-1 font-medium">{title}</h3>
-        <p className="text-black">{description}</p>
+        <p className="text-white">{description}</p>
         {children}
       </div>
       <div className="border-t border-accents-1 bg-red-100-2 p-4 text-blue-300 rounded-b-lg">
@@ -50,13 +50,13 @@ export default function Account() {
     }).format(subscription.prices.unit_amount / 100);
 
   return (
-    <section className="bg-white mb-32">
+    <section className="bg-[#0C0C0C] mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             Account
           </h1>
-          <p className="mt-5 text-xl text-black sm:text-center sm:text-2xl max-w-2xl m-auto">
+          <p className="mt-5 text-xl text-white sm:text-center sm:text-2xl max-w-2xl m-auto">
             We partnered with Stripe for a simplified billing.
           </p>
         </div>

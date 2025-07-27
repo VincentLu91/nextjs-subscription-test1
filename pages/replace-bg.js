@@ -393,7 +393,7 @@ export default function ReplaceBg() {
   }
 
   return (
-    <main className="bg-black text-white min-h-screen font-['Inter'] text-base leading-6">
+    <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
       <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <h1 className="text-5xl font-bold">Replace Background</h1>
