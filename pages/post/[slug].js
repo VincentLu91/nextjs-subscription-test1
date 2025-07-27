@@ -21,7 +21,7 @@ export const Post = ({ title, body, image }) => {
   }, [image]);
 
   return (
-    <div style={{ color: 'var(--text-secondary)' }}>
+    <div className="bg-[#0C0C0C]" style={{ color: 'var(--text-base)' }}>
       <Toolbar />
       <div className={styles.unset_img}>
         <h1>{title}</h1>
