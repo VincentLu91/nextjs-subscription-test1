@@ -85,18 +85,16 @@ export default function Footer() {
               Product
             </h4>
             <ul className="space-y-2">
-              {['Dashboard', 'Generate Visuals', 'View Content', 'Pricing'].map(
-                (item) => (
-                  <li key={item}>
-                    <Link
-                      href={`/${item.toLowerCase().replace(' ', '-')}`}
-                      className="text-[rgba(255,255,255,0.7)] text-sm font-medium hover:text-purple-300 transition-colors duration-200 ease-out"
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                )
-              )}
+              {['Dashboard', 'Account', 'Pricing', 'Contact'].map((item) => (
+                <li key={item}>
+                  <Link
+                    href={`/${item.toLowerCase().replace(' ', '-')}`}
+                    className="text-[rgba(255,255,255,0.7)] text-sm font-medium hover:text-purple-300 transition-colors duration-200 ease-out"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -106,10 +104,10 @@ export default function Footer() {
               Company
             </h4>
             <ul className="space-y-2">
-              {['About', 'Blog', 'Gallery', 'Careers'].map((item) => (
+              {['Blog', 'Privacy Policy'].map((item) => (
                 <li key={item}>
                   <Link
-                    href={`/${item.toLowerCase()}`}
+                    href={`/${item.toLowerCase().replace(' ', '')}`}
                     className="text-[rgba(255,255,255,0.7)] text-sm font-medium hover:text-purple-300 transition-colors duration-200 ease-out"
                   >
                     {item}

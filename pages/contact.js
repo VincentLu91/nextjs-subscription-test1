@@ -4,12 +4,12 @@ import Image from 'next/image';
 export default function Contact() {
   return (
     <div className="App">
-      <section className="bg-white mb-32">
+      <section className="bg-[#0C0C0C] mb-32">
         <div
           className={`max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 flex justify-center items-center`}
         >
           <div className="text-center">
-            <h1 className="text-4xl font-extrabold text-black sm:text-6xl">
+            <h1 className="text-4xl font-extrabold text-white sm:text-6xl">
               Contact
             </h1>
             <br />
@@ -21,7 +21,7 @@ export default function Contact() {
                 height={600}
               />
             </div>
-            <div className="text-4xl text-black sm:text-center sm:text-2xl">
+            <div className="text-4xl text-white sm:text-center sm:text-2xl">
               <br />
               <p>To reach out for support, please email vince@brandpix.ai</p>
               <br />
