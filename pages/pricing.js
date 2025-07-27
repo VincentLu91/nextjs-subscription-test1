@@ -6,12 +6,12 @@ import Script from 'next/script';
 export default function PricingPage({ products }) {
   // the return statement renders a one-time payment button. Delete it after when ready.
   return (
-    <>
+    <div className="w-full min-h-screen" style={{ backgroundColor: '#0C0C0C' }}>
       <Script
         src="https://assets.endorsely.com/endorsely.js"
         data-endorsely="def6bd04-d2b5-4b31-814d-50e230cb97e0"
       />
-      <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+      <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
         Early Bird Special
       </h1>
       <br />
@@ -19,36 +19,36 @@ export default function PricingPage({ products }) {
         <div className="w-full max-w-4xl">
           <div className="rounded-lg shadow-sm divide-y divide-accents-2 bg-red-100-2">
             <div className="p-6 text-center">
-              <h2 className="text-2xl leading-6 font-semibold text-black">
+              <h2 className="text-2xl leading-6 font-semibold text-white">
                 Creating content for your online business has never been easier.
               </h2>
               <br />
-              <h2 className="text-2xl leading-6 font-semibold text-black">
+              <h2 className="text-2xl leading-6 font-semibold text-white">
                 Own the Ultimate Plan{' '}
                 <span className="text-red-500 font-bold italic">Forever</span>
               </h2>
-              <p className="mt-4 text-accents-5 text-black">
+              <p className="mt-4 text-accents-5 text-white">
                 Pay once. Unlock lifetime access to the Ultimate plan...limited
                 to the first 100 users!
               </p>
-              <p className="mt-4 text-accents-5 text-black">
+              <p className="mt-4 text-accents-5 text-white">
                 We’ll email you as soon as your account is ready.
               </p>
-              <p className="mt-4 text-accents-5 text-black">Features:</p>
-              <p className="mt-4 text-accents-5 text-black">
+              <p className="mt-4 text-accents-5 text-white">Features:</p>
+              <p className="mt-4 text-accents-5 text-white">
                 120 product image renders / month
               </p>
-              <p className="mt-4 text-accents-5 text-black">
+              <p className="mt-4 text-accents-5 text-white">
                 AI Videos of your product - coming soon
               </p>
-              <p className="mt-4 text-accents-5 text-black">
+              <p className="mt-4 text-accents-5 text-white">
                 240 caption creation credits / month
               </p>
               <p className="mt-8">
                 <span className="text-5xl font-extrabold text-red-500 line-through ml-2">
                   $55 / month
                 </span>{' '}
-                <span className="text-5xl font-extrabold text-black">
+                <span className="text-5xl font-extrabold text-white">
                   $100 one-time
                 </span>
               </p>
@@ -71,7 +71,7 @@ export default function PricingPage({ products }) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
   //return <Pricing products={products} />;
 }
