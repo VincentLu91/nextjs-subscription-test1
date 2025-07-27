@@ -5,12 +5,8 @@ import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
-import { Card, Form, Container, Row, Col } from 'react-bootstrap';
-import styles from '../styles/Home.module.css';
 import { supabase } from '../utils/initSupabase';
 import { v4 as uuidv4 } from 'uuid';
-import Image from 'next/image';
-import { forEach } from 'jszip';
 
 const ATTEMPTS = 1;
 const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
@@ -25,10 +21,10 @@ export default function GenerateImages() {
   const [resultImages, setResultImages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadedUrls, setUploadedUrls] = useState([]);
   const fileInputRef = useRef(null);
   const [promptObject, setPromptObject] = useState(null);
   const [promptStatus, setPromptStatus] = useState(null);
+  const [hasAttemptedGenerate, setHasAttemptedGenerate] = useState(false);
 
   const router = useRouter();
   const {
@@ -67,6 +63,11 @@ export default function GenerateImages() {
   const intervalPrompt = useRef();
   const intervalImage = useRef();
 
+  // Update isImageUploaded based on uploadedImages length
+  useEffect(() => {
+    setIsImageUploaded(uploadedImages.length > 0);
+  }, [uploadedImages]);
+
   function selectFiles() {
     fileInputRef.current.click();
   }
@@ -74,6 +75,7 @@ export default function GenerateImages() {
   function onFileSelect(event) {
     const files = event.target.files;
     if (files.length === 0) return;
+    setHasAttemptedGenerate(false);
     for (let i = 0; i < files.length; i++) {
       if (files[i].type.split('/')[0] !== 'image') continue;
       if (!uploadedImages.some((e) => e.name == files[i].name)) {
@@ -91,12 +93,10 @@ export default function GenerateImages() {
   function deleteImage(index) {
     const newImages = uploadedImages.filter((_, i) => i !== index);
     setUploadedImages(newImages);
-    // Clear prompt and reset image upload state if all images are deleted
-    if (newImages.length === 0) {
-      setBackgroundPrompt('');
-      setIsImageUploaded(false);
-      setUploadedUrls([]);
-    }
+    // Always clear the prompt when images are modified
+    setBackgroundPrompt('');
+    // Reset the generate attempt state to allow fresh generation
+    setHasAttemptedGenerate(false);
   }
 
   function onDragOver(event) {
@@ -113,6 +113,7 @@ export default function GenerateImages() {
   function onDrop(event) {
     event.preventDefault();
     setIsDragging(false);
+    setHasAttemptedGenerate(false);
     const files = event.dataTransfer.files;
     for (let i = 0; i < files.length; i++) {
       if (files[i].type.split('/')[0] !== 'image') continue;
@@ -128,71 +129,59 @@ export default function GenerateImages() {
     }
   }
 
-  async function uploadImages() {
-    if (uploadedImages.length === 0) {
-      alert('Please upload images');
-      return;
-    }
+  const getImage = async (attempt, backgroundPrompt, imagesToProcess) => {
+    try {
+      setResultImages([]);
+      const urls = [];
 
-    const urls = [];
+      // Upload all images to Supabase
+      for (const image of imagesToProcess) {
+        const response = await fetch(image.url);
+        const blob = await response.blob();
+        const fileExt = image.name.split('.').pop().toLowerCase();
+        const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
 
-    // Upload all images to Supabase
-    for (const image of uploadedImages) {
-      const response = await fetch(image.url);
-      const blob = await response.blob();
-      const fileExt = image.name.split('.').pop().toLowerCase();
-      const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
-
-      const { data, error } = await supabase.storage
-        .from('images')
-        .upload(filePath, blob);
-
-      if (data) {
-        const { data: publicUrlData } = supabase.storage
+        const { data, error } = await supabase.storage
           .from('images')
-          .getPublicUrl(filePath);
+          .upload(filePath, blob);
 
-        if (publicUrlData) {
-          urls.push(publicUrlData.publicUrl);
+        if (data) {
+          const { data: publicUrlData } = supabase.storage
+            .from('images')
+            .getPublicUrl(filePath);
+
+          if (publicUrlData) {
+            urls.push(publicUrlData.publicUrl);
+          }
+        } else {
+          throw new Error(`Failed to upload image: ${error.message}`);
         }
-      } else {
-        console.error('Error uploading file:', error);
-        alert('Failed to upload image. Please try again.');
-        return;
       }
-    }
 
-    if (urls.length > 0) {
-      setUploadedUrls(urls);
-      setImageForBg(urls[0]); // Set first image as preview
-      setIsImageUploaded(true);
-    }
-  }
+      if (urls.length === 0) {
+        throw new Error('No images were successfully uploaded');
+      }
 
-  const getImage = async (attempt, backgroundPrompt) => {
-    if (uploadedUrls.length === 0) {
-      console.error('No images uploaded');
+      // Send images to API
+      const resp = await axios.post('/api/fluxUno', {
+        prompt: backgroundPrompt,
+        images: urls,
+        user: user.id
+      });
+
+      setBackgroundImagePredictions((state) => ({
+        ...state,
+        [attempt]: resp.data
+      }));
+      setisGeneratingBGImages(true);
+      return resp.data;
+    } catch (error) {
+      console.error('Error in getImage:', error);
+      alert(error.message);
       setisGeneratingBGImages(false);
       setisBGImagesLoading(false);
-      return;
+      return null;
     }
-    setResultImages([]);
-
-    console.log('Sending images to API:', uploadedUrls);
-
-    const resp = await axios.post('/api/fluxUno', {
-      prompt: backgroundPrompt,
-      images: uploadedUrls,
-      user: user.id
-    });
-
-    setBackgroundImagePredictions((state) => ({
-      ...state,
-      [attempt]: resp.data
-    }));
-    console.log('Resp data is: ', resp.data);
-    setisGeneratingBGImages(true);
-    return resp.data;
   };
 
   async function copyImageToSupabase(img_url) {
@@ -222,41 +211,112 @@ export default function GenerateImages() {
 
   const getImageResults = async (attempt, url) => {
     try {
-      const output = await axios.get('/api/imageresults?url=' + url);
+      const output = await axios.get(
+        '/api/imageresults?url=' + encodeURIComponent(url)
+      );
+
       if (output.data.status === 'COMPLETED') {
-        const result = await axios.get(
-          '/api/imageresults?url=' + output.data.response_url
-        );
-        console.log('Result images:', result.data.images);
-        setResultImages(result.data.images);
+        try {
+          const result = await axios.get(
+            '/api/imageresults?url=' +
+              encodeURIComponent(output.data.response_url)
+          );
 
-        setBackgroundImagePredictions((state) => ({
-          ...state,
-          [attempt]: { ...state[attempt], status: 'COMPLETED' }
-        }));
+          if (result.data.images && result.data.images.length > 0) {
+            console.log('Result images:', result.data.images);
 
-        return result.data.images;
+            // Update results using functional update to ensure we have latest state
+            setResultImages((prevImages) => {
+              const newImages = [...result.data.images];
+              return newImages;
+            });
+
+            setBackgroundImagePredictions((state) => ({
+              ...state,
+              [attempt]: {
+                ...state[attempt],
+                status: 'COMPLETED',
+                images: result.data.images
+              }
+            }));
+
+            return result.data.images;
+          } else {
+            throw new Error('No images received in response');
+          }
+        } catch (resultError) {
+          console.error('Error fetching result images:', resultError);
+          setBackgroundImagePredictions((state) => ({
+            ...state,
+            [attempt]: {
+              ...state[attempt],
+              status: 'ERROR',
+              error: resultError.message
+            }
+          }));
+        }
+      } else if (output.data.status === 'ERROR') {
+        throw new Error(output.data.error || 'Image generation failed');
       }
+      // If not completed or error, return empty array to continue polling
+      return [];
     } catch (error) {
       console.error('Error in getImageResults:', error.message);
+      setBackgroundImagePredictions((state) => ({
+        ...state,
+        [attempt]: {
+          ...state[attempt],
+          status: 'ERROR',
+          error: error.message
+        }
+      }));
+      return [];
     }
-    return [];
   };
 
-  const suggestPromptMultiImages = async (uploadedUrls) => {
-    if (!uploadedUrls || uploadedUrls.length === 0) {
-      alert('No images have been uploaded!');
+  const suggestPromptMultiImages = async () => {
+    if (uploadedImages.length === 0) {
+      alert('Please add some images first!');
       return [];
     }
 
+    // Clear any existing prompt
+    setBackgroundPrompt('');
     const prompts = [];
 
-    for (const imageUrl of uploadedUrls) {
-      console.log('Processing image URL:', imageUrl);
+    for (const image of uploadedImages) {
+      console.log('Processing image:', image.url);
       try {
-        const rawPrompt = await axios.post(
-          '/api/extractSubject?imageLink=' + imageUrl + `&user=${user.id}`
-        );
+        // Upload image to Supabase first
+        const response = await fetch(image.url);
+        const blob = await response.blob();
+        const fileExt = image.name.split('.').pop().toLowerCase();
+        const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
+
+        const { data, error } = await supabase.storage
+          .from('images')
+          .upload(filePath, blob);
+
+        if (error) {
+          console.error('Failed to upload image:', error.message);
+          continue;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('images')
+          .getPublicUrl(filePath);
+
+        if (!publicUrlData) {
+          console.error('Failed to get public URL for image');
+          continue;
+        }
+
+        const rawPrompt = await axios.post('/api/extractSubject', null, {
+          params: {
+            imageLink: publicUrlData.publicUrl,
+            user: user.id
+          }
+        });
         console.log('Raw prompt response:', rawPrompt.data);
 
         if (!rawPrompt.data.status_url) {
@@ -308,19 +368,31 @@ export default function GenerateImages() {
         if (!output?.data?.status === 'COMPLETED') {
           console.error(
             'Failed to process image after all attempts for image:',
-            imageUrl
+            image.url
           );
         }
       } catch (error) {
-        console.error('Error processing image:', imageUrl, error);
+        console.error('Error processing image:', image.url, error);
       }
     }
 
     // Send prompts to anyLlm API and poll for result
     try {
+      // Format prompts into a descriptive list
+      const validPrompts = prompts.map((p) => p.trim()).filter(Boolean);
+      if (validPrompts.length === 0) {
+        throw new Error('No valid prompts generated from images');
+      }
+
+      // Create a descriptive list of subjects
+      const subjectsList = validPrompts
+        .map((p, i) => `${i + 1}. ${p}`)
+        .join('\n');
+      const promptInstruction = `I have the following subjects:\n${subjectsList}\n\nCreate a detailed prompt that describes how to combine all of these subjects into a single image. The prompt should specify how the subjects should be arranged and interact with each other in the scene. Focus on their spatial relationship and visual composition.`;
+
       const response = await axios.post('/api/anyLlm', null, {
         params: {
-          promptArray: prompts.join(', '),
+          promptArray: promptInstruction,
           user: user.id
         }
       });
@@ -468,15 +540,41 @@ export default function GenerateImages() {
 
   useEffect(() => {
     const list = Object.values(backgroundImagePredictions);
-    if (list.length > 0 && list.every((item) => item.status === 'COMPLETED')) {
-      console.log('background ', backgroundImagePredictions);
-      clearInterval(intervalImage.current);
-      setisBGImagesLoading(false);
-      setisGeneratingBGImages(false);
-      setFinishMessage(
-        'All images are generated and saved to gallery.\n' +
-          'Please go to the Gallery page to see all your generated images'
+    if (list.length > 0) {
+      // Check if all attempts are either completed or errored
+      const isFinished = list.every(
+        (item) => item.status === 'COMPLETED' || item.status === 'ERROR'
       );
+
+      if (isFinished) {
+        console.log(
+          'Background image predictions:',
+          backgroundImagePredictions
+        );
+        clearInterval(intervalImage.current);
+        setisBGImagesLoading(false);
+        setisGeneratingBGImages(false);
+
+        // Count successful and failed attempts
+        const completed = list.filter(
+          (item) => item.status === 'COMPLETED'
+        ).length;
+        const failed = list.filter((item) => item.status === 'ERROR').length;
+
+        if (completed > 0) {
+          setFinishMessage(
+            `${completed} image${completed > 1 ? 's' : ''} generated and saved to gallery.${
+              failed > 0
+                ? `\n${failed} generation${failed > 1 ? 's' : ''} failed.`
+                : ''
+            }\nPlease go to the Gallery page to see all your generated images.`
+          );
+        } else {
+          setFinishMessage(
+            'Image generation failed. Please try again with different images or prompt.'
+          );
+        }
+      }
     }
   }, [backgroundImagePredictions]);
 
@@ -489,16 +587,43 @@ export default function GenerateImages() {
 
   useEffect(() => {
     const predictionAry = Object.entries(backgroundImagePredictions).filter(
-      ([attempt, item]) => item.status !== 'COMPLETED'
+      ([attempt, item]) =>
+        item.status !== 'COMPLETED' && item.status !== 'ERROR'
     );
+
     if (predictionAry.length > 0) {
+      // Clear any existing interval
+      if (intervalImage.current) {
+        clearInterval(intervalImage.current);
+      }
+
+      // Set maximum polling duration (5 minutes)
+      const startTime = Date.now();
+      const MAX_POLLING_DURATION = 5 * 60 * 1000;
+
       intervalImage.current = setInterval(() => {
+        // Check if we've exceeded maximum polling duration
+        if (Date.now() - startTime > MAX_POLLING_DURATION) {
+          clearInterval(intervalImage.current);
+          setisBGImagesLoading(false);
+          setisGeneratingBGImages(false);
+          setFinishMessage('Image generation timed out. Please try again.');
+          return;
+        }
+
         predictionAry.forEach(([attempt, item]) => {
-          getImageResults(attempt, item.status_url);
+          if (item.status_url) {
+            getImageResults(attempt, item.status_url);
+          }
         });
       }, 3000);
     }
-    return () => clearInterval(intervalImage.current);
+
+    return () => {
+      if (intervalImage.current) {
+        clearInterval(intervalImage.current);
+      }
+    };
   }, [backgroundImagePredictions]);
 
   useEffect(() => {
@@ -512,215 +637,265 @@ export default function GenerateImages() {
     console.log('backgroundPrompt: ', e.target.value);
   };
 
-  const loadingWithBackgroundPrompt = isBGImagesLoading && (
-    <div className={styles['black-text']}>
-      Description of image: {backgroundPrompt}
-      <p>
-        Loading
-        <LoadingDots />
-      </p>
-      <p>Please do not refresh or you will lose all progress!</p>
-    </div>
-  );
-
   const viewGeneratedContent = (url) => {
     setImageLink(url);
     localStorage.setItem('imageLink', url);
     router.push('/view-image');
   };
 
-  const renderCard = (image, index) => {
+  if (!subscription) {
     return (
-      <Card
-        style={{ width: '10rem' }}
-        key={index}
-        className={`hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md ${styles.box}`}
-        onClick={() => viewGeneratedContent(image.url)}
-      >
-        <Card.Img variant="top" src={image.url} />
-      </Card>
+      <main className="bg-black text-white min-h-screen font-['Inter'] text-base leading-6">
+        <div className="max-w-[960px] mx-auto px-4 py-12">
+          <h1 className="text-5xl font-bold mb-2">Pix Blender</h1>
+          <p className="text-xl">You are not subscribed yet!</p>
+        </div>
+      </main>
     );
-  };
+  }
 
-  function subscribedAndModelChosen() {
-    if (subscription) {
-      return (
-        <div className={styles['get-image-button']}>
-          <br />
-          {!isGeneratingBGImages && (
-            <div className="flex flex-col items-center p-2">
-              <div className={styles['image-card']}>
-                <p className="text-black sm:text-center">
-                  Upload your product images below
+  return (
+    <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
+      <div className="max-w-[960px] mx-auto px-4 py-12">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+          <h1 className="text-5xl font-bold">Pix Blender</h1>
+
+          {/* Credits Badge */}
+          <div
+            className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
+              ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#8256FF] text-white ring-2 ring-[#8256FF]'}`}
+            aria-live="polite"
+          >
+            Credits: {numTokens} / {numTieredTokens}
+          </div>
+        </div>
+
+        <p className="text-[#A1A1AA] mb-6">
+          Our most flexible option: Combine multiple product images into one.
+        </p>
+        <p className="text-[#A1A1AA] mb-10">
+          <strong>For Best Results:</strong> Avoid uploading images with labels,
+          text, or highly detailed patterns, as these might not merge smoothly
+          in the final image.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* Upload Card */}
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Upload Images
+            </label>
+
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+              <div
+                className={`relative flex flex-col items-center justify-center min-h-[220px] sm:min-h-[260px] border-2 border-dashed border-[#3F3F46] rounded-xl cursor-pointer transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none
+                  ${isDragging ? 'scale-[1.03] shadow-[0_4px_24px_rgba(0,0,0,0.6)]' : ''}`}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                onClick={selectFiles}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  multiple
+                  onChange={onFileSelect}
+                />
+
+                <svg
+                  className="w-12 h-12 text-[#52525B] opacity-40 mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+
+                <p className="text-sm text-[#A1A1AA]">
+                  {isDragging
+                    ? 'Drop files here'
+                    : 'Drag and drop your images here, or click to select'}
                 </p>
-                <div className={styles['image-top']}></div>
-                <div
-                  className={styles['drag-area']}
-                  onDragOver={onDragOver}
-                  onDragLeave={onDragLeave}
-                  onDrop={onDrop}
-                >
-                  {isDragging ? (
-                    <span className={styles['select']}>Drop files here</span>
-                  ) : (
-                    <>
-                      Drag & Drop images here or{' '}
-                      <span
-                        className={styles['select']}
-                        role="button"
-                        onClick={selectFiles}
-                      >
-                        Browse
-                      </span>
-                    </>
-                  )}
-
-                  <input
-                    name="file"
-                    type="file"
-                    className={styles['file']}
-                    multiple
-                    ref={fileInputRef}
-                    onChange={onFileSelect}
-                  ></input>
-                </div>
-
-                {uploadedImages.length > 0 && (
-                  <div className={styles['image-container']}>
-                    {uploadedImages.map((images, index) => (
-                      <div className={styles['image']} key={index}>
-                        <span
-                          className={styles['delete']}
-                          onClick={() => deleteImage(index)}
-                        >
-                          &times;
-                        </span>
-                        <Image
-                          src={images.url}
-                          alt={images.name}
-                          width={300}
-                          height={200}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={uploadImages}
-                  className="mt-4 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90 px-4 py-2 rounded"
-                >
-                  Upload Images
-                </button>
               </div>
 
-              {isImageUploaded && (
-                <>
-                  <p className="text-black sm:text-center mt-8">
-                    No idea what content to generate? Click 'Generate Prompt'
-                    for some ideas.
-                  </p>
-                  <Button
-                    className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                    variant="slim"
-                    onClick={async () => {
-                      const generatedPrompts =
-                        await suggestPromptMultiImages(uploadedUrls);
-                      console.log('Generated prompts:', generatedPrompts);
-                    }}
-                  >
-                    Generate Prompt
-                  </Button>
-                  <br></br>
-                  <textarea
-                    type="text"
-                    id="backgroundPrompt"
-                    name="backgroundPrompt"
-                    placeholder="Enter text to generate image of your product/brand"
-                    value={backgroundPrompt || ''}
-                    cols="80"
-                    rows="15"
-                    onChange={handleChange}
-                    className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-                  />
-                  <br></br>
+              {uploadedImages.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {uploadedImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative rounded-lg overflow-hidden"
+                    >
+                      <button
+                        onClick={() => deleteImage(index)}
+                        className="absolute top-2 right-2 w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-opacity-70"
+                      >
+                        &times;
+                      </button>
+                      <img
+                        src={image.url}
+                        alt={image.name}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
 
-                  <Button
-                    className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                    variant="slim"
+          {/* Prompt Card */}
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Image Description
+            </label>
+
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+              <div className="space-y-4">
+                <button
+                  onClick={suggestPromptMultiImages}
+                  className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={uploadedImages.length === 0 || isGeneratingBGImages}
+                >
+                  Generate Prompt
+                </button>
+
+                <textarea
+                  value={backgroundPrompt || ''}
+                  onChange={handleChange}
+                  placeholder="Describe how you want to combine your images..."
+                  className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                />
+
+                <div className="space-y-2">
+                  {uploadedImages.length === 0 &&
+                    hasAttemptedGenerate &&
+                    !isGeneratingBGImages && (
+                      <p className="text-[#FF4444] text-sm">
+                        Please upload at least one image
+                      </p>
+                    )}
+                  <button
                     onClick={async () => {
-                      if (
-                        backgroundPrompt == null ||
-                        backgroundPrompt.trim() == '' ||
-                        isImageUploaded == false
-                      ) {
-                        alert(
-                          'Please enter all prompts and upload your images!'
-                        );
-                      } else {
+                      setHasAttemptedGenerate(true);
+
+                      if (uploadedImages.length === 0) {
+                        return;
+                      }
+
+                      if (!backgroundPrompt?.trim()) {
+                        alert('Please enter a prompt!');
+                        return;
+                      }
+
+                      try {
                         clearInterval(intervalImage.current);
                         setBackgroundImagePredictions({});
                         setBackgroundImageList([]);
                         setisBGImagesLoading(true);
                         setFinishMessage('');
+                        setisGeneratingBGImages(true);
+
+                        // Process all images at once
                         for (let i = 0; i < ATTEMPTS; i++) {
-                          await getImage(i, backgroundPrompt);
+                          const result = await getImage(
+                            i,
+                            backgroundPrompt,
+                            uploadedImages
+                          );
+                          if (!result) return; // Stop if there was an error
                         }
-                        // Clear states after generation
+
+                        // Clear states after successful generation
                         setBackgroundPrompt('');
                         setUploadedImages([]);
-                        setIsImageUploaded(false);
-                        setUploadedUrls([]);
-                        // Update token count after generation
+                        setHasAttemptedGenerate(false); // Reset since we're starting fresh
                         await getImageTokenData();
+                      } catch (error) {
+                        console.error('Error generating images:', error);
+                        alert('Failed to generate images. Please try again.');
+                        setisGeneratingBGImages(false);
+                        setisBGImagesLoading(false);
                       }
                     }}
+                    disabled={
+                      isGeneratingBGImages ||
+                      !backgroundPrompt?.trim() ||
+                      uploadedImages.length === 0
+                    }
+                    className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${uploadedImages.length === 0 ? 'bg-[#4A4A4A] cursor-not-allowed' : ''} ${isGeneratingBGImages ? 'bg-[#4A4A4A] cursor-not-allowed' : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'}`}
                   >
-                    Generate Image
-                  </Button>
-                </>
+                    {isGeneratingBGImages ? (
+                      <span className="flex items-center justify-center">
+                        Generating
+                        <LoadingDots />
+                      </span>
+                    ) : (
+                      'Generate Image'
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {isBGImagesLoading && (
+                <div className="mt-4 text-[#A1A1AA]">
+                  <p>Processing your request...</p>
+                  <p className="text-sm">Please do not refresh the page</p>
+                </div>
+              )}
+
+              {finishMessage && (
+                <div className="mt-4 p-4 bg-[#1F1F1F] rounded-lg text-[#E4E4E7]">
+                  {finishMessage}
+                </div>
               )}
             </div>
-          )}
-          <br></br>
-          {loadingWithBackgroundPrompt}
-          {finishMessage}
-          <div className={styles['grid']}>
-            {backgroundImageList.map(renderCard)}
-          </div>
+          </section>
         </div>
-      );
-    } else {
-      return <h1 className="text-black">You are not subscribed yet!</h1>;
-    }
-  }
 
-  return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Pix Blender
-          </h1>
-          <br></br>
-          <p className="text-black sm:text-center">
-            Number of image rendering credits available: {numTokens} /{' '}
-            {numTieredTokens}
-          </p>
-          <br></br>
-          <p className="text-black sm:text-center">
-            Our most flexible option: Combine multiple product images into one.
-          </p>
-          <p className="text-black sm:text-center">
-            <strong>For Best Results:</strong> Avoid uploading images with
-            <strong> labels</strong>, <strong>text</strong>, or highly detailed
-            patterns, as these might not merge smoothly in the final image.
-          </p>
-          <br />
-          {subscribedAndModelChosen()}
-        </div>
+        {/* Results Grid */}
+        {backgroundImageList.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mt-10 mb-6">
+              Your Generated Images
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {backgroundImageList.map((image, index) => (
+                <div
+                  key={index}
+                  className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
+                  onClick={() => viewGeneratedContent(image.url)}
+                >
+                  <img
+                    src={image.url}
+                    alt={`Generated image ${index + 1}`}
+                    className="w-full h-auto"
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
-    </section>
+
+      <style jsx>{`
+        @keyframes button-shadow {
+          0% {
+            box-shadow: 0 0 0 0 rgba(130, 86, 255, 0.45);
+          }
+          100% {
+            box-shadow: 0 0 0 24px rgba(130, 86, 255, 0);
+          }
+        }
+        .animate-button-shadow:not(:disabled):active {
+          animation: button-shadow 400ms ease-out;
+        }
+      `}</style>
+    </main>
   );
 }
