@@ -342,7 +342,7 @@ export default function ImageGallery() {
   }
 
   return (
-    <section className="bg-white mb-32">
+    <section className="bg-[#0C0C0C] mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
         {subscribedAndModelChosen()}
       </div>

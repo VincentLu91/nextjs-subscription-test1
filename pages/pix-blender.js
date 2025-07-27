@@ -697,7 +697,7 @@ export default function GenerateImages() {
   }
 
   return (
-    <section className="bg-white mb-32">
+    <section className="bg-[#0C0C0C] mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
