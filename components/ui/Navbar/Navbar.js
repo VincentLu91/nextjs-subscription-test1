@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import s from './Navbar.module.css';
 import Logo from '../../icons/Logo';
 import { useUser } from '../../UserContext';
 import { useRouter } from 'next/router';
@@ -26,20 +25,30 @@ const Navbar = () => {
   }, [scrolled]);
 
   return (
-    <nav className={`${s.root} ${scrolled ? s.scrolled : ''}`}>
+    <nav
+      className={`sticky top-0 z-50 bg-black/60 backdrop-blur-md shadow-inner shadow-white/5 border-b border-white/5 transition-all duration-300 ${
+        scrolled ? 'h-14' : 'h-16'
+      }`}
+    >
       <a href="#skip" className="sr-only focus:not-sr-only">
         Skip to content
       </a>
-      <div className="mx-auto max-w-6xl px-6">
-        <div className={s.navContent}>
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="h-full flex items-center justify-between">
           <div className="flex flex-1 items-center">
             <Link href="/" /*className={s.logo}*/ aria-label="Logo">
-              <Logo />
+              <div className="w-10 h-10 rounded-full hover:ring-2 ring-purple-400/40 transition duration-300">
+                <Logo />
+              </div>
             </Link>
             <nav className="space-x-2 ml-6 hidden lg:block">
               <Link
                 href="/pricing"
-                className={s.link}
+                className={`text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 ${
+                  router.pathname === '/pricing'
+                    ? 'border-b-2 border-purple-500 text-purple-300'
+                    : ''
+                }`}
                 aria-current={
                   router.pathname === '/pricing' ? 'page' : undefined
                 }
@@ -48,7 +57,11 @@ const Navbar = () => {
               </Link>
               <Link
                 href="/account"
-                className={s.link}
+                className={`text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 ${
+                  router.pathname === '/account'
+                    ? 'border-b-2 border-purple-500 text-purple-300'
+                    : ''
+                }`}
                 aria-current={
                   router.pathname === '/account' ? 'page' : undefined
                 }
@@ -63,7 +76,11 @@ const Navbar = () => {
               <>
                 <Link
                   href="/dashboard"
-                  className={s.link}
+                  className={`text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center ${
+                    router.pathname === '/dashboard'
+                      ? 'border-b-2 border-purple-500 text-purple-300'
+                      : ''
+                  }`}
                   aria-current={
                     router.pathname === '/dashboard' ? 'page' : undefined
                   }
@@ -73,34 +90,34 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className={s.link}
+                    className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center"
                     onBlur={() => setTimeout(() => setIsOpen(false), 200)}
                   >
                     Generate Visuals
                   </button>
                   {isOpen && (
-                    <div className="absolute top-full left-0 bg-black/80 backdrop-blur-md shadow-lg rounded-md py-2 mt-1">
+                    <div className="absolute top-full left-0 bg-zinc-900/90 backdrop-blur-md shadow-lg rounded-xl py-2 mt-1 border border-white/5">
                       <Link
                         href="/replace-bg"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Replace Backgrounds
                       </Link>
                       <Link
                         href="/pix-blender"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Pix Blender
                       </Link>
                       <Link
                         href="/generate-apparel"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Clothes Swapping
                       </Link>
                       <Link
                         href="/image-to-video"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Image to Video (NEW)
                       </Link>
@@ -111,7 +128,7 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsViewContentOpen(!isViewContentOpen)}
-                    className={s.link}
+                    className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center"
                     onBlur={() =>
                       setTimeout(() => setIsViewContentOpen(false), 200)
                     }
@@ -119,16 +136,16 @@ const Navbar = () => {
                     View Content
                   </button>
                   {isViewContentOpen && (
-                    <div className="absolute top-full left-0 bg-black/80 backdrop-blur-md shadow-lg rounded-md py-2 mt-1">
+                    <div className="absolute top-full left-0 bg-zinc-900/90 backdrop-blur-md shadow-lg rounded-xl py-2 mt-1 border border-white/5">
                       <Link
                         href="/view-image"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         View Image
                       </Link>
                       <Link
                         href="/view-video"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         View Video (NEW)
                       </Link>
@@ -163,10 +180,10 @@ const Navbar = () => {
                 >
                   Advanced Users
                 </Link>*/}
-                <div className="relative">
+                <div className="relative flex items-center">
                   <button
                     onClick={() => setIsGalleryOpen(!isGalleryOpen)}
-                    className={s.link}
+                    className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200"
                     onBlur={() =>
                       setTimeout(() => setIsGalleryOpen(false), 200)
                     }
@@ -174,28 +191,35 @@ const Navbar = () => {
                     Gallery
                   </button>
                   {isGalleryOpen && (
-                    <div className="absolute top-full left-0 bg-black/80 backdrop-blur-md shadow-lg rounded-md py-2 mt-1">
+                    <div className="absolute top-full left-0 bg-zinc-900/90 backdrop-blur-md shadow-lg rounded-xl py-2 mt-1 border border-white/5">
                       <Link
                         href="/image-gallery"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Images
                       </Link>
                       <Link
                         href="/video-gallery"
-                        className={`${s.link} block px-4 py-2`}
+                        className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Videos (NEW)
                       </Link>
                     </div>
                   )}
                 </div>
-                <Link href="#" className={s.link} onClick={() => signOut()}>
+                <Link
+                  href="#"
+                  className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center"
+                  onClick={() => signOut()}
+                >
                   Sign out
                 </Link>
               </>
             ) : (
-              <Link href="/signin" className={s.link}>
+              <Link
+                href="/signin"
+                className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center"
+              >
                 Sign in
               </Link>
             )}
