@@ -23,6 +23,7 @@ export const UserContextProvider = (props) => {
   const [isBlenderImgLoading, setIsBlenderImgLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
   const [backgroundPrompt, setBackgroundPrompt] = useState(null);
+  const [pixBlenderPrompt, setPixBlenderPrompt] = useState(null);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
 
   const [zipFiles, setZipFiles] = useState([]);
@@ -170,6 +171,8 @@ export const UserContextProvider = (props) => {
     setModelClass,
     backgroundPrompt,
     setBackgroundPrompt,
+    pixBlenderPrompt,
+    setPixBlenderPrompt,
     isBGImagesLoading,
     setisBGImagesLoading,
     isBlenderImgLoading,

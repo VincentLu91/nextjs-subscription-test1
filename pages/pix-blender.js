@@ -41,8 +41,8 @@ export default function GenerateImages() {
     setPixBlenderImageList,
     isBlenderImgLoading,
     setIsBlenderImgLoading,
-    backgroundPrompt,
-    setBackgroundPrompt,
+    pixBlenderPrompt,
+    setPixBlenderPrompt,
     setTrainingText,
     modelName,
     setModelName,
@@ -94,7 +94,7 @@ export default function GenerateImages() {
     const newImages = uploadedImages.filter((_, i) => i !== index);
     setUploadedImages(newImages);
     // Always clear the prompt when images are modified
-    setBackgroundPrompt('');
+    setPixBlenderPrompt('');
     // Reset the generate attempt state to allow fresh generation
     setHasAttemptedGenerate(false);
   }
@@ -129,7 +129,7 @@ export default function GenerateImages() {
     }
   }
 
-  const getImage = async (attempt, backgroundPrompt, imagesToProcess) => {
+  const getImage = async (attempt, pixBlenderPrompt, imagesToProcess) => {
     try {
       setResultImages([]);
       const urls = [];
@@ -164,7 +164,7 @@ export default function GenerateImages() {
 
       // Send images to API
       const resp = await axios.post('/api/fluxUno', {
-        prompt: backgroundPrompt,
+        prompt: pixBlenderPrompt,
         images: urls,
         user: user.id
       });
@@ -281,7 +281,7 @@ export default function GenerateImages() {
     }
 
     // Clear any existing prompt
-    setBackgroundPrompt('');
+    setPixBlenderPrompt('');
     const prompts = [];
 
     for (const image of uploadedImages) {
@@ -413,7 +413,7 @@ export default function GenerateImages() {
             '/api/imageresults?url=' + output.data.response_url
           );
           console.log('Final AnyLlm result:', result.data);
-          setBackgroundPrompt(result.data.output);
+          setPixBlenderPrompt(result.data.output);
           return result.data;
         }
 
@@ -440,7 +440,7 @@ export default function GenerateImages() {
         const joinedPrompt = result.join('');
         const joinedPromptWithoutQuotes = joinedPrompt.slice(1, -1);
         console.log(joinedPromptWithoutQuotes);
-        setBackgroundPrompt(joinedPromptWithoutQuotes);
+        setPixBlenderPrompt(joinedPromptWithoutQuotes);
         setPromptStatus(null);
       } else {
         alert('nothing generated');
@@ -630,8 +630,8 @@ export default function GenerateImages() {
   }, [user, isLoadingUser]);
 
   const handleChange = (e) => {
-    setBackgroundPrompt(e.target.value);
-    console.log('backgroundPrompt: ', e.target.value);
+    setPixBlenderPrompt(e.target.value);
+    console.log('pixBlenderPrompt: ', e.target.value);
   };
 
   const viewGeneratedContent = (url) => {
@@ -765,7 +765,7 @@ export default function GenerateImages() {
                 </button>
 
                 <textarea
-                  value={backgroundPrompt || ''}
+                  value={pixBlenderPrompt || ''}
                   onChange={handleChange}
                   placeholder="Describe how you want to combine your images..."
                   className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
@@ -787,7 +787,7 @@ export default function GenerateImages() {
                         return;
                       }
 
-                      if (!backgroundPrompt?.trim()) {
+                      if (!pixBlenderPrompt?.trim()) {
                         alert('Please enter a prompt!');
                         return;
                       }
@@ -804,14 +804,14 @@ export default function GenerateImages() {
                         for (let i = 0; i < ATTEMPTS; i++) {
                           const result = await getImage(
                             i,
-                            backgroundPrompt,
+                            pixBlenderPrompt,
                             uploadedImages
                           );
                           if (!result) return; // Stop if there was an error
                         }
 
                         // Clear states after successful generation
-                        setBackgroundPrompt('');
+                        setPixBlenderPrompt('');
                         setUploadedImages([]);
                         setHasAttemptedGenerate(false); // Reset since we're starting fresh
                         await getImageTokenData();
@@ -824,7 +824,7 @@ export default function GenerateImages() {
                     }}
                     disabled={
                       isGeneratingBlenderImg ||
-                      !backgroundPrompt?.trim() ||
+                      !pixBlenderPrompt?.trim() ||
                       uploadedImages.length === 0
                     }
                     className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${uploadedImages.length === 0 ? 'bg-[#4A4A4A] cursor-not-allowed' : ''} ${isGeneratingBlenderImg ? 'bg-[#4A4A4A] cursor-not-allowed' : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'}`}
