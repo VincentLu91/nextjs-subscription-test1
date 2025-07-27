@@ -17,8 +17,10 @@ export const UserContextProvider = (props) => {
   const [imageList, setImageList] = useState([]);
   const [videoList, setVideoList] = useState([]);
   const [backgroundImageList, setBackgroundImageList] = useState([]);
+  const [pixBlenderImageList, setPixBlenderImageList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBGImagesLoading, setisBGImagesLoading] = useState(false);
+  const [isBlenderImgLoading, setIsBlenderImgLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
   const [backgroundPrompt, setBackgroundPrompt] = useState(null);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
@@ -47,9 +49,11 @@ export const UserContextProvider = (props) => {
   const [backgroundImagePredictions, setBackgroundImagePredictions] = useState(
     {}
   );
+  const [pixBlenderPredictions, setPixBlenderPredictions] = useState({});
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isGeneratingVideos, setIsGeneratingVideos] = useState(false);
   const [isGeneratingBGImages, setisGeneratingBGImages] = useState(false);
+  const [isGeneratingBlenderImg, setIsGeneratingBlenderImg] = useState(false);
   const [isApparelLoading, setisApparelLoading] = useState(false);
   const [isGeneratingApparel, setisGeneratingApparel] = useState(false);
   const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
@@ -168,14 +172,22 @@ export const UserContextProvider = (props) => {
     setBackgroundPrompt,
     isBGImagesLoading,
     setisBGImagesLoading,
+    isBlenderImgLoading,
+    setIsBlenderImgLoading,
     isVideoLoading,
     setIsVideoLoading,
     isGeneratingBGImages,
     setisGeneratingBGImages,
+    isGeneratingBlenderImg,
+    setIsGeneratingBlenderImg,
     backgroundImageList,
     setBackgroundImageList,
     backgroundImagePredictions,
     setBackgroundImagePredictions,
+    pixBlenderImageList,
+    setPixBlenderImageList,
+    pixBlenderPredictions,
+    setPixBlenderPredictions,
     instanceList,
     setInstanceList,
     predictions,
