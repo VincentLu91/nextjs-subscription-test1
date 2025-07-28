@@ -203,13 +203,13 @@ export default function VideoGallery() {
               <h1 className="text-2xl font-semibold text-white">
                 Video Gallery
               </h1>
-              <Button
+              {/*<Button
                 className="bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
                 variant="slim"
                 onClick={() => fetchAndStoreVideos(true)}
               >
                 Sync AI Videos
-              </Button>
+              </Button>*/}
             </div>
 
             {message && (

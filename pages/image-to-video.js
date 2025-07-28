@@ -53,13 +53,7 @@ export default function ImageToVideo() {
     return null;
   });
   const [numTieredTokens, setNumTieredTokens] = useState(null);
-  const [finishMessage, setFinishMessage] = useState(() => {
-    // Initialize from localStorage if available
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('videoFinishMessage') || '';
-    }
-    return '';
-  });
+  const [finishMessage, setFinishMessage] = useState(null);
 
   const interval = useRef();
 
@@ -132,8 +126,7 @@ export default function ImageToVideo() {
     if (prompt == null || prompt.trim() == '' || !image) {
       setCaption("You haven't entered anything!");
     } else {
-      setFinishMessage(''); // Clear any existing finish message
-      localStorage.removeItem('videoFinishMessage'); // Clear from localStorage
+      setFinishMessage(null); // Clear any existing finish message
       //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
       const videoResp = await axios.post(
         '/api/img2vid?prompt=' +
@@ -166,7 +159,9 @@ export default function ImageToVideo() {
       console.log('Result video url:', result.data.video.url);
       const videoUrl = result.data.video.url;
       setResultVideo(videoUrl);
+      setVideoLink(videoUrl);
       localStorage.setItem('resultVideo', videoUrl);
+      localStorage.setItem('videoLink', videoUrl);
       //setResultVideo(result.data.video);
       // Clear interval when video is completed
       if (interval.current) {
@@ -174,10 +169,18 @@ export default function ImageToVideo() {
         interval.current = null;
       }
       setIsVideoLoading(false);
-      const message =
-        'Video has been generated and saved to gallery. You can view it below or in the Video Gallery.';
-      setFinishMessage(message);
-      localStorage.setItem('videoFinishMessage', message);
+      setFinishMessage(
+        <div>
+          Video has been generated and saved to gallery. You can view it below
+          or in the Video Gallery. To view content or generate captions,{' '}
+          <Link href={`/view-video?videoLink=${videoUrl}`}>
+            <span className="text-[#8256FF] hover:underline cursor-pointer">
+              click here
+            </span>
+          </Link>
+          .
+        </div>
+      );
     }
     return output.data.status;
   };
