@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     // should be if (result) but disabling paywall
     // first, make an api call to GENERATE a prediction (HTTP method is POST):
     const resp = await axios.post(
-      'https://queue.fal.run/fal-ai/video-understanding',
+      'https://queue.fal.run/fal-ai/sa2va/4b/video',
       {
         video_url: videoLink,
         prompt
