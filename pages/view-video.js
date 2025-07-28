@@ -209,79 +209,131 @@ export default function ViewVideo() {
     }).format(subscription.prices.unit_amount / 100);
 
   return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            View Video and Generate Captions
-          </h1>
-          <br></br>
-          <p className="sm:text-center text-black">
-            Number of caption creation credits available: {numTokens} /{' '}
-            {numTieredTokens}
-          </p>
-          <br />
-          {subscription ? ( // goal of this is to restrict content to subscribers.
-            <div className={styles['display-image']}>
-              {isLoading && <LoadingDots />}
-              <p>
-                Download the image selected and generate caption for your social
-                media post.
-              </p>
-              <br />
-              {displayContent || (
-                <div>
-                  <p className="text-black">You do not have video selected!</p>
-                </div>
-              )}
-              <br></br>
-              <p>
-                Enter your instruction for the AI to generate a caption,
-                including any product details or relevant context.
-              </p>
-              <br></br>
-              <p>
-                e.g., Write a 300-word caption for our honey brand above. Try to
-                encourage followers to check out our store storename.com. Also
-                our IG handle is @store_name
-              </p>
-              <br></br>
-              <input
-                type="text"
-                id="prompt"
-                name="prompt"
-                onChange={handleChange}
-                value={prompt}
-                placeholder="Describe caption you want generated"
-                style={{ width: '600px' }}
-                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-              />
-              <br></br>
-              <Button
-                variant="slim"
-                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                onClick={() => generateCaption(prompt, videoLink)}
+    <div className="min-h-screen bg-[#0C0C0C]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {subscription ? (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+              <h1 className="text-4xl font-extrabold text-white">
+                View Video & Generate Captions
+              </h1>
+
+              {/* Credits Badge */}
+              <div
+                className={`inline-flex px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
+                  numTokens <= 10
+                    ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]'
+                    : 'bg-[#8256FF] text-white ring-2 ring-[#8256FF]'
+                }`}
+                role="status"
+                aria-label={`Credits remaining: ${numTokens} out of ${numTieredTokens}`}
               >
-                Generate Caption
-              </Button>
-              <br></br>
-              <textarea
-                type="text"
-                id="caption"
-                name="caption"
-                onChange={handleChangeCaption}
-                value={caption}
-                cols="80"
-                rows="15"
-                placeholder="Caption generating or you could type it yourself..."
-                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-              />
+                Credits: {numTokens} / {numTieredTokens}
+              </div>
             </div>
-          ) : (
-            <h1 className="text-black">You are not subscribed yet!</h1>
-          )}
-        </div>
+
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-[72px] mt-[40px] sm:gap-[48px]">
+              {/* Left Column - Video Preview */}
+              <div>
+                <div className="bg-[#0F0F0F] rounded-xl relative overflow-hidden">
+                  {videoLink ? (
+                    <>
+                      <button
+                        onClick={() => {
+                          setVideoLink(null);
+                          localStorage.removeItem('videoLink');
+                        }}
+                        className="absolute top-4 left-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center z-10 text-[#F87171] transition-transform duration-200 hover:scale-110"
+                        aria-label="Close preview"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                      <div className="p-4">
+                        <video
+                          src={videoLink}
+                          controls
+                          className="w-full h-auto rounded animate-fade-in"
+                          onMouseOver={(e) => e.target.play()}
+                          onMouseOut={(e) => e.target.pause()}
+                          loop
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-8 text-center">
+                      <p className="text-white mb-4">
+                        No video selected. Please go back to Gallery and select
+                        a video
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column - Action Panel */}
+              <div className="sm:mt-[24px]">
+                <div className="bg-[#181818] rounded-2xl p-6 sm:p-10 lg:p-12 space-y-6">
+                  <button
+                    onClick={() => download(videoLink)}
+                    disabled={!videoLink}
+                    className="w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97] disabled:opacity-50"
+                  >
+                    Download Video
+                  </button>
+
+                  <p className="text-sm text-[#9CA3AF] max-w-[380px]">
+                    Enter your instruction for the AI to generate a caption,
+                    including any product details or relevant context.
+                  </p>
+
+                  <input
+                    type="text"
+                    value={prompt}
+                    onChange={handleChange}
+                    placeholder="Describe the caption you want generated"
+                    className="w-full h-12 px-4 bg-[#101010] border border-[#2A2A2A] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-shadow"
+                  />
+
+                  <button
+                    onClick={() => generateCaption(prompt, videoLink)}
+                    disabled={!prompt || !videoLink}
+                    className="w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97] disabled:opacity-50"
+                  >
+                    Generate Caption
+                  </button>
+
+                  <textarea
+                    value={caption}
+                    onChange={handleChangeCaption}
+                    placeholder="Caption will appear here..."
+                    className="w-full h-60 p-5 bg-[#0F0F0F] border border-dashed border-[#2A2A2A] rounded-xl text-[#E5E7EB] text-sm leading-relaxed placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7]/20 transition-shadow resize-none"
+                  />
+
+                  {isLoading && <LoadingDots />}
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <h1 className="text-2xl text-white">
+              You need to subscribe to access this feature!
+            </h1>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }

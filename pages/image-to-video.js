@@ -242,7 +242,7 @@ export default function ImageToVideo() {
       const blob = await response.blob();
       // Get file extension from the URL or default to mp4
       const fileExt = vid_url.split('.').pop().toLowerCase() || 'mp4';
-      const uniqueFileName = `${user.id}/${uuidv4()}.${fileExt}`;
+      const uniqueFileName = `${user?.id}/${uuidv4()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('videos') // Specify the bucket name
