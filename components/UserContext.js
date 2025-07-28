@@ -22,6 +22,7 @@ export const UserContextProvider = (props) => {
   const [isBGImagesLoading, setisBGImagesLoading] = useState(false);
   const [isBlenderImgLoading, setIsBlenderImgLoading] = useState(false);
   const [contentPrompt, setcontentPrompt] = useState(null);
+  const [img2vidPrompt, setImg2vidPrompt] = useState(null);
   const [backgroundPrompt, setBackgroundPrompt] = useState(null);
   const [pixBlenderPrompt, setPixBlenderPrompt] = useState(null);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
@@ -137,6 +138,8 @@ export const UserContextProvider = (props) => {
     setIsLoading,
     contentPrompt,
     setcontentPrompt,
+    img2vidPrompt,
+    setImg2vidPrompt,
     zipFiles,
     setZipFiles,
     isUploaded,

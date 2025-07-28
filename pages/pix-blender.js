@@ -93,10 +93,13 @@ export default function GenerateImages() {
   function deleteImage(index) {
     const newImages = uploadedImages.filter((_, i) => i !== index);
     setUploadedImages(newImages);
-    // Always clear the prompt when images are modified
-    setPixBlenderPrompt('');
     // Reset the generate attempt state to allow fresh generation
     setHasAttemptedGenerate(false);
+
+    // If no images left, clean up localStorage
+    if (newImages.length === 0) {
+      localStorage.removeItem('pixBlenderUploadedImages');
+    }
   }
 
   function onDragOver(event) {
@@ -280,8 +283,6 @@ export default function GenerateImages() {
       return [];
     }
 
-    // Clear any existing prompt
-    setPixBlenderPrompt('');
     const prompts = [];
 
     for (const image of uploadedImages) {
@@ -626,8 +627,26 @@ export default function GenerateImages() {
   useEffect(() => {
     if (!isLoadingUser && !user) {
       router.replace('/signin');
+    } else if (user) {
+      // Restore uploaded images from localStorage
+      const savedImages = localStorage.getItem('pixBlenderUploadedImages');
+      if (savedImages) {
+        setUploadedImages(JSON.parse(savedImages));
+      }
     }
   }, [user, isLoadingUser]);
+
+  // Save uploaded images to localStorage whenever they change
+  useEffect(() => {
+    if (uploadedImages.length > 0) {
+      localStorage.setItem(
+        'pixBlenderUploadedImages',
+        JSON.stringify(uploadedImages)
+      );
+    } else {
+      localStorage.removeItem('pixBlenderUploadedImages');
+    }
+  }, [uploadedImages]);
 
   const handleChange = (e) => {
     setPixBlenderPrompt(e.target.value);
@@ -810,8 +829,7 @@ export default function GenerateImages() {
                           if (!result) return; // Stop if there was an error
                         }
 
-                        // Clear states after successful generation
-                        setPixBlenderPrompt('');
+                        // Clear uploaded images after successful generation
                         setUploadedImages([]);
                         setHasAttemptedGenerate(false); // Reset since we're starting fresh
                         await getImageTokenData();
