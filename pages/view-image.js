@@ -7,15 +7,9 @@ import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
 import { Form } from 'react-bootstrap';
-import Select from 'react-select';
-import styles from '../styles/Home.module.css';
-import Input from '../components/ui/Input';
+import { saveAs } from 'file-saver';
 import { supabase } from '../utils/initSupabase';
 import { v4 as uuidv4 } from 'uuid';
-
-// import trainML's config code
-import contentTypes from './api/contentTypes';
-import { saveAs } from 'file-saver';
 
 export default function ViewImage() {
   const [loading, setLoading] = useState(false);
@@ -38,6 +32,11 @@ export default function ViewImage() {
   const [captionStatus, setCaptionStatus] = useState(null);
   const [numTokens, setNumTokens] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [prefersReducedMotion] = useState(
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
 
   const interval = useRef();
 
@@ -50,186 +49,97 @@ export default function ViewImage() {
     if (storedImageLink) {
       setImageLink(storedImageLink);
     }
-  }, []); // Retrieve imageLink from localStorage on component mount
+  }, []);
 
-  const redirectToCustomerPortal = async () => {
-    setLoading(true);
-    const { url, error } = await postData({
-      url: '/api/createPortalLink',
-      token: session.access_token
-    });
-    if (error) return alert(error.message);
-    window.location.assign(url);
-    setLoading(false);
-  };
-
-  // handle onChange event of the text input (no longer dropdown)
   const handleChange = (e) => {
     setPrompt(e.target.value);
-    console.log('Prompt: ', e.target.value);
   };
 
   const handleChangeCaption = (e) => {
     setCaption(e.target.value);
-    console.log('Caption: ', e.target.value);
   };
 
-  const displayContent = imageLink && (
-    <div className={styles['display-image']} style={{ position: 'relative' }}>
-      {/* Close button */}
-      <button
-        onClick={() => {
-          setImageLink(null); // Clear the state
-          localStorage.removeItem('imageLink'); // Remove the key from localStorage
-        }}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          left: '10px',
-          backgroundColor: 'red',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          width: '30px',
-          height: '30px',
-          cursor: 'pointer',
-          fontSize: '16px',
-          lineHeight: '30px',
-          textAlign: 'center'
-        }}
-      >
-        X
-      </button>
+  const download = (url) => {
+    saveAs(url, 'image');
+  };
 
-      <img alt="uploaded" src={imageLink} />
-      <br />
-      <Button
-        variant="slim"
-        onClick={() => download(imageLink)}
-        className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-      >
-        Download Content
-      </Button>
-    </div>
-  );
+  const goGenerateVideo = (url) => {
+    setImageLink(url);
+    localStorage.setItem('imageLink', url);
+    router.push('/image-to-video');
+  };
 
   async function uploadFile(e) {
     let file = e.target.files[0];
-    console.log('file: ', file);
-    if (file == undefined) {
-      return; // don't upload an empty file!
-    }
+    if (!file) return;
 
     const filePath = `${user.id}/${uuidv4()}.png`;
-
     const { data, error } = await supabase.storage
       .from('images')
-      .upload(filePath, file); // add .png extension otherwise storage will complain
+      .upload(filePath, file);
 
     if (data) {
-      // Get the public URL of the uploaded file
       const { data: publicUrlData } = supabase.storage
         .from('images')
         .getPublicUrl(filePath);
 
       if (publicUrlData) {
-        setImageLink(publicUrlData.publicUrl); // Set the image link
+        setImageLink(publicUrlData.publicUrl);
       }
     } else {
       console.log(error);
     }
   }
 
-  const download = (url) => {
-    saveAs(url, 'image');
-  };
-
-  /*const generateCaptionsCohere = async (prompt) => {
-    if (prompt == null || prompt.trim() == '') {
-      setCaption("You haven't entered anything!");
-    } else {
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
-      const rawCaption = await axios.post(
-        '/api/socialCaptions?prompt=' + prompt
-      );
-      console.log('raw caption', rawCaption);
-      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
-      console.log(rawCaption.data.text);
-      setCaption(rawCaption.data.text.trim());
-    }
-  };*/
-
-  const goGenerateVideo = (url) => {
-    setImageLink(url);
-    localStorage.setItem('imageLink', url); // Save imageLink to localStorage
-    router.push('/image-to-video');
-  };
-
   const generateCaptionsReplicate = async (prompt, imageLink) => {
-    if (prompt == null || prompt.trim() == '' || !imageLink) {
+    if (!prompt?.trim() || !imageLink) {
       setCaption("You haven't entered anything!");
-    } else {
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
-      const rawCaption = await axios.post(
-        '/api/imageCaption?prompt=' +
-          prompt +
-          'in the style of a social media caption' +
-          '&imageLink=' +
-          imageLink +
-          `&user=${user.id}`
-      );
-      console.log('raw caption', rawCaption);
-      setCaptionObject(rawCaption);
-      setCaptionStatus(rawCaption.data.status); // should be "starting"
-      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
-      //console.log(rawCaption.data.text);
-      //setCaption(rawCaption.data.text.trim());
+      return;
     }
+
+    const rawCaption = await axios.post(
+      '/api/imageCaption?prompt=' +
+        prompt +
+        'in the style of a social media caption' +
+        '&imageLink=' +
+        imageLink +
+        `&user=${user.id}`
+    );
+
+    setCaptionObject(rawCaption);
+    setCaptionStatus(rawCaption.data.status);
   };
 
   const getCaptionResults = async (url) => {
     const output = await axios.get('/api/captionresults?url=' + url);
     if (output.data.status === 'succeeded') {
-      setCaptionStatus(output.data.status); // should be "succeeded"
+      setCaptionStatus(output.data.status);
       const result = output.data.output;
       if (result) {
-        console.log('caption result: ', result); // this prints array of words
         const joinedCaption = result.join('');
         const joinedCaptionWithoutQuotes = joinedCaption.slice(1, -1);
-        console.log(joinedCaptionWithoutQuotes);
         setCaption(joinedCaptionWithoutQuotes);
         setCaptionStatus(null);
       } else {
         alert('nothing generated');
       }
-      /*setPredictions((state) => ({
-        ...state,
-        [attempt]: { ...state[attempt], status: 'succeeded' }
-      }));*/
     }
-    //console.log('output data is: ', output);
   };
 
   useEffect(() => {
     if (captionStatus) {
       interval.current = setInterval(() => {
-        console.log(captionStatus);
         getCaptionResults(captionObject.data.urls.get);
       }, 3000);
     }
-    // at every 2 seconds, an 'interval' is created via calling setInterval().
-    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
-    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
     return () => clearInterval(interval.current);
-    // why is the useEffect running continuously, even though it's finished?
   }, [captionStatus]);
 
   async function getCaptionTokenData() {
-    console.log('user is: ', user.id);
+    if (!user?.id) return;
     const captionTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}` + `&tokenType=caption_tokens`
+      `/api/tokenInfo?user=${user.id}&tokenType=caption_tokens`
     );
-    console.log('captionTokenData: ', captionTokenData.data);
     setNumTokens(captionTokenData.data);
   }
 
@@ -240,11 +150,10 @@ export default function ViewImage() {
   }, [user]);
 
   async function getTieredTokenData() {
-    console.log('user is: ', user.id);
+    if (!user?.id) return;
     const captionTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=caption_tokens`
+      `/api/tieredToken?user=${user.id}&tokenType=caption_tokens`
     );
-    console.log('captionTieredData: ', captionTieredData.data);
     setNumTieredTokens(captionTieredData.data);
   }
 
@@ -254,108 +163,171 @@ export default function ViewImage() {
     }
   }, [user]);
 
-  const subscriptionName = subscription && subscription.prices.products.name;
-  const subscriptionPrice =
-    subscription &&
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: subscription.prices.currency,
-      minimumFractionDigits: 0
-    }).format(subscription.prices.unit_amount / 100);
-
   return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            View Content and Generate Captions
-          </h1>
-          <br></br>
-          <p className="sm:text-center text-black">
-            Number of caption creation credits available: {numTokens} /{' '}
-            {numTieredTokens}
-          </p>
-          <br />
-          {subscription ? ( // goal of this is to restrict content to subscribers.
-            <div className={styles['display-image']}>
-              {isLoading && <LoadingDots />}
-              <p>
-                Download the image selected and generate caption for your social
-                media post.
-              </p>
-              <br />
-              <Button
-                variant="slim"
-                onClick={() => goGenerateVideo(imageLink)}
-                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+    <div className="min-h-screen bg-[#0C0C0C]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {subscription ? (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+              <h1 className="text-4xl font-extrabold text-white">
+                View Content & Generate Captions
+              </h1>
+
+              {/* Credits Badge */}
+              <div
+                className={`inline-flex px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 motion-reduce:transition-none ${
+                  !prefersReducedMotion &&
+                  'hover:shadow-[0_4px_12px_rgba(168,85,247,0.35)] hover:scale-105'
+                } ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#8256FF] text-white ring-2 ring-[#8256FF]'}`}
+                role="status"
+                aria-label={`Credits remaining: ${numTokens} out of ${numTieredTokens}`}
               >
-                Go Generate Video
-              </Button>
-              <br />
-              {displayContent || (
-                <div>
-                  <p className="text-black">
-                    You do not have image! Go back to Dashboard and select an
-                    image first, or, upload an image of your own
-                  </p>
-                  <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-                    <Form.Control
+                Credits: {numTokens} / {numTieredTokens}
+              </div>
+            </div>
+
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-[72px] mt-[40px] sm:gap-[48px]">
+              {/* Left Column - Image Preview */}
+              <div>
+                <div className="bg-[#0F0F0F] rounded-xl relative overflow-hidden">
+                  {imageLink ? (
+                    <>
+                      <button
+                        onClick={() => {
+                          setImageLink(null);
+                          localStorage.removeItem('imageLink');
+                        }}
+                        className={`absolute top-4 left-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center z-10 text-[#F87171] transition-transform duration-200 ${
+                          !prefersReducedMotion && 'hover:scale-110'
+                        }`}
+                        aria-label="Close preview"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                      <div className="p-4">
+                        <img
+                          src={imageLink}
+                          alt="Preview"
+                          className="w-full h-auto rounded animate-fade-in"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-8 text-center">
+                      <p className="text-white mb-4">
+                        No image selected. Please go back to Gallery and select
+                        AI image
+                      </p>
+                      {/*<Form.Control
                       type="file"
                       accept="image/png, image/jpeg"
-                      //accept="*"
-                      onChange={(e) => uploadFile(e)}
-                    />
-                  </Form.Group>
+                      onChange={uploadFile}
+                      className="max-w-sm mx-auto"
+                    />*/}
+                    </div>
+                  )}
                 </div>
-              )}
-              <br></br>
-              <p>
-                Enter your instruction for the AI to generate a caption,
-                including any product details or relevant context.
-              </p>
-              <br></br>
-              <p>
-                e.g., Write a 300-word caption for our honey brand above. Try to
-                encourage followers to check out our store storename.com. Also
-                our IG handle is @store_name
-              </p>
-              <br></br>
-              <input
-                type="text"
-                id="prompt"
-                name="prompt"
-                onChange={handleChange}
-                value={prompt}
-                placeholder="Describe caption you want generated"
-                style={{ width: '600px' }}
-                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-              />
-              <br></br>
-              <Button
-                variant="slim"
-                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                onClick={() => generateCaptionsReplicate(prompt, imageLink)}
-              >
-                Generate Caption
-              </Button>
-              <br></br>
-              <textarea
-                type="text"
-                id="caption"
-                name="caption"
-                onChange={handleChangeCaption}
-                value={caption}
-                cols="80"
-                rows="15"
-                placeholder="Caption generating or you could type it yourself..."
-                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-              />
+              </div>
+
+              {/* Right Column - Action Panel */}
+              <div className="sm:mt-[24px]">
+                <div className="bg-[#181818] rounded-2xl p-6 sm:p-10 lg:p-12 space-y-6">
+                  <button
+                    onClick={() => download(imageLink)}
+                    disabled={!imageLink}
+                    className={`w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 ${
+                      !prefersReducedMotion &&
+                      'hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97]'
+                    } disabled:opacity-50`}
+                  >
+                    Download Content
+                  </button>
+
+                  <button
+                    onClick={() => goGenerateVideo(imageLink)}
+                    disabled={!imageLink}
+                    className={`w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 ${
+                      !prefersReducedMotion &&
+                      'hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97]'
+                    } disabled:opacity-50`}
+                  >
+                    Generate Video
+                  </button>
+
+                  <p className="text-sm text-[#9CA3AF] max-w-[380px]">
+                    Enter your instruction for the AI to generate a caption,
+                    including any product details or relevant context.
+                  </p>
+
+                  <input
+                    type="text"
+                    value={prompt}
+                    onChange={handleChange}
+                    placeholder="Describe the caption you want generated"
+                    className="w-full h-12 px-4 bg-[#101010] border border-[#2A2A2A] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-shadow"
+                  />
+
+                  <button
+                    onClick={() => generateCaptionsReplicate(prompt, imageLink)}
+                    disabled={!prompt || !imageLink}
+                    className={`w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 ${
+                      !prefersReducedMotion &&
+                      'hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97]'
+                    } disabled:opacity-50`}
+                  >
+                    Generate Caption
+                  </button>
+
+                  <textarea
+                    value={caption}
+                    onChange={handleChangeCaption}
+                    placeholder="Caption will appear here..."
+                    className="w-full h-60 p-5 bg-[#0F0F0F] border border-dashed border-[#2A2A2A] rounded-xl text-[#E5E7EB] text-sm leading-relaxed placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7]/20 transition-shadow resize-none"
+                  />
+
+                  {isLoading && <LoadingDots />}
+                </div>
+              </div>
             </div>
-          ) : (
-            <h1 className="text-black">You are not subscribed yet!</h1>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <h1 className="text-2xl text-white">
+              You need to subscribe to access this feature!
+            </h1>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
+
+// Add required keyframe animations to globals.css
+const fadeInAnimation = `
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 400ms ease-out forwards;
+}
+`;
