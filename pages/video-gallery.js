@@ -1,14 +1,9 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
-import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
-import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
-import { Card } from 'react-bootstrap';
-import styles from '../styles/Home.module.css';
 import { supabase } from '../utils/initSupabase';
-import Select from 'react-select';
 
 const ATTEMPTS = 2;
 // the current code for this page is a workaround to account for switching model APIs to call
@@ -199,66 +194,111 @@ export default function VideoGallery() {
       .eq('video_url', video_url);
   }
 
-  const renderCard = (resultVideo, index) => {
-    return (
-      <div className="relative" key={index}>
-        <Card
-          style={{ width: '10rem' }}
-          className={`hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md ${styles.box}`}
-          onClick={() => viewGeneratedContent(resultVideo)}
-        >
-          <video width="100%" src={resultVideo} controls={false} />
-        </Card>
-        <button
-          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-700"
-          onClick={(e) => {
-            e.stopPropagation();
-            deleteVideo(resultVideo);
-          }}
-        >
-          X
-        </button>
-      </div>
-    );
-  };
-
-  function subscribedAndModelChosen() {
-    if (subscription) {
-      return (
-        <div className="sm:flex sm:flex-col sm:align-center sm:items-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Video Gallery
-          </h1>
-          <br />
-          <Button
-            className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-            variant="slim"
-            onClick={() => fetchAndStoreVideos(true)}
-          >
-            Sync AI Videos
-          </Button>
-          <br />
-          <p className="text-black sm:text-center">
-            All your generated videos are saved here. To delete a video, click
-            'X' at the top right corner.
-          </p>
-          <p className="text-black sm:text-center">{message}</p>
-          <br></br>
-          <div className="flex flex-wrap justify-center">
-            {generatedVideos.map(renderCard)}
-          </div>
-        </div>
-      );
-    } else {
-      return <h1 className="text-black">You are not a paid member yet!!</h1>;
-    }
-  }
-
   return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
-        {subscribedAndModelChosen()}
+    <section className="bg-[#0F0F0F] min-h-screen py-16">
+      <div className="max-w-[1280px] mx-auto px-4">
+        {subscription ? (
+          <>
+            <div className="mb-8 flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-white">
+                Video Gallery
+              </h1>
+              <Button
+                className="bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                variant="slim"
+                onClick={() => fetchAndStoreVideos(true)}
+              >
+                Sync AI Videos
+              </Button>
+            </div>
+
+            {message && (
+              <p className="mb-6 text-[#E0E0E0] text-center">{message}</p>
+            )}
+
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 justify-items-center">
+              {generatedVideos.map((videoUrl, index) => (
+                <div
+                  key={index}
+                  className="gallery-tile relative w-full aspect-square overflow-hidden rounded-[14px] transition-transform duration-220 ease-out hover:translate-y-[-4px] hover:scale-[1.03] hover:drop-shadow-lg"
+                >
+                  <div
+                    className="relative w-full h-full cursor-pointer"
+                    onClick={() => viewGeneratedContent(videoUrl)}
+                    style={{ position: 'relative' }}
+                  >
+                    <video
+                      src={videoUrl}
+                      className="w-full h-full object-cover brightness-[0.92]"
+                      controls={false}
+                    />
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteVideo(videoUrl);
+                      }}
+                      className="absolute top-[10px] right-[10px] w-8 h-8 rounded-full bg-[rgba(255,69,58,0.18)] flex items-center justify-center border-0 cursor-pointer backdrop-blur-[6px] opacity-65 transition-all duration-180 ease-out hover:opacity-100 hover:scale-[1.12] hover:shadow-[0_0_0_2px_rgba(255,69,58,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF453A]"
+                      aria-label="Delete video"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="stroke-[#FF453A] stroke-2"
+                      >
+                        <line
+                          x1="1"
+                          y1="1"
+                          x2="13"
+                          y2="13"
+                          strokeLinecap="round"
+                        />
+                        <line
+                          x1="13"
+                          y1="1"
+                          x2="1"
+                          y2="13"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-semibold text-white mb-4">
+              Premium Feature
+            </h1>
+            <p className="text-[#E0E0E0]">
+              You need an active subscription to access the gallery.
+            </p>
+          </div>
+        )}
       </div>
+
+      <style jsx global>{`
+        @keyframes shake {
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-4px);
+          }
+          50% {
+            transform: translateX(4px);
+          }
+          75% {
+            transform: translateX(-4px);
+          }
+        }
+      `}</style>
     </section>
   );
 }
