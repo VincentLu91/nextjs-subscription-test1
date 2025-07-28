@@ -39,7 +39,7 @@ export default function MyApp({
   return (
     <>
       <PostHogProvider client={posthog}>
-        <div className="bg-black">
+        <div className="bg-[#0C0C0C]">
           <UserContextProvider>
             <Layout>
               <Component {...pageProps} />

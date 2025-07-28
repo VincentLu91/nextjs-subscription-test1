@@ -322,11 +322,11 @@ export default function ImageToVideo() {
     <section className="bg-[#0C0C0C] mb-32">
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             Image to Video
           </h1>
           <br></br>
-          <p className="sm:text-center text-black">
+          <p className="sm:text-center text-white">
             Number of video credits available: {numTokens} / {numTieredTokens}
           </p>
           <br />
@@ -337,14 +337,14 @@ export default function ImageToVideo() {
               <br />
               {displayContent || (
                 <div>
-                  <p className="text-black">
+                  <p className="text-white">
                     You do not have image! Go back to Dashboard and select an
                     image first
                   </p>
                 </div>
               )}
               <br></br>
-              <p>
+              <p className="text-white">
                 Enter your instruction for the AI to generate a video scene.
               </p>
               <br></br>
@@ -374,7 +374,7 @@ export default function ImageToVideo() {
               {resultVideo && renderCard(resultVideo, 0)}
             </div>
           ) : (
-            <h1 className="text-black">You are not subscribed yet!</h1>
+            <h1 className="text-white">You are not subscribed yet!</h1>
           )}
         </div>
       </div>
