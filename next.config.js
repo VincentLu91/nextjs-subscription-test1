@@ -1,18 +1,22 @@
-module.exports = {
-  i18n: {
-    locales: ['en-US'],
-    defaultLocale: 'en-US'
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
   images: {
-    remotePatterns: [
+    domains: ['eolmngjyubxaxlvtwbzs.supabase.co']
+  },
+  async headers() {
+    return [
       {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io'
-      },
-      {
-        protocol: 'https',
-        hostname: 'replicate.delivery'
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin'
+          }
+        ]
       }
-    ]
+    ];
   }
 };
+
+module.exports = nextConfig;

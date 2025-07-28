@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
@@ -258,18 +259,26 @@ export default function ImageGallery() {
 
   const renderCard = (imageUrl, index) => {
     return (
-      <div className="relative">
-        <Card
-          style={{ width: '10rem' }}
-          key={index}
-          className={`hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md ${styles.box}`}
+      <div className="relative" key={index}>
+        <div
+          className={`relative w-40 h-40 hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md overflow-hidden ${styles.box}`}
           onClick={() => viewGeneratedContent(imageUrl)}
         >
-          <Card.Img variant="top" src={imageUrl} />
-        </Card>
+          <Image
+            src={imageUrl}
+            alt={`Generated Image ${index + 1}`}
+            fill
+            sizes="160px"
+            className="object-cover"
+            priority={index < 4}
+          />
+        </div>
         <button
-          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-700"
-          onClick={() => deletePhoto(imageUrl)}
+          className="absolute top-2 right-6 bg-red-500 text-white rounded-full p-2 hover:bg-red-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            deletePhoto(imageUrl);
+          }}
         >
           X
         </button>
@@ -291,7 +300,7 @@ export default function ImageGallery() {
       return (
         <div className="sm:flex sm:flex-col sm:align-center sm:items-center">
           <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Gallery
+            Image Gallery
           </h1>
           <br />
           <Button
@@ -343,18 +352,19 @@ export default function ImageGallery() {
                 <div
                   key={index}
                   className="gallery-tile relative w-full aspect-square overflow-hidden rounded-[14px] transition-transform duration-220 ease-out hover:translate-y-[-4px] hover:scale-[1.03] hover:drop-shadow-lg"
-                  style={{
-                    animation: `fadeIn 400ms ease-out forwards ${index * 60}ms`
-                  }}
                 >
                   <div
                     className="relative w-full h-full cursor-pointer"
                     onClick={() => viewGeneratedContent(imageUrl)}
+                    style={{ position: 'relative' }}
                   >
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={`Generated Image ${index + 1}`}
-                      className="object-cover w-full h-full brightness-[0.92]"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover brightness-[0.92]"
+                      priority={index < 4} // Prioritize loading first 4 images
                     />
 
                     <button
@@ -407,17 +417,6 @@ export default function ImageGallery() {
       </div>
 
       <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         @keyframes shake {
           0%,
           100% {
