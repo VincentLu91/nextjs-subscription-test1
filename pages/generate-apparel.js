@@ -5,15 +5,14 @@ import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
-import { Card, Form, Container, Row, Col } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import styles from '../styles/Home.module.css';
 import { supabase } from '../utils/initSupabase';
-import Select from 'react-select';
 import { v4 as uuidv4 } from 'uuid';
-
 const ATTEMPTS = 1;
 
 export default function GenerateApparel() {
+  // Keep all existing state and hooks
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
@@ -26,8 +25,13 @@ export default function GenerateApparel() {
   const [modelImageUrl, setModelImageUrl] = useState('');
   const [garmentImageUrl, setGarmentImageUrl] = useState('');
   const [selectedOption, setSelectedOption] = useState('tops');
+  const [mounted, setMounted] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const {
     userLoaded,
     isLoadingUser,
@@ -55,6 +59,7 @@ export default function GenerateApparel() {
 
   const intervalImage = useRef();
 
+  // Keep all existing functions
   const getImage = async (attempt) => {
     if (!modelImagePath || !garmentImagePath) {
       console.error('Both model and garment images must be uploaded');
@@ -63,7 +68,6 @@ export default function GenerateApparel() {
       return;
     }
     setResultImages([]);
-    // Get fresh public URLs for both images
     const { data: modelUrlData } = supabase.storage
       .from('images')
       .getPublicUrl(modelImagePath);
@@ -91,7 +95,6 @@ export default function GenerateApparel() {
       ...state,
       [attempt]: resp.data
     }));
-    console.log('Resp data is: ', resp.data);
     setIsGeneratingTryOn(true);
     return resp.data;
   };
@@ -100,7 +103,6 @@ export default function GenerateApparel() {
     try {
       const response = await fetch(img_url);
       const blob = await response.blob();
-      // Get file extension from the URL or default to png
       const fileExt = img_url.split('.').pop().toLowerCase() || 'png';
       const uniqueFileName = `${user.id}/${uuidv4()}.${fileExt}`;
 
@@ -133,15 +135,11 @@ export default function GenerateApparel() {
         const result = await axios.get(
           '/api/imageresults?url=' + output.data.response_url
         );
-        console.log('Result images:', result.data.images);
         setResultImages(result.data.images);
-
-        // Mark prediction as completed
         setTryOnPredictions((state) => ({
           ...state,
           [attempt]: { ...state[attempt], status: 'COMPLETED' }
         }));
-
         return result.data.images;
       }
     } catch (error) {
@@ -152,8 +150,6 @@ export default function GenerateApparel() {
 
   const addImages = async (images) => {
     for (const imageObj of images) {
-      console.log('Processing image:', imageObj.url);
-
       const uniqueFileName = await copyImageToSupabase(imageObj.url);
       if (uniqueFileName) {
         const { data, error: urlError } = supabase.storage
@@ -165,7 +161,6 @@ export default function GenerateApparel() {
           continue;
         }
 
-        // Save to database and local state
         await supabase.from('photos').insert({
           customer_id: user.identities[0].id,
           photo_url: data.publicUrl
@@ -185,10 +180,10 @@ export default function GenerateApparel() {
     }
   };
 
+  // Keep all existing useEffects
   useEffect(() => {
     const list = Object.values(tryOnPredictions);
     if (list.length > 0 && list.every((item) => item.status === 'COMPLETED')) {
-      console.log('try-on results: ', tryOnPredictions);
       clearInterval(intervalImage.current);
       setIsGeneratingTryOn(false);
       setFinishMessage(
@@ -222,23 +217,10 @@ export default function GenerateApparel() {
     if (!isLoadingUser && !user) router.replace('/signin');
   }, [user]);
 
-  const redirectToCustomerPortal = async () => {
-    setLoading(true);
-    const { url, error } = await postData({
-      url: '/api/createPortalLink',
-      token: session.access_token
-    });
-    if (error) return alert(error.message);
-    window.location.assign(url);
-    setLoading(false);
-  };
-
   async function getImageTokenData() {
-    console.log('user is: ', user.id);
     const imageTokenData = await axios.get(
       `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
     );
-    console.log('imageTokenData: ', imageTokenData.data);
     setNumTokens(imageTokenData.data);
   }
 
@@ -249,11 +231,9 @@ export default function GenerateApparel() {
   }, [user]);
 
   async function getTieredImageData() {
-    console.log('user is: ', user.id);
     const imageTieredData = await axios.get(
       `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
     );
-    console.log('imageTieredData: ', imageTieredData.data);
     setNumTieredTokens(imageTieredData.data);
   }
 
@@ -263,159 +243,8 @@ export default function GenerateApparel() {
     }
   }, [user]);
 
-  const loadingMessage = isGeneratingTryOn && (
-    <div className={styles['black-text']}>
-      <p>
-        Generating...
-        <LoadingDots />
-      </p>
-      <p>Please do not refresh or you will lose all progress!</p>
-    </div>
-  );
-
-  const viewGeneratedContent = (url) => {
-    setImageLink(url);
-    localStorage.setItem('imageLink', url);
-    router.push('/view-image');
-  };
-
-  const renderCard = (image, index) => {
-    return (
-      <Card
-        style={{ width: '10rem' }}
-        key={index}
-        className={`hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md ${styles.box}`}
-        onClick={() => viewGeneratedContent(image.url)}
-      >
-        <Card.Img variant="top" src={image.url} />
-      </Card>
-    );
-  };
-
-  function subscribedAndModelChosen() {
-    if (subscription) {
-      return (
-        <div className={styles['get-image-button']}>
-          <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-            <Form.Label>Upload Model Image (Person)</Form.Label>
-            <div>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  onChange={(e) => uploadFile(e, 'model')}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
-                  Choose File
-                </div>
-              </div>
-              {modelImagePath && (
-                <div className="mt-2 text-sm text-gray-600">
-                  Selected: {modelImagePath.split('/').pop()}
-                </div>
-              )}
-            </div>
-          </Form.Group>
-          <Form.Group className="mb-3" style={{ maxWidth: '500px' }}>
-            <Form.Label>Upload Clothing Piece (shirts, pants)</Form.Label>
-            <div>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  onChange={(e) => uploadFile(e, 'garment')}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <div className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
-                  Choose File
-                </div>
-              </div>
-              {garmentImagePath && (
-                <div className="mt-2 text-sm text-gray-600">
-                  Selected: {garmentImagePath.split('/').pop()}
-                </div>
-              )}
-            </div>
-          </Form.Group>
-          <br />
-          {displayContent}
-          {!isGeneratingTryOn && (
-            <div className="flex flex-col items-center p-2">
-              <p>Category:</p>
-              <select value={selectedOption} onChange={handleOptionChange}>
-                <option value="tops">Top</option>
-                <option value="bottoms">Bottom</option>
-                <option value="one-pieces">Full-Body</option>
-              </select>
-              {/*<p>Selected: {selectedOption}</p>*/}
-              <Button
-                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                variant="slim"
-                onClick={async () => {
-                  if (!modelImagePath || !garmentImagePath) {
-                    alert('Please upload both model and garment images!');
-                  } else {
-                    clearInterval(intervalImage.current);
-                    setTryOnPredictions({});
-                    setTryOnImageList([]);
-                    setIsGeneratingTryOn(true);
-                    setFinishMessage('');
-                    for (let i = 0; i < ATTEMPTS; i++) {
-                      getImage(i);
-                    }
-                    await getImageTokenData();
-                  }
-                }}
-              >
-                Generate Image
-              </Button>
-            </div>
-          )}
-          <br></br>
-          {loadingMessage}
-          {finishMessage}
-          <div className={styles['grid']}>{tryOnImageList.map(renderCard)}</div>
-        </div>
-      );
-    } else {
-      return <h1 className="text-black">You are not subscribed yet!</h1>;
-    }
-  }
-
-  async function getFiles() {
-    console.log('isImageUploaded: ', isImageUploaded);
-    // Get public URLs for both files
-    const { data: modelData, error: modelError } = await supabase.storage
-      .from('images')
-      .getPublicUrl(modelImagePath);
-
-    const { data: garmentData, error: garmentError } = await supabase.storage
-      .from('images')
-      .getPublicUrl(garmentImagePath);
-
-    if (modelData != null) {
-      setImageFile(modelData);
-      setImageFileName(modelData.publicUrl);
-      console.log('model image: ', modelData.publicUrl);
-    }
-
-    if (modelError || garmentError) {
-      alert('Error loading images');
-      console.log('Model error:', modelError);
-      console.log('Garment error:', garmentError);
-    }
-  }
-
-  useEffect(() => {
-    if (user && isImageUploaded) {
-      getFiles();
-    }
-  }, [user, isImageUploaded]);
-
   async function uploadFile(e, type) {
     let file = e.target.files[0];
-    console.log('file: ', file);
     if (file == undefined) {
       return;
     }
@@ -450,45 +279,320 @@ export default function GenerateApparel() {
     }
   }
 
-  const displayContent = (
-    <div className={styles['display-image']} style={{ position: 'relative' }}>
-      {modelImageUrl && (
-        <>
-          <h3 className="text-black mb-2">Model Image:</h3>
-          <img alt="model" src={modelImageUrl} className="mb-4" />
-        </>
-      )}
-      {garmentImageUrl && (
-        <>
-          <h3 className="text-black mb-2">Garment Image:</h3>
-          <img alt="garment" src={garmentImageUrl} className="mb-4" />
-        </>
-      )}
-    </div>
-  );
+  async function getFiles() {
+    const { data: modelData, error: modelError } = await supabase.storage
+      .from('images')
+      .getPublicUrl(modelImagePath);
+
+    const { data: garmentData, error: garmentError } = await supabase.storage
+      .from('images')
+      .getPublicUrl(garmentImagePath);
+
+    if (modelData != null) {
+      setImageFile(modelData);
+      setImageFileName(modelData.publicUrl);
+    }
+
+    if (modelError || garmentError) {
+      alert('Error loading images');
+      console.log('Model error:', modelError);
+      console.log('Garment error:', garmentError);
+    }
+  }
+
+  useEffect(() => {
+    if (user && isImageUploaded) {
+      getFiles();
+    }
+  }, [user, isImageUploaded]);
+
+  const viewGeneratedContent = (url) => {
+    setImageLink(url);
+    localStorage.setItem('imageLink', url);
+    router.push('/view-image');
+  };
+
+  const renderCard = (image, index) => {
+    return (
+      <Card
+        style={{ width: '10rem' }}
+        key={index}
+        className="hover:cursor-pointer m-4 hover:scale-105 shadow-lg rounded-md"
+        onClick={() => viewGeneratedContent(image.url)}
+      >
+        <Card.Img variant="top" src={image.url} />
+      </Card>
+    );
+  };
+
+  if (!subscription) {
+    return (
+      <div className="min-h-screen bg-[#0C0C0C] py-12">
+        <h1 className="text-white text-center text-2xl">
+          You are not subscribed yet!
+        </h1>
+      </div>
+    );
+  }
 
   return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+    <div className="min-h-screen bg-[#0C0C0C] py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+          <h1 className="text-4xl font-extrabold text-white">
             Clothes Swapping
           </h1>
-          {console.log('isGeneratingTryOn: ', isGeneratingTryOn)}
-          <br></br>
-          <p className="text-black sm:text-center">
-            Number of image rendering credits available: {numTokens} /{' '}
-            {numTieredTokens}
-          </p>
-          <br></br>
-          <p className="text-black sm:text-center">
-            Upload a photo of a person and a clothing item to try on. The AI
-            will generate the result.
-          </p>
-          <br />
-          {subscribedAndModelChosen()}
+
+          {/* Credits Badge */}
+          <div
+            className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
+              ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#8256FF] text-white ring-2 ring-[#8256FF]'}`}
+            aria-live="polite"
+          >
+            Credits: {numTokens} / {numTieredTokens}
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column - Preview Frame */}
+          <div
+            className={`w-full transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${mounted ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <div className="w-[560px] h-[560px] mx-auto bg-[#16161A] rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col items-center justify-center relative">
+              {modelImageUrl ? (
+                <img
+                  src={modelImageUrl}
+                  alt="Preview"
+                  className="w-full h-full object-contain rounded-2xl"
+                  style={{ transition: 'opacity 400ms' }}
+                />
+              ) : (
+                <svg
+                  className="w-[120px] h-[120px] stroke-[rgba(255,255,255,0.12)]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="8" r="4" strokeWidth="2" />
+                  <path
+                    d="M4 20C4 17.2386 7.58172 15 12 15C16.4183 15 20 17.2386 20 20"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column - Form Card */}
+          <div
+            className={`transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+          >
+            <div className="bg-[#16161A] rounded-[20px] p-8 shadow-[0_8px_24px_rgba(0,0,0,0.55)]">
+              <div className="grid gap-6">
+                {/* Model Upload Dropzone */}
+                <div>
+                  <label className="block text-[14px] text-[rgba(255,255,255,0.6)] mb-2">
+                    Upload Model Image (Person)
+                  </label>
+                  <div
+                    className="h-[140px] border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-xl relative group transition-all duration-300 ease-in-out hover:border-solid hover:border-[#8B5CF6] hover:bg-[rgba(139,92,246,0.08)]"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.add(
+                        'border-[#8B5CF6]',
+                        'bg-[rgba(139,92,246,0.08)]'
+                      );
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.remove(
+                        'border-[#8B5CF6]',
+                        'bg-[rgba(139,92,246,0.08)]'
+                      );
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.remove(
+                        'border-[#8B5CF6]',
+                        'bg-[rgba(139,92,246,0.08)]'
+                      );
+                      const file = e.dataTransfer.files[0];
+                      if (file) {
+                        const event = { target: { files: [file] } };
+                        uploadFile(event, 'model');
+                      }
+                    }}
+                    onClick={() =>
+                      document.getElementById('modelFileInput').click()
+                    }
+                  >
+                    <input
+                      id="modelFileInput"
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      onChange={(e) => uploadFile(e, 'model')}
+                      className="hidden"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <svg
+                        className="w-12 h-12 text-[rgba(255,255,255,0.6)]"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"
+                        />
+                      </svg>
+                      <span className="mt-2 text-[14px] text-[rgba(255,255,255,0.6)]">
+                        Drop your file here or click to upload
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Garment Upload Dropzone */}
+                <div>
+                  <label className="block text-[14px] text-[rgba(255,255,255,0.6)] mb-2">
+                    Upload Clothing Piece
+                  </label>
+                  <div
+                    className="h-[140px] border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-xl relative group transition-all duration-300 ease-in-out hover:border-solid hover:border-[#8B5CF6] hover:bg-[rgba(139,92,246,0.08)]"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.add(
+                        'border-[#8B5CF6]',
+                        'bg-[rgba(139,92,246,0.08)]'
+                      );
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.remove(
+                        'border-[#8B5CF6]',
+                        'bg-[rgba(139,92,246,0.08)]'
+                      );
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.classList.remove(
+                        'border-[#8B5CF6]',
+                        'bg-[rgba(139,92,246,0.08)]'
+                      );
+                      const file = e.dataTransfer.files[0];
+                      if (file) {
+                        const event = { target: { files: [file] } };
+                        uploadFile(event, 'garment');
+                      }
+                    }}
+                    onClick={() =>
+                      document.getElementById('garmentFileInput').click()
+                    }
+                  >
+                    <input
+                      id="garmentFileInput"
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      onChange={(e) => uploadFile(e, 'garment')}
+                      className="hidden"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <svg
+                        className="w-12 h-12 text-[rgba(255,255,255,0.6)]"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"
+                        />
+                      </svg>
+                      <span className="mt-2 text-[14px] text-[rgba(255,255,255,0.6)]">
+                        Drop your file here or click to upload
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category Select */}
+                <div>
+                  <label className="block text-[14px] text-[rgba(255,255,255,0.6)] mb-2">
+                    Category
+                  </label>
+                  <select
+                    value={selectedOption}
+                    onChange={handleOptionChange}
+                    className="w-full h-12 bg-[#0E0E11] border border-[rgba(255,255,255,0.08)] rounded-[10px] px-4 text-white focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] transition-all duration-120"
+                  >
+                    <option value="tops">Top</option>
+                    <option value="bottoms">Bottom</option>
+                    <option value="one-pieces">Full-Body</option>
+                  </select>
+                </div>
+
+                {/* Generate Button */}
+                {!isGeneratingTryOn && (
+                  <button
+                    onClick={async () => {
+                      if (!modelImagePath || !garmentImagePath) {
+                        alert('Please upload both model and garment images!');
+                      } else {
+                        clearInterval(intervalImage.current);
+                        setTryOnPredictions({});
+                        setTryOnImageList([]);
+                        setIsGeneratingTryOn(true);
+                        setFinishMessage('');
+                        for (let i = 0; i < ATTEMPTS; i++) {
+                          getImage(i);
+                        }
+                        await getImageTokenData();
+                      }
+                    }}
+                    className="w-full h-14 rounded-[14px] bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white font-semibold transform hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(139,92,246,0.45)] active:scale-[0.98] transition-all duration-90 ease-out"
+                  >
+                    Generate Image
+                  </button>
+                )}
+
+                {/* Loading & Status Messages */}
+                {isGeneratingTryOn && (
+                  <div className="text-center">
+                    <p className="text-white flex items-center justify-center">
+                      Generating...
+                      <LoadingDots />
+                    </p>
+                    <p className="text-[rgba(255,255,255,0.6)] mt-2">
+                      Please do not refresh or you will lose all progress!
+                    </p>
+                  </div>
+                )}
+
+                {finishMessage && (
+                  <p className="text-[rgba(255,255,255,0.8)] text-center">
+                    {finishMessage}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Grid */}
+        {tryOnImageList.length > 0 && (
+          <>
+            <h2 className="text-2xl text-white font-bold mt-10 mb-6">
+              Your Generated Images
+            </h2>
+            <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {tryOnImageList.map(renderCard)}
+            </div>
+          </>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
