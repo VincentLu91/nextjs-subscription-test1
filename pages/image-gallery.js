@@ -11,12 +11,6 @@ import { supabase } from '../utils/initSupabase';
 import Select from 'react-select';
 
 const ATTEMPTS = 2;
-// the current code for this page is a workaround to account for switching model APIs to call
-// currently, there is no retraining of existing models. When the feature is available, revert back to the following:
-// https://github.com/VincentLu91/nextjs-subscription-test1/blob/31372c6dd2188fa96bb997c044088123f1d2b3e6/pages/dashboard.js
-// be mindful though, that if you go to other pages and coming back, the loading dots may disappear with
-// no images re-rendered. This is because the 'predictions' and 'setPredictions' were not included in
-// components/UserContext.js
 export default function ImageGallery() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
@@ -52,7 +46,6 @@ export default function ImageGallery() {
   } = useUser();
 
   const interval = useRef();
-  // Access the query parameters to get the custom message
   const message = router.query.message;
 
   const imageStyles = [
@@ -106,10 +99,7 @@ export default function ImageGallery() {
       });
 
       if (result) {
-        setImageList((current) => [
-          ...current,
-          { url: result, text: '' } // placeholder text is empty for optional caption generation
-        ]);
+        setImageList((current) => [...current, { url: result, text: '' }]);
       } else {
         alert('nothing generated');
       }
@@ -132,7 +122,6 @@ export default function ImageGallery() {
   }, [predictions]);
 
   useEffect(() => {
-    // [ [0, {get: 'sss.com' , cancel: 'ssswe.com', status: 'training'}],  ]
     const predictionAry = Object.entries(predictions).filter(
       ([attempt, item]) => item.status !== 'COMPLETED'
     );
@@ -144,9 +133,6 @@ export default function ImageGallery() {
         });
       }, 3000);
     }
-    // at every 2 seconds, an 'interval' is created via calling setInterval().
-    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
-    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
     return () => clearInterval(interval.current);
   }, [predictions]);
 
@@ -167,7 +153,7 @@ export default function ImageGallery() {
 
   const getInstancePrompts = async () => {
     if (!user?.identities[0]?.id) {
-      return; // i.e., if user hasn't trained anything yet.
+      return;
     }
     let instanceArr = [
       {
@@ -182,7 +168,6 @@ export default function ImageGallery() {
       .eq('user_auth_id', user.identities[0].id);
     instancePromptsInfo.data.map((i) => {
       console.log(i.instance_prompt);
-      //i.instance_prompt;
       if (i.model_version != null) {
         instanceArr.push({ label: i.instance_prompt, value: i.model_version });
       }
@@ -197,7 +182,7 @@ export default function ImageGallery() {
 
   const getPhotos = async () => {
     if (!user?.identities[0]?.id) {
-      return []; // i.e., if user hasn't trained anything yet.
+      return [];
     }
     const photosInfo = await supabase
       .from('photos')
@@ -206,7 +191,6 @@ export default function ImageGallery() {
     const listOfPhotos = photosInfo.data.map((item) => item.photo_url);
     console.log('listOfPhotos: ', listOfPhotos);
     return listOfPhotos;
-    //setGeneratedPhotos(listOfPhotos);
   };
 
   const fetchAndStorePhotos = async (isForceSync = false) => {
@@ -227,27 +211,22 @@ export default function ImageGallery() {
   };
 
   useEffect(() => {
-    // Fetch and store photos when the component mounts
     fetchAndStorePhotos(true);
   }, []);
 
-  // Clear localStorage on route change
   useEffect(() => {
     const handleRouteChange = () => {
-      localStorage.removeItem('generatedPhotos'); // Clear the data
+      localStorage.removeItem('generatedPhotos');
     };
 
     const handleBeforeUnload = () => {
-      localStorage.removeItem('generatedPhotos'); // Clear on tab close
+      localStorage.removeItem('generatedPhotos');
     };
 
-    // Listen to route changes
     router.events.on('routeChangeStart', handleRouteChange);
-    // Listen to tab close or reload
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      // Cleanup the listeners when the component unmounts
       router.events.off('routeChangeStart', handleRouteChange);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
@@ -255,7 +234,7 @@ export default function ImageGallery() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem('imageLink', url); // Save imageLink to localStorage
+    localStorage.setItem('imageLink', url);
     router.push('/view-image');
   };
 
@@ -264,7 +243,6 @@ export default function ImageGallery() {
     const storedPhotosUrl = JSON.parse(storedPhotos);
     const index = storedPhotosUrl.indexOf(photo_url);
     if (index > -1) {
-      // only splice array when item is found
       storedPhotosUrl.splice(index, 1);
       setGeneratedPhotos(storedPhotosUrl);
       localStorage.setItem('generatedPhotos', JSON.stringify(storedPhotosUrl));
@@ -276,7 +254,6 @@ export default function ImageGallery() {
       .delete()
       .eq('customer_id', user?.identities[0]?.id)
       .eq('photo_url', photo_url);
-    //window.location.reload(true);
   }
 
   const renderCard = (imageUrl, index) => {
@@ -291,7 +268,7 @@ export default function ImageGallery() {
           <Card.Img variant="top" src={imageUrl} />
         </Card>
         <button
-          className="absolute top-0 right-0 bg-red-500 text-black rounded-full p-2 hover:bg-red-700"
+          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-700"
           onClick={() => deletePhoto(imageUrl)}
         >
           X
@@ -313,7 +290,7 @@ export default function ImageGallery() {
     if (subscription) {
       return (
         <div className="sm:flex sm:flex-col sm:align-center sm:items-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             Gallery
           </h1>
           <br />
@@ -325,11 +302,11 @@ export default function ImageGallery() {
             Sync AI Imagery
           </Button>
           <br />
-          <p className="text-black sm:text-center">
+          <p className="text-white sm:text-center">
             All your generated images are saved here. To delete an image, click
             'X' at the top left corner.
           </p>
-          <p className="text-black sm:text-center">{message}</p>
+          <p className="text-white sm:text-center">{message}</p>
           <br></br>
           <div className="flex flex-wrap justify-center">
             {generatedPhotos.map(renderCard)}
@@ -337,15 +314,126 @@ export default function ImageGallery() {
         </div>
       );
     } else {
-      return <h1 className="text-black">You are not a paid member yet!!</h1>;
+      return <h1 className="text-white">You are not a paid member yet!!</h1>;
     }
   }
 
   return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
-        {subscribedAndModelChosen()}
+    <section className="bg-[#0F0F0F] min-h-screen py-16">
+      <div className="max-w-[1280px] mx-auto px-4">
+        {subscription ? (
+          <>
+            <div className="mb-8 flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-white">Gallery</h1>
+              <Button
+                className="bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                variant="slim"
+                onClick={() => fetchAndStorePhotos(true)}
+              >
+                Sync AI Imagery
+              </Button>
+            </div>
+
+            {message && (
+              <p className="mb-6 text-[#E0E0E0] text-center">{message}</p>
+            )}
+
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 justify-items-center">
+              {generatedPhotos.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className="gallery-tile relative w-full aspect-square overflow-hidden rounded-[14px] transition-transform duration-220 ease-out hover:translate-y-[-4px] hover:scale-[1.03] hover:drop-shadow-lg"
+                  style={{
+                    animation: `fadeIn 400ms ease-out forwards ${index * 60}ms`
+                  }}
+                >
+                  <div
+                    className="relative w-full h-full cursor-pointer"
+                    onClick={() => viewGeneratedContent(imageUrl)}
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={`Generated Image ${index + 1}`}
+                      className="object-cover w-full h-full brightness-[0.92]"
+                    />
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePhoto(imageUrl);
+                      }}
+                      className="absolute top-[10px] right-[10px] w-8 h-8 rounded-full bg-[rgba(255,69,58,0.18)] flex items-center justify-center border-0 cursor-pointer backdrop-blur-[6px] opacity-65 transition-all duration-180 ease-out hover:opacity-100 hover:scale-[1.12] hover:shadow-[0_0_0_2px_rgba(255,69,58,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF453A]"
+                      aria-label="Delete image"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="stroke-[#FF453A] stroke-2"
+                      >
+                        <line
+                          x1="1"
+                          y1="1"
+                          x2="13"
+                          y2="13"
+                          strokeLinecap="round"
+                        />
+                        <line
+                          x1="13"
+                          y1="1"
+                          x2="1"
+                          y2="13"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-semibold text-white mb-4">
+              Premium Feature
+            </h1>
+            <p className="text-[#E0E0E0]">
+              You need an active subscription to access the gallery.
+            </p>
+          </div>
+        )}
       </div>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes shake {
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-4px);
+          }
+          50% {
+            transform: translateX(4px);
+          }
+          75% {
+            transform: translateX(-4px);
+          }
+        }
+      `}</style>
     </section>
   );
 }
