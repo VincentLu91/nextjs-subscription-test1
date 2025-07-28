@@ -42,8 +42,22 @@ export default function ImageToVideo() {
   const [captionStatus, setCaptionStatus] = useState(null);
   const [numTokens, setNumTokens] = useState(null);
   const [videoRespObj, setVideoRespObj] = useState(null);
-  const [resultVideo, setResultVideo] = useState(null);
+  const [resultVideo, setResultVideo] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('resultVideo');
+      return saved || null;
+    }
+    return null;
+  });
   const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [finishMessage, setFinishMessage] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('videoFinishMessage') || '';
+    }
+    return '';
+  });
 
   const interval = useRef();
 
@@ -85,7 +99,7 @@ export default function ImageToVideo() {
       {/* Close button */}
       <button
         onClick={() => {
-          setImageLinkLink(null); // Clear the state
+          setImageLink(null); // Clear the state
           localStorage.removeItem('imageLink'); // Remove the key from localStorage
         }}
         style={{
@@ -116,6 +130,8 @@ export default function ImageToVideo() {
     if (prompt == null || prompt.trim() == '' || !image) {
       setCaption("You haven't entered anything!");
     } else {
+      setFinishMessage(''); // Clear any existing finish message
+      localStorage.removeItem('videoFinishMessage'); // Clear from localStorage
       //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
       const videoResp = await axios.post(
         '/api/img2vid?prompt=' +
@@ -146,7 +162,9 @@ export default function ImageToVideo() {
         '/api/imageresults?url=' + output.data.response_url
       );
       console.log('Result video url:', result.data.video.url);
-      setResultVideo(result.data.video.url);
+      const videoUrl = result.data.video.url;
+      setResultVideo(videoUrl);
+      localStorage.setItem('resultVideo', videoUrl);
       //setResultVideo(result.data.video);
       // Clear interval when video is completed
       if (interval.current) {
@@ -154,6 +172,10 @@ export default function ImageToVideo() {
         interval.current = null;
       }
       setIsVideoLoading(false);
+      const message =
+        'Video has been generated and saved to gallery. You can view it below or in the Video Gallery.';
+      setFinishMessage(message);
+      localStorage.setItem('videoFinishMessage', message);
     }
     return output.data.status;
   };
@@ -318,66 +340,160 @@ export default function ImageToVideo() {
       minimumFractionDigits: 0
     }).format(subscription.prices.unit_amount / 100);
 
+  if (!subscription) {
+    return (
+      <main className="bg-black text-white min-h-screen font-['Inter'] text-base leading-6">
+        <div className="max-w-[960px] mx-auto px-4 py-12">
+          <h1 className="text-5xl font-bold mb-2">Image to Video</h1>
+          <p className="text-xl">You are not subscribed yet!</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <section className="bg-[#0C0C0C] mb-32">
-      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Image to Video
-          </h1>
-          <br></br>
-          <p className="sm:text-center text-white">
-            Number of video credits available: {numTokens} / {numTieredTokens}
-          </p>
-          <br />
-          {subscription ? ( // goal of this is to restrict content to subscribers.
-            <div className={styles['display-image']}>
-              {isLoading && <LoadingDots />}
-              <p>Select image and generate video</p>
-              <br />
-              {displayContent || (
-                <div>
-                  <p className="text-white">
-                    You do not have image! Go back to Dashboard and select an
-                    image first
+    <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
+      <div className="max-w-[960px] mx-auto px-4 py-12">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+          <h1 className="text-5xl font-bold">Image to Video</h1>
+
+          {/* Credits Badge */}
+          <div
+            className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
+              ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#8256FF] text-white ring-2 ring-[#8256FF]'}`}
+            aria-live="polite"
+          >
+            Credits: {numTokens} / {numTieredTokens}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
+          {/* Image Preview Card */}
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Selected Image
+            </label>
+
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+              {displayContent ? (
+                <div className="relative rounded-lg overflow-hidden">
+                  <img
+                    src={imageLink}
+                    alt="Selected image"
+                    className="w-full h-auto"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center min-h-[220px] sm:min-h-[260px] border-2 border-dashed border-[#3F3F46] rounded-xl">
+                  <svg
+                    className="w-12 h-12 text-[#52525B] opacity-40 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-sm text-[#A1A1AA]">
+                    No image selected. Go to Dashboard to select an image first.
                   </p>
                 </div>
               )}
-              <br></br>
-              <p className="text-white">
-                Enter your instruction for the AI to generate a video scene.
-              </p>
-              <br></br>
-              <input
-                type="text"
-                id="prompt"
-                name="prompt"
-                onChange={handleChange}
-                value={prompt}
-                placeholder="Describe caption you want generated"
-                style={{ width: '600px' }}
-                className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-              />
-              <br></br>
-              <Button
-                variant="slim"
-                className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-                onClick={() => {
-                  generateVideo(prompt, imageLink);
-                  setIsVideoLoading(true);
-                }}
-              >
-                Generate Video
-              </Button>
-              <br></br>
-              {loadingWithVideoPrompt}
-              {resultVideo && renderCard(resultVideo, 0)}
             </div>
-          ) : (
-            <h1 className="text-white">You are not subscribed yet!</h1>
-          )}
+          </section>
+
+          {/* Video Generation Card */}
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Video Generation
+            </label>
+
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+              <div className="space-y-4">
+                <textarea
+                  value={prompt}
+                  onChange={handleChange}
+                  placeholder="Describe the video scene you want to generate..."
+                  className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                />
+
+                <button
+                  onClick={() => {
+                    generateVideo(prompt, imageLink);
+                    setIsVideoLoading(true);
+                  }}
+                  disabled={isVideoLoading || !imageLink || !prompt?.trim()}
+                  className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none
+                    ${
+                      isVideoLoading
+                        ? 'bg-[#4A4A4A] cursor-not-allowed'
+                        : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'
+                    }`}
+                >
+                  {isVideoLoading ? (
+                    <span className="flex items-center justify-center">
+                      Generating
+                      <LoadingDots />
+                    </span>
+                  ) : (
+                    'Generate Video'
+                  )}
+                </button>
+              </div>
+
+              {loadingWithVideoPrompt && (
+                <div className="mt-4 text-[#A1A1AA]">
+                  <p>Processing your request...</p>
+                  <p className="text-sm">Please do not refresh the page</p>
+                </div>
+              )}
+
+              {finishMessage && (
+                <div className="mt-4 p-4 bg-[#1F1F1F] rounded-lg text-[#E4E4E7]">
+                  {finishMessage}
+                </div>
+              )}
+            </div>
+          </section>
         </div>
+
+        {/* Results Section */}
+        {resultVideo && (
+          <>
+            <h1 className="text-2xl font-bold mt-10 mb-6">Generated Video</h1>
+            <div className="grid grid-cols-1 gap-6">
+              <div
+                className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none bg-[#181818] p-4"
+                onClick={() => viewGeneratedContent(resultVideo)}
+              >
+                <video
+                  src={resultVideo}
+                  controls
+                  className="w-full h-auto rounded-lg"
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
-    </section>
+
+      <style jsx>{`
+        @keyframes button-shadow {
+          0% {
+            box-shadow: 0 0 0 0 rgba(130, 86, 255, 0.45);
+          }
+          100% {
+            box-shadow: 0 0 0 24px rgba(130, 86, 255, 0);
+          }
+        }
+        .animate-button-shadow:not(:disabled):active {
+          animation: button-shadow 400ms ease-out;
+        }
+      `}</style>
+    </main>
   );
 }
