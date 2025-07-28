@@ -33,7 +33,9 @@ export default function ImageToVideo() {
     videoLink,
     setVideoLink,
     isVideoLoading,
-    setIsVideoLoading
+    setIsVideoLoading,
+    img2vidPrompt,
+    setImg2vidPrompt
   } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
@@ -85,7 +87,7 @@ export default function ImageToVideo() {
 
   // handle onChange event of the text input (no longer dropdown)
   const handleChange = (e) => {
-    setPrompt(e.target.value);
+    setImg2vidPrompt(e.target.value);
     console.log('Prompt: ', e.target.value);
   };
 
@@ -205,7 +207,7 @@ export default function ImageToVideo() {
 
   const loadingWithVideoPrompt = isVideoLoading && (
     <div className={styles['black-text']}>
-      Description of video: {prompt}
+      Description of video: {img2vidPrompt}
       <p>
         Loading
         <LoadingDots />
@@ -415,7 +417,7 @@ export default function ImageToVideo() {
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="space-y-4">
                 <textarea
-                  value={prompt}
+                  value={img2vidPrompt}
                   onChange={handleChange}
                   placeholder="Describe the video scene you want to generate..."
                   className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
@@ -423,10 +425,12 @@ export default function ImageToVideo() {
 
                 <button
                   onClick={() => {
-                    generateVideo(prompt, imageLink);
+                    generateVideo(img2vidPrompt, imageLink);
                     setIsVideoLoading(true);
                   }}
-                  disabled={isVideoLoading || !imageLink || !prompt?.trim()}
+                  disabled={
+                    isVideoLoading || !imageLink || !img2vidPrompt?.trim()
+                  }
                   className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none
                     ${
                       isVideoLoading
