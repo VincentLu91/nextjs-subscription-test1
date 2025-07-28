@@ -303,13 +303,13 @@ export default function ImageGallery() {
             Image Gallery
           </h1>
           <br />
-          <Button
+          {/*<Button
             className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
             variant="slim"
             onClick={() => fetchAndStorePhotos(true)}
           >
             Sync AI Imagery
-          </Button>
+          </Button>*/}
           <br />
           <p className="text-white sm:text-center">
             All your generated images are saved here. To delete an image, click
@@ -333,14 +333,16 @@ export default function ImageGallery() {
         {subscription ? (
           <>
             <div className="mb-8 flex items-center justify-between">
-              <h1 className="text-2xl font-semibold text-white">Gallery</h1>
-              <Button
+              <h1 className="text-2xl font-semibold text-white">
+                Image Gallery
+              </h1>
+              {/*<Button
                 className="bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
                 variant="slim"
                 onClick={() => fetchAndStorePhotos(true)}
               >
                 Sync AI Imagery
-              </Button>
+              </Button>*/}
             </div>
 
             {message && (
