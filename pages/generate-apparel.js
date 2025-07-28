@@ -381,6 +381,13 @@ export default function GenerateApparel() {
                   />
                 </svg>
               )}
+              {garmentImageUrl && (
+                <img
+                  src={garmentImageUrl}
+                  alt="Garment thumbnail"
+                  className="absolute bottom-5 right-5 w-24 h-24 object-contain rounded-xl border border-[rgba(255,255,255,0.08)] shadow-lg hover:scale-105 hover:ring-2 hover:ring-[#8B5CF6] transition-all duration-200"
+                />
+              )}
             </div>
           </div>
 
