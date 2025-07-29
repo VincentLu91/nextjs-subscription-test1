@@ -101,12 +101,12 @@ const SignUp = () => {
     setLoading(false);
   };
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (user) {
-      console.log('User is signup: ', user);
-      //router.replace('/pricing'); // used to be account.
+      //console.log('User is signup: ', user);
+      router.replace('/dashboard'); // used to be account.
     }
-  }, [user]);*/
+  }, [user]);
 
   return (
     <form
