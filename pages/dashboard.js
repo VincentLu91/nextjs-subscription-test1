@@ -2,9 +2,11 @@ import styles from '../styles/Home.module.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { useUser } from '../components/UserContext';
+import { useRouter } from 'next/router';
 
 export default function Dashboard() {
   const { user, isLoadingUser } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
