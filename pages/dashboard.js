@@ -8,11 +8,13 @@ import { useRouter } from 'next/router';
 
 export default function Dashboard() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoadingUser } = useUser();
 
   useEffect(() => {
-    if (!user) router.replace('/signin');
-  }, [user]);
+    if (!isLoadingUser && !user) {
+      router.replace('/signin');
+    }
+  }, [user, isLoadingUser, router]);
 
   useEffect(() => {
     // Intersection Observer for fade-up animations
