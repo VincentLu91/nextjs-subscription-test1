@@ -3,8 +3,10 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
 import { supabase } from '../utils/initSupabase';
+import { useUser } from '../components/UserContext';
 
 export default function Dashboard() {
+  const { user } = useUser();
   useEffect(() => {
     if (!user) router.replace('/signin');
   }, [user]);
