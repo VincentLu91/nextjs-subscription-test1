@@ -1,21 +1,8 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
-import { supabase } from '../utils/initSupabase';
-import { useUser } from '../components/UserContext';
-import { useRouter } from 'next/router';
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { user, isLoadingUser } = useUser();
-
-  useEffect(() => {
-    if (!isLoadingUser && !user) {
-      router.replace('/signin');
-    }
-  }, [user, isLoadingUser, router]);
-
   useEffect(() => {
     // Intersection Observer for fade-up animations
     const observer = new IntersectionObserver(
@@ -34,20 +21,6 @@ export default function Dashboard() {
     });
 
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    // A. page refresh after OAuth completes
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      addCustomerIfMissing(user);
-      console.log('User OAuth: ', user);
-    });
-
-    // B. future auth events (magic link, sign‑out, etc.)
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      addCustomerIfMissing(session?.user);
-    });
-    return () => sub.subscription.unsubscribe();
   }, []);
 
   function renderView() {

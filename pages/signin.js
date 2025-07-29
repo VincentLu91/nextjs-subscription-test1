@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useUser } from '../components/UserContext';
-import { addCustomerIfMissing } from '../utils/provisionCustomer';
 import LoadingDots from '../components/ui/LoadingDots';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -18,7 +17,7 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', content: '' });
   const router = useRouter();
-  const { user, signIn, isLoadingUser } = useUser();
+  const { user, signIn } = useUser();
 
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -40,93 +39,23 @@ const SignIn = () => {
   };
 
   const handleOAuthSignIn = async (provider) => {
-    try {
-      setLoading(true);
-      setMessage({});
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: provider,
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-    } catch (err) {
-      console.error('OAuth error:', err);
-      setMessage({ type: 'error', content: err.message });
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    //const { error } = await signIn({ provider });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google'
+    });
+    if (error) {
+      setMessage({ type: 'error', content: error.message });
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    // Check URL for error parameters from OAuth redirect
-    const params = new URLSearchParams(window.location.search);
-    const error = params.get('error');
-    const error_description = params.get('error_description');
-
-    if (error) {
-      setMessage({
-        type: 'error',
-        content: error_description || 'An error occurred during sign in'
-      });
-      setLoading(false);
+    if (user) {
+      // originally account route
+      router.replace('/pricing'); // used to be dashboard
     }
-
-    // Handle auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN') {
-          try {
-            if (session?.user) {
-              await addCustomerIfMissing(session.user);
-              await router.replace('/dashboard');
-            }
-          } catch (err) {
-            console.error('Error during sign in:', err);
-            setMessage({
-              type: 'error',
-              content: 'Failed to complete sign in. Please try again.'
-            });
-            setLoading(false);
-          }
-        } else if (event === 'SIGNED_OUT') {
-          router.replace('/signin');
-        }
-      }
-    );
-
-    // Clear loading state after timeout
-    const loadingTimeout = setTimeout(() => {
-      if (loading) {
-        setLoading(false);
-        setMessage({
-          type: 'error',
-          content: 'Sign in is taking longer than expected. Please try again.'
-        });
-      }
-    }, 10000);
-
-    return () => {
-      authListener?.subscription?.unsubscribe();
-      clearTimeout(loadingTimeout);
-    };
-  }, [router, loading]);
-
-  if (isLoadingUser) {
-    return (
-      <div className="m-6">
-        <LoadingDots />
-      </div>
-    );
-  }
+  }, [user]);
 
   if (!user)
     return (
@@ -146,6 +75,26 @@ const SignIn = () => {
               {message.content}
             </div>
           )}
+
+          {/*!showPasswordInput && ( // comment out the magic link
+            <form onSubmit={handleSignin} className="flex flex-col space-y-4">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={setEmail}
+                required
+              />
+              <Button
+                variant="slim"
+                type="submit"
+                loading={loading}
+                disabled={!email.length}
+              >
+                Send magic link
+              </Button>
+            </form>
+          )*/}
 
           {!showPasswordInput && (
             <form onSubmit={handleSignin} className="flex flex-col space-y-4">
@@ -168,11 +117,28 @@ const SignIn = () => {
                 variant="slim"
                 type="submit"
                 loading={loading}
+                //disabled={!password.length}
               >
                 Sign in
               </Button>
             </form>
           )}
+
+          <span className="pt-1 text-center text-sm">
+            <a
+              href="#"
+              className="text-blue-600 hover:underline cursor-pointer"
+              onClick={() => {
+                if (showPasswordInput) setPassword('');
+                setShowPasswordInput(!showPasswordInput);
+                setMessage({});
+              }}
+            >
+              {/*`Or sign in with ${ // comment out the magic link
+                showPasswordInput ? 'magic link' : 'password'
+              }.`*/}
+            </a>
+          </span>
 
           <span className="pt-1 text-center text-sm">
             <span className="text-gray-600">Don't have an account?</span>

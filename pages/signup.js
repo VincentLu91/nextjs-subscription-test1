@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../utils/initSupabase';
 import { useUser } from '../components/UserContext';
-import { addCustomerIfMissing } from '../utils/provisionCustomer';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Logo from '../components/icons/Logo';
@@ -29,15 +28,14 @@ const SignUp = () => {
       // First create the auth user
       const {
         error: signUpError,
-        data: { user, session }
+        data: { user }
       } = await signUp({ email, password });
 
       if (signUpError) {
         throw signUpError;
       }
 
-      // Only proceed with additional setup if we have a session (email verified)
-      if (session) {
+      if (user) {
         // Update user's name
         const { error: updateError } = await supabase
           .from('users')
@@ -50,8 +48,8 @@ const SignUp = () => {
           throw updateError;
         }
 
-        // Initialize free user tokens - no need. this is taken care of in addCustomerIfMissing().
-        /*const response = await fetch('/api/initializeFreeUser', {
+        // Initialize free user tokens
+        const response = await fetch('/api/initializeFreeUser', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: user.id })
@@ -62,13 +60,10 @@ const SignUp = () => {
           throw new Error(
             errorData.error || 'Failed to initialize free user tokens'
           );
-        }*/
+        }
 
         setUser(user);
-      }
-
-      // If no session, it means email verification is required
-      if (!session) {
+      } else {
         setMessage({
           type: 'note',
           content: 'Check your email or spam folder for the confirmation link.'
@@ -86,39 +81,22 @@ const SignUp = () => {
   };
 
   const handleOAuthSignIn = async (provider) => {
-    try {
-      setLoading(true);
-      const { error, data } = await supabase.auth.signInWithOAuth({
-        provider: 'google'
-      });
-
-      if (error) {
-        throw error;
-      }
-    } catch (err) {
-      console.error('OAuth error:', err);
-      setMessage({ type: 'error', content: err.message });
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    //const { error } = await signIn({ provider });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google'
+    });
+    if (error) {
+      setMessage({ type: 'error', content: error.message });
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN') {
-          if (session?.user) {
-            await addCustomerIfMissing(session.user);
-            router.replace('/dashboard');
-          }
-        }
-      }
-    );
-
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
-  }, [router]);
+    if (user) {
+      router.replace('/pricing'); // used to be account.
+    }
+  }, [user]);
 
   return (
     <form
