@@ -28,14 +28,15 @@ const SignUp = () => {
       // First create the auth user
       const {
         error: signUpError,
-        data: { user }
+        data: { user, session }
       } = await signUp({ email, password });
 
       if (signUpError) {
         throw signUpError;
       }
 
-      if (user) {
+      // Only proceed with additional setup if we have a session (email verified)
+      if (session) {
         // Update user's name
         const { error: updateError } = await supabase
           .from('users')
@@ -48,8 +49,8 @@ const SignUp = () => {
           throw updateError;
         }
 
-        // Initialize free user tokens
-        const response = await fetch('/api/initializeFreeUser', {
+        // Initialize free user tokens - no need. this is taken care of in addCustomerIfMissing().
+        /*const response = await fetch('/api/initializeFreeUser', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: user.id })
@@ -60,10 +61,13 @@ const SignUp = () => {
           throw new Error(
             errorData.error || 'Failed to initialize free user tokens'
           );
-        }
+        }*/
 
         setUser(user);
-      } else {
+      }
+
+      // If no session, it means email verification is required
+      if (!session) {
         setMessage({
           type: 'note',
           content: 'Check your email or spam folder for the confirmation link.'
