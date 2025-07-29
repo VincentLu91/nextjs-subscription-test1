@@ -39,23 +39,31 @@ const SignIn = () => {
   };
 
   const handleOAuthSignIn = async (provider) => {
-    setLoading(true);
-    //const { error } = await signIn({ provider });
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google'
-    });
-    if (error) {
-      setMessage({ type: 'error', content: error.message });
+    try {
+      setLoading(true);
+      const { error, data } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/dashboard'
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (err) {
+      console.error('OAuth error:', err);
+      setMessage({ type: 'error', content: err.message });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    if (user) {
-      // originally account route
-      router.replace('/dashboard'); // used to be dashboard
+    if (user && !loading) {
+      router.replace('/dashboard');
     }
-  }, [user]);
+  }, [user, loading]);
 
   if (!user)
     return (
