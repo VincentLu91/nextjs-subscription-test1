@@ -1,37 +1,16 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { useUser } from '../components/UserContext';
-import { addCustomerIfMissing } from '../utils/provisionCustomer';
+import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
 import { supabase } from '../utils/initSupabase';
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { user } = useUser();
+  useEffect(() => {
+    if (!user) router.replace('/signin');
+  }, [user]);
 
   useEffect(() => {
-    // Handle initial auth state
-    if (!user) {
-      router.replace('/signin');
-      return;
-    }
-
-    // Initialize customer if needed
-    addCustomerIfMissing(user);
-
-    // Set up auth state listener
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT') {
-          router.replace('/signin');
-        } else if (session?.user) {
-          addCustomerIfMissing(session.user);
-        }
-      }
-    );
-
-    // Set up animation observer
+    // Intersection Observer for fade-up animations
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -47,12 +26,22 @@ export default function Dashboard() {
       observer.observe(el);
     });
 
-    // Cleanup
-    return () => {
-      observer.disconnect();
-      authListener?.subscription?.unsubscribe();
-    };
-  }, [user, router]);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    // A. page refresh after OAuth completes
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      addCustomerIfMissing(user);
+      console.log('User OAuth: ', user);
+    });
+
+    // B. future auth events (magic link, sign‑out, etc.)
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      addCustomerIfMissing(session?.user);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   function renderView() {
     return (
