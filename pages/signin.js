@@ -50,12 +50,12 @@ const SignIn = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (user) {
       // originally account route
-      router.replace('/pricing'); // used to be dashboard
+      //router.replace('/pricing'); // used to be dashboard
     }
-  }, [user]);
+  }, [user]);*/
 
   if (!user)
     return (
