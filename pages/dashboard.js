@@ -1,7 +1,7 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { ensureCustomerRow } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
+import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
 import { supabase } from '../utils/initSupabase';
 
 export default function Dashboard() {
@@ -28,13 +28,13 @@ export default function Dashboard() {
   useEffect(() => {
     // A. page refresh after OAuth completes
     supabase.auth.getUser().then(({ data: { user } }) => {
-      ensureCustomerRow(user);
+      addCustomerIfMissing(user);
       console.log('User OAuth: ', user);
     });
 
     // B. future auth events (magic link, sign‑out, etc.)
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      ensureCustomerRow(session?.user);
+      addCustomerIfMissing(session?.user);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
