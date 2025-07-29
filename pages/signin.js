@@ -18,7 +18,7 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', content: '' });
   const router = useRouter();
-  const { user, signIn } = useUser();
+  const { user, signIn, isLoadingUser } = useUser();
 
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -119,6 +119,14 @@ const SignIn = () => {
       clearTimeout(loadingTimeout);
     };
   }, [router, loading]);
+
+  if (isLoadingUser) {
+    return (
+      <div className="m-6">
+        <LoadingDots />
+      </div>
+    );
+  }
 
   if (!user)
     return (
