@@ -5,7 +5,7 @@ import Script from 'next/script';
 
 export default function PricingPage({ products }) {
   // the return statement renders a one-time payment button. Delete it after when ready.
-  return (
+  /*return (
     <div className="w-full min-h-screen" style={{ backgroundColor: '#0C0C0C' }}>
       <Script
         src="https://assets.endorsely.com/endorsely.js"
@@ -72,8 +72,8 @@ export default function PricingPage({ products }) {
         </div>
       </div>
     </div>
-  );
-  //return <Pricing products={products} />;
+  );*/
+  return <Pricing products={products} />;
 }
 
 export async function getStaticProps() {
