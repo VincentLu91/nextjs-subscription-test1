@@ -1,16 +1,37 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
+import { useUser } from '../components/UserContext';
+import { addCustomerIfMissing } from '../utils/provisionCustomer';
 import { supabase } from '../utils/initSupabase';
 
 export default function Dashboard() {
-  useEffect(() => {
-    if (!user) router.replace('/signin');
-  }, [user]);
+  const router = useRouter();
+  const { user } = useUser();
 
   useEffect(() => {
-    // Intersection Observer for fade-up animations
+    // Handle initial auth state
+    if (!user) {
+      router.replace('/signin');
+      return;
+    }
+
+    // Initialize customer if needed
+    addCustomerIfMissing(user);
+
+    // Set up auth state listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          router.replace('/signin');
+        } else if (session?.user) {
+          addCustomerIfMissing(session.user);
+        }
+      }
+    );
+
+    // Set up animation observer
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -26,6 +47,7 @@ export default function Dashboard() {
       observer.observe(el);
     });
 
+<<<<<<< HEAD
     return () => observer.disconnect();
   }, []);
 
@@ -42,6 +64,14 @@ export default function Dashboard() {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+=======
+    // Cleanup
+    return () => {
+      observer.disconnect();
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [user, router]);
+>>>>>>> 76c87f6a4e8aa51d0cc534703015478c62f0814e
 
   function renderView() {
     return (

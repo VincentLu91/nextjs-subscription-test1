@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useUser } from '../components/UserContext';
+import { addCustomerIfMissing } from '../utils/provisionCustomer';
 import LoadingDots from '../components/ui/LoadingDots';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -39,23 +40,39 @@ const SignIn = () => {
   };
 
   const handleOAuthSignIn = async (provider) => {
-    setLoading(true);
-    //const { error } = await signIn({ provider });
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google'
-    });
-    if (error) {
-      setMessage({ type: 'error', content: error.message });
+    try {
+      setLoading(true);
+      const { error, data } = await supabase.auth.signInWithOAuth({
+        provider: 'google'
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (err) {
+      console.error('OAuth error:', err);
+      setMessage({ type: 'error', content: err.message });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    if (user) {
-      // originally account route
-      router.replace('/dashboard'); // used to be dashboard
-    }
-  }, [user]);
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN') {
+          if (session?.user) {
+            await addCustomerIfMissing(session.user);
+            router.replace('/dashboard');
+          }
+        }
+      }
+    );
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [router]);
 
   if (!user)
     return (
