@@ -83,20 +83,11 @@ const SignUp = () => {
   const handleOAuthSignIn = async (provider) => {
     setLoading(true);
     //const { error } = await signIn({ provider });
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google'
     });
     if (error) {
       setMessage({ type: 'error', content: error.message });
-    } else {
-      console.log('data: ', data);
-      // Subscribe to auth state changes to get the user data
-      supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN') {
-          console.log('User UID:', session.user.id);
-          setUser(session.user);
-        }
-      });
     }
     setLoading(false);
   };
