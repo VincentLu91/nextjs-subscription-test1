@@ -35,40 +35,10 @@ const SignUp = () => {
         throw signUpError;
       }
 
-      if (user) {
-        // Update user's name
-        const { error: updateError } = await supabase
-          .from('users')
-          .update({
-            full_name: name
-          })
-          .eq('id', user.id);
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        // Initialize free user tokens
-        const response = await fetch('/api/initializeFreeUser', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.error || 'Failed to initialize free user tokens'
-          );
-        }
-
-        setUser(user);
-      } else {
-        setMessage({
-          type: 'note',
-          content: 'Check your email or spam folder for the confirmation link.'
-        });
-      }
+      setMessage({
+        type: 'note',
+        content: 'Check your email or spam folder for the confirmation link.'
+      });
     } catch (err) {
       console.error('Error during signup:', err);
       setMessage({
@@ -91,12 +61,6 @@ const SignUp = () => {
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (user) {
-      router.replace('/dashboard'); // used to be account.
-    }
-  }, [user]);
 
   return (
     <form
