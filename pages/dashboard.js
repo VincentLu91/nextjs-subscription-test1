@@ -36,7 +36,7 @@ export default function Dashboard() {
       console.log('User OAuth: ', user);
     });
 
-    // B. future auth events (magic link, sign‑out, etc.)
+    // B. future auth events (magic link, sign‑out, etc.). Try if this works
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       addCustomerIfMissing(session?.user);
     });
