@@ -94,7 +94,7 @@ const SignUp = () => {
 
   useEffect(() => {
     if (user) {
-      router.replace('/pricing'); // used to be account.
+      router.replace('/dashboard'); // used to be account.
     }
   }, [user]);
 
