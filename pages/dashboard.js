@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { useUser } from '../components/UserContext';
 import { useRouter } from 'next/router';
+import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
+import { supabase } from '../utils/initSupabase';
 
 export default function Dashboard() {
   const { user, isLoadingUser } = useUser();
@@ -32,6 +34,20 @@ export default function Dashboard() {
     });
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    // A. page refresh after OAuth completes
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      addCustomerIfMissing(user);
+      console.log('User OAuth: ', user);
+    });
+
+    // B. future auth events (magic link, sign‑out, etc.)
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      addCustomerIfMissing(session?.user);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   function renderView() {
