@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useUser } from '../components/UserContext';
+import { addCustomerIfMissing } from '../utils/provisionCustomer';
 import LoadingDots from '../components/ui/LoadingDots';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -42,10 +43,7 @@ const SignIn = () => {
     try {
       setLoading(true);
       const { error, data } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/dashboard'
-        }
+        provider: 'google'
       });
 
       if (error) {
@@ -60,10 +58,21 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (user && !loading) {
-      router.replace('/dashboard');
-    }
-  }, [user, loading]);
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN') {
+          if (session?.user) {
+            await addCustomerIfMissing(session.user);
+            router.replace('/dashboard');
+          }
+        }
+      }
+    );
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [router]);
 
   if (!user)
     return (
