@@ -6,6 +6,10 @@ import { supabase } from '../utils/initSupabase';
 
 export default function Dashboard() {
   useEffect(() => {
+    if (!user) router.replace('/signin');
+  }, [user]);
+
+  useEffect(() => {
     // Intersection Observer for fade-up animations
     const observer = new IntersectionObserver(
       (entries) => {
