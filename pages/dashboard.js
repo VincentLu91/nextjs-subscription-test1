@@ -1,8 +1,17 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { useUser } from '../components/UserContext';
 
 export default function Dashboard() {
+  const { user, isLoadingUser } = useUser();
+
+  useEffect(() => {
+    if (!isLoadingUser && !user) {
+      router.replace('/signin');
+    }
+  }, [user, isLoadingUser]);
+
   useEffect(() => {
     // Intersection Observer for fade-up animations
     const observer = new IntersectionObserver(
