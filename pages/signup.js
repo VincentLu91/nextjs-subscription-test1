@@ -23,17 +23,45 @@ const SignUp = () => {
 
     setLoading(true);
     setMessage({});
-    const { error, user } = await signUp({ email, password });
-    if (error) {
-      setMessage({ type: 'error', content: error.message });
-    } else {
+
+    try {
+      // First create the auth user
+      const {
+        error: signUpError,
+        data: { user }
+      } = await signUp({ email, password });
+
+      if (signUpError) {
+        throw signUpError;
+      }
+
       if (user) {
-        await supabase
+        // Update user's name
+        const { error: updateError } = await supabase
           .from('users')
           .update({
             full_name: name
           })
           .eq('id', user.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // Initialize free user tokens
+        const response = await fetch('/api/initializeFreeUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || 'Failed to initialize free user tokens'
+          );
+        }
+
         setUser(user);
       } else {
         setMessage({
@@ -41,8 +69,15 @@ const SignUp = () => {
           content: 'Check your email or spam folder for the confirmation link.'
         });
       }
+    } catch (err) {
+      console.error('Error during signup:', err);
+      setMessage({
+        type: 'error',
+        content: err.message || 'Error setting up account. Please try again.'
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleOAuthSignIn = async (provider) => {

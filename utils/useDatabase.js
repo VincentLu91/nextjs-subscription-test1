@@ -438,6 +438,22 @@ const deductUserCaptionToken = async (customerId, tokensToDeduct) => {
   }
 };
 
+const initializeFreeUser = async (uuid) => {
+  const { error } = await supabaseAdmin.from('customers').insert([
+    {
+      id: uuid,
+      stripe_customer_id: null,
+      image_tokens: 12,
+      training_tokens: 14,
+      caption_tokens: 16,
+      video_tokens: 18
+    }
+  ]);
+
+  if (error) throw error;
+  console.log(`Initialized free user: ${uuid}`);
+};
+
 export {
   upsertProductRecord,
   upsertPriceRecord,
@@ -448,5 +464,6 @@ export {
   deductUserTrainingToken,
   deductUserCaptionToken,
   getTokens,
-  getTieredTokens
+  getTieredTokens,
+  initializeFreeUser
 };
