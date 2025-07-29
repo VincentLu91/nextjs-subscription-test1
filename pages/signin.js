@@ -44,10 +44,14 @@ const SignIn = () => {
       setLoading(true);
       setMessage({});
 
-      const { error, data } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
-          redirectTo: window.location.origin + '/dashboard'
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
         }
       });
 
@@ -57,18 +61,44 @@ const SignIn = () => {
     } catch (err) {
       console.error('OAuth error:', err);
       setMessage({ type: 'error', content: err.message });
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Check URL for error parameters from OAuth redirect
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    const error_description = params.get('error_description');
+
+    if (error) {
+      setMessage({
+        type: 'error',
+        content: error_description || 'An error occurred during sign in'
+      });
+      setLoading(false);
+    }
+
+    // Handle auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN') {
-          if (session?.user) {
-            await addCustomerIfMissing(session.user);
-            router.replace('/dashboard');
+          try {
+            if (session?.user) {
+              await addCustomerIfMissing(session.user);
+              await router.replace('/dashboard');
+            }
+          } catch (err) {
+            console.error('Error during sign in:', err);
+            setMessage({
+              type: 'error',
+              content: 'Failed to complete sign in. Please try again.'
+            });
+            setLoading(false);
           }
+        } else if (event === 'SIGNED_OUT') {
+          router.replace('/signin');
         }
       }
     );
@@ -109,26 +139,6 @@ const SignIn = () => {
             </div>
           )}
 
-          {/*!showPasswordInput && ( // comment out the magic link
-            <form onSubmit={handleSignin} className="flex flex-col space-y-4">
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={setEmail}
-                required
-              />
-              <Button
-                variant="slim"
-                type="submit"
-                loading={loading}
-                disabled={!email.length}
-              >
-                Send magic link
-              </Button>
-            </form>
-          )*/}
-
           {!showPasswordInput && (
             <form onSubmit={handleSignin} className="flex flex-col space-y-4">
               <Input
@@ -150,28 +160,11 @@ const SignIn = () => {
                 variant="slim"
                 type="submit"
                 loading={loading}
-                //disabled={!password.length}
               >
                 Sign in
               </Button>
             </form>
           )}
-
-          <span className="pt-1 text-center text-sm">
-            <a
-              href="#"
-              className="text-blue-600 hover:underline cursor-pointer"
-              onClick={() => {
-                if (showPasswordInput) setPassword('');
-                setShowPasswordInput(!showPasswordInput);
-                setMessage({});
-              }}
-            >
-              {/*`Or sign in with ${ // comment out the magic link
-                showPasswordInput ? 'magic link' : 'password'
-              }.`*/}
-            </a>
-          </span>
 
           <span className="pt-1 text-center text-sm">
             <span className="text-gray-600">Don't have an account?</span>
