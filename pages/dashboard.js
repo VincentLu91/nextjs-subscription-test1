@@ -1,37 +1,16 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { useUser } from '../components/UserContext';
-import { addCustomerIfMissing } from '../utils/provisionCustomer';
+import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
 import { supabase } from '../utils/initSupabase';
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { user } = useUser();
+  useEffect(() => {
+    if (!user) router.replace('/signin');
+  }, [user]);
 
   useEffect(() => {
-    // Handle initial auth state
-    if (!user) {
-      router.replace('/signin');
-      return;
-    }
-
-    // Initialize customer if needed
-    addCustomerIfMissing(user);
-
-    // Set up auth state listener
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT') {
-          router.replace('/signin');
-        } else if (session?.user) {
-          addCustomerIfMissing(session.user);
-        }
-      }
-    );
-
-    // Set up animation observer
+    // Intersection Observer for fade-up animations
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -47,7 +26,6 @@ export default function Dashboard() {
       observer.observe(el);
     });
 
-<<<<<<< HEAD
     return () => observer.disconnect();
   }, []);
 
@@ -58,20 +36,12 @@ export default function Dashboard() {
       console.log('User OAuth: ', user);
     });
 
-    // B. future auth events (magic link, sign‑out, etc.). Try if this works
+    // B. future auth events (magic link, sign‑out, etc.)
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       addCustomerIfMissing(session?.user);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
-=======
-    // Cleanup
-    return () => {
-      observer.disconnect();
-      authListener?.subscription?.unsubscribe();
-    };
-  }, [user, router]);
->>>>>>> 76c87f6a4e8aa51d0cc534703015478c62f0814e
 
   function renderView() {
     return (
