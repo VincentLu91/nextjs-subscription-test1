@@ -42,8 +42,13 @@ const SignIn = () => {
   const handleOAuthSignIn = async (provider) => {
     try {
       setLoading(true);
+      setMessage({});
+
       const { error, data } = await supabase.auth.signInWithOAuth({
-        provider: 'google'
+        provider: provider,
+        options: {
+          redirectTo: window.location.origin + '/dashboard'
+        }
       });
 
       if (error) {
@@ -52,7 +57,6 @@ const SignIn = () => {
     } catch (err) {
       console.error('OAuth error:', err);
       setMessage({ type: 'error', content: err.message });
-    } finally {
       setLoading(false);
     }
   };
@@ -69,10 +73,22 @@ const SignIn = () => {
       }
     );
 
+    // Clear loading state after timeout
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        setLoading(false);
+        setMessage({
+          type: 'error',
+          content: 'Sign in is taking longer than expected. Please try again.'
+        });
+      }
+    }, 10000);
+
     return () => {
       authListener?.subscription?.unsubscribe();
+      clearTimeout(loadingTimeout);
     };
-  }, [router]);
+  }, [router, loading]);
 
   if (!user)
     return (
