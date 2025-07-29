@@ -83,18 +83,28 @@ const SignUp = () => {
   const handleOAuthSignIn = async (provider) => {
     setLoading(true);
     //const { error } = await signIn({ provider });
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google'
     });
     if (error) {
       setMessage({ type: 'error', content: error.message });
+    } else {
+      console.log('data: ', data);
+      // Subscribe to auth state changes to get the user data
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+          console.log('User UID:', session.user.id);
+          setUser(session.user);
+        }
+      });
     }
     setLoading(false);
   };
 
   useEffect(() => {
     if (user) {
-      router.replace('/pricing'); // used to be account.
+      console.log('User is signup: ', user);
+      //router.replace('/pricing'); // used to be account.
     }
   }, [user]);
 
