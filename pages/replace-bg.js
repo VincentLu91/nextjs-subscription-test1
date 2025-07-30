@@ -227,7 +227,8 @@ export default function ReplaceBg() {
       setisGeneratingBGImages(false);
       setFinishMessage(
         'All images are generated and saved to gallery. You can also view them below. \n' +
-          'Please go to the Gallery page to see all your generated images'
+          'Please go to the Gallery page to see all your generated images \n' +
+          'Please wait for all 7 images to be loaded before generating another set'
       );
     }
   }, [backgroundImagePredictions]);
