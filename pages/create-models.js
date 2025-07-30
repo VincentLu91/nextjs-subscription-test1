@@ -59,7 +59,7 @@ export default function CreateModels() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(14);
   const [step, setStep] = useState(1);
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, 3));
@@ -755,53 +755,52 @@ export default function CreateModels() {
   };
 
   function renderView() {
-    if (subscription) {
-      return (
-        <section className="bg-white mb-32">
-          <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-            <div className="sm:flex sm:flex-col sm:align-center">
-              <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-                Create Your AI Model
-              </h1>
-              <br></br>
-              <p className="text-black sm:text-center">
-                Number of training sessions available: {numTokens} /{' '}
-                {numTieredTokens}
-              </p>
-              <br></br>
-              <p className="text-black sm:text-center">
-                Give your Product an identity!
-              </p>
-              <br></br>
-              <p className="text-black sm:text-center">
-                Training takes <strong>5-10 mins</strong>. When done, you'll be
-                redirected to "Generate Images."
-              </p>
+    return (
+      <section className="bg-white mb-32">
+        <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+          <div className="sm:flex sm:flex-col sm:align-center">
+            <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
+              Create Your AI Model
+            </h1>
+            <br></br>
+            <p className="text-black sm:text-center">
+              Number of training sessions available: {numTokens} /{' '}
+              {numTieredTokens}
+            </p>
+            <br></br>
+            <p className="text-black sm:text-center">
+              Give your Product an identity!
+            </p>
+            <br></br>
+            <p className="text-black sm:text-center">
+              Training takes <strong>5-10 mins</strong>. When done, you'll be
+              redirected to "Generate Images."
+            </p>
 
-              <br></br>
-              <p
-                className="text-black sm:text-center"
-                //style={{ color: 'var(--text-secondary)' }}
-              >
-                {trainingText}
-                <br />
-              </p>
-              {isTraining ? (
-                <div style={{ textAlign: 'center', color: 'black' }}>
-                  {loadingWhileTraining}
-                </div>
-              ) : (
-                <div>
-                  {renderStep()}
-                  {/* 
+            <br></br>
+            <p
+              className="text-black sm:text-center"
+              //style={{ color: 'var(--text-secondary)' }}
+            >
+              {trainingText}
+              <br />
+            </p>
+            {isTraining ? (
+              <div style={{ textAlign: 'center', color: 'black' }}>
+                {loadingWhileTraining}
+              </div>
+            ) : (
+              <div>
+                {renderStep()}
+                {/* 
               to get an image: CDNURL + user.id + "/" + image.name
               images: [image1, image2, image3]
           */}
-                  <Row xs={1} md={3} className="g-4">
-                    <div className="flex flex-col items-center sm:flex-col sm:items-center">
-                      <br></br>
-                      {console.log('zipFileName: ', zipFileName)}
-                      {/*zipFileName && (
+                <Row xs={1} md={3} className="g-4">
+                  <div className="flex flex-col items-center sm:flex-col sm:items-center">
+                    <br></br>
+                    {console.log('zipFileName: ', zipFileName)}
+                    {/*zipFileName && (
                       <Button
                         variant="slim"
                         onClick={() => trainModel(instancePrompt, classPrompt)}
@@ -809,31 +808,15 @@ export default function CreateModels() {
                         Train Model
                       </Button>
                     )*/}
-                    </div>
-                  </Row>
-                  <br></br>
-                </div>
-              )}
-            </div>
+                  </div>
+                </Row>
+                <br></br>
+              </div>
+            )}
           </div>
-        </section>
-      );
-    } else {
-      return (
-        <section className="bg-white mb-32">
-          <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-            <div className="sm:flex sm:flex-col sm:align-center">
-              <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-                Training page
-              </h1>
-              <br></br>
-              <br></br>
-              <h1 className="text-black">You are not subscribed yet!</h1>
-            </div>
-          </div>
-        </section>
-      );
-    }
+        </div>
+      </section>
+    );
   }
 
   return (
