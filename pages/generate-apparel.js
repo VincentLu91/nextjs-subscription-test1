@@ -18,7 +18,7 @@ export default function GenerateApparel() {
   const [finishMessage, setFinishMessage] = useState('');
   const [photoData, setPhotoData] = useState(null);
   const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(12);
   const [resultImages, setResultImages] = useState([]);
   const [modelImagePath, setModelImagePath] = useState('');
   const [garmentImagePath, setGarmentImagePath] = useState('');
@@ -324,16 +324,6 @@ export default function GenerateApparel() {
       </Card>
     );
   };
-
-  if (!subscription) {
-    return (
-      <div className="min-h-screen bg-[#0C0C0C] py-12">
-        <h1 className="text-white text-center text-2xl">
-          You are not subscribed yet!
-        </h1>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#0C0C0C] py-12">

@@ -23,7 +23,7 @@ export default function AIStudio() {
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
   const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(14);
   const [photoData, setPhotoData] = useState(null);
   const [step, setStep] = useState(1);
   const router = useRouter();
@@ -510,18 +510,14 @@ export default function AIStudio() {
   };
 
   function subscribedAndModelChosen() {
-    if (subscription) {
-      return (
-        <div className={styles['get-image-button']}>
-          {renderStep()}
-          {loadingWithContentPrompt}
-          {finishMessage}
-          <div className={styles['grid']}>{imageList.map(renderCard)}</div>
-        </div>
-      );
-    } else {
-      return <h1 className="text-black">You are not subscribed yet!</h1>;
-    }
+    return (
+      <div className={styles['get-image-button']}>
+        {renderStep()}
+        {loadingWithContentPrompt}
+        {finishMessage}
+        <div className={styles['grid']}>{imageList.map(renderCard)}</div>
+      </div>
+    );
   }
 
   return (
