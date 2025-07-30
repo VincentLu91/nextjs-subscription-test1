@@ -50,8 +50,8 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
     .eq('id', uuid)
     .single();
 
-  if (error) {
-    console.log('No existing customer found, creating new one');
+  if (error || !data || !data.stripe_customer_id) {
+    console.log('No existing customer or stripe ID found, creating new one');
     // No customer record found, let's create one.
     const customerData = {
       metadata: {
@@ -63,19 +63,25 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
     const customer = await stripe.customers.create(customerData);
     console.log('Created Stripe customer:', customer.id);
 
-    // Now insert the customer ID into our Supabase mapping table.
+    // Get existing customer data if any
+    const { data: existingCustomer } = await supabaseAdmin
+      .from('customers')
+      .select('image_tokens, training_tokens, caption_tokens, video_tokens')
+      .eq('id', uuid)
+      .single();
+
+    // Now update or insert the customer ID into our Supabase mapping table
     const { error: supabaseError } = await supabaseAdmin
       .from('customers')
-      .insert([
-        {
-          id: uuid,
-          stripe_customer_id: customer.id,
-          image_tokens: 0,
-          training_tokens: 0,
-          caption_tokens: 0,
-          video_tokens: 0
-        }
-      ]);
+      .upsert({
+        id: uuid,
+        stripe_customer_id: customer.id,
+        // Preserve existing token values or default to 0
+        image_tokens: existingCustomer?.image_tokens ?? 0,
+        training_tokens: existingCustomer?.training_tokens ?? 0,
+        caption_tokens: existingCustomer?.caption_tokens ?? 0,
+        video_tokens: existingCustomer?.video_tokens ?? 0
+      });
 
     if (supabaseError) {
       console.error('Failed to create Supabase customer:', supabaseError);
