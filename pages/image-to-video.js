@@ -52,7 +52,7 @@ export default function ImageToVideo() {
     }
     return null;
   });
-  const [numTieredTokens, setNumTieredTokens] = useState(null);
+  const [numTieredTokens, setNumTieredTokens] = useState(18);
   const [finishMessage, setFinishMessage] = useState(null);
 
   const interval = useRef();
@@ -344,17 +344,6 @@ export default function ImageToVideo() {
       currency: subscription.prices.currency,
       minimumFractionDigits: 0
     }).format(subscription.prices.unit_amount / 100);
-
-  if (!subscription) {
-    return (
-      <main className="bg-black text-white min-h-screen font-['Inter'] text-base leading-6">
-        <div className="max-w-[960px] mx-auto px-4 py-12">
-          <h1 className="text-5xl font-bold mb-2">Image to Video</h1>
-          <p className="text-xl">You are not subscribed yet!</p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
