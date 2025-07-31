@@ -88,7 +88,7 @@ export default function Pricing({ products }) {
     return (
       <section className="bg-[#0E0E0F] relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_100%)]"></div>
-        <div className="max-w-[1280px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-[1000px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
           <p className="text-6xl font-extrabold text-[rgba(255,255,255,0.95)] sm:text-center sm:text-6xl">
             No subscription pricing plans found. Create them in your{' '}
             <a
@@ -113,7 +113,7 @@ export default function Pricing({ products }) {
           background: `radial-gradient(circle at 40% 30%, rgba(123,92,255,0.05) 0%, transparent 60%), url('/noise.png') repeat 3%`
         }}
       ></div>
-      <div className="max-w-[1280px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
+      <div className="max-w-[1000px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-[20px] font-semibold tracking-[-0.2px] text-[rgba(255,255,255,0.95)] sm:text-center">
             Choose Your Plan
@@ -172,7 +172,7 @@ export default function Pricing({ products }) {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
           {products.map((product) => {
             const price = product.prices.find(
               (price) =>
@@ -196,7 +196,7 @@ export default function Pricing({ products }) {
               <div
                 key={product.id}
                 className={cn(
-                  'rounded-2xl bg-[#1A1A1D] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-250 hover:translate-y-[-6px] hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(123,92,255,0.25)]',
+                  'rounded-2xl bg-[#1A1A1D] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-250 hover:translate-y-[-6px] hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(123,92,255,0.25)] w-full sm:w-[280px]',
                   {
                     'relative before:absolute before:inset-0 before:rounded-2xl before:p-[2px] before:bg-gradient-to-r before:from-[#7B5CFF] before:to-[#00D0FF] before:-z-10 before:backdrop-blur-[10px] before:saturate-[130%]':
                       product.name === 'Professional',
