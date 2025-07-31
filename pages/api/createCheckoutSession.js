@@ -22,7 +22,7 @@ const createCheckoutSession = async (req, res) => {
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
-        billing_address_collection: 'required',
+        billing_address_collection: 'auto', // used to be 'required'
         customer,
         line_items: [
           {
