@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { postData } from '../utils/helpers';
 import { getStripe } from '../utils/initStripejs';
 import { useUser } from '../components/UserContext';
@@ -9,6 +9,7 @@ import Button from './ui/Button';
 export default function Pricing({ products }) {
   const [billingInterval, setBillingInterval] = useState('month');
   const [loading, setLoading] = useState(false);
+  const [animatedPrices, setAnimatedPrices] = useState({});
   const router = useRouter();
   const { session, userLoaded, subscription } = useUser();
 
@@ -35,20 +36,49 @@ export default function Pricing({ products }) {
     const stripe = await getStripe();
     console.log(sessionId, url);
     window.location.href = url;
-    //const { error: stripeError } = stripe.redirectToCheckout({ sessionId });
-    //if (stripeError) alert(error.message);
-    //setLoading(false);
   };
+
+  useEffect(() => {
+    // Animate prices when billing interval changes
+    products.forEach((product) => {
+      const price = product.prices.find(
+        (p) =>
+          p.interval === billingInterval &&
+          p.product_id !== 'prod_SW7dE3i2msnicA'
+      );
+      if (price) {
+        const amount = price.unit_amount / 100;
+        const duration = 200; // Animation duration in ms
+        const steps = 20; // Number of steps in animation
+        const stepDuration = duration / steps;
+        let currentStep = 0;
+
+        const interval = setInterval(() => {
+          if (currentStep >= steps) {
+            clearInterval(interval);
+            return;
+          }
+          const progress = currentStep / steps;
+          const currentAmount = Math.floor(amount * progress);
+          setAnimatedPrices((prev) => ({
+            ...prev,
+            [product.id]: currentAmount
+          }));
+          currentStep++;
+        }, stepDuration);
+      }
+    });
+  }, [billingInterval, products]);
 
   if (!products.length)
     return (
-      <section className="bg-black">
-        <div className="max-w-6xl mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8">
-          <div className="sm:flex sm:flex-col sm:align-center"></div>
-          <p className="text-6xl font-extrabold text-white sm:text-center sm:text-6xl">
+      <section className="bg-[#0E0E0F] relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_100%)]"></div>
+        <div className="max-w-[1280px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
+          <p className="text-6xl font-extrabold text-[rgba(255,255,255,0.95)] sm:text-center sm:text-6xl">
             No subscription pricing plans found. Create them in your{' '}
             <a
-              className="text-pink underline"
+              className="text-[#7B5CFF] underline"
               href="https://dashboard.stripe.com/products"
               rel="noopener noreferrer"
               target="_blank"
@@ -62,105 +92,207 @@ export default function Pricing({ products }) {
     );
 
   return (
-    <section className="bg-white">
-      <div className="max-w-6xl mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8">
+    <section className="bg-[#0E0E0F] relative">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_100%)]"></div>
+      <div className="max-w-[1280px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
         <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-center sm:text-6xl">
-            Other Plans below.
+          <h1 className="text-[20px] font-semibold tracking-[-0.2px] text-[rgba(255,255,255,0.95)] sm:text-center">
+            Choose Your Plan
           </h1>
-          <div className="relative self-center mt-6 bg-blue-50 rounded-lg p-0.5 flex sm:mt-8 border border-accents-0">
-            <button
-              onClick={() => setBillingInterval('month')}
-              type="button"
-              className={`${
-                billingInterval === 'month'
-                  ? 'relative w-1/2 bg-blue-500 border-accents-0 shadow-sm text-white'
-                  : 'ml-0.5 relative w-1/2 border border-transparent text-blue-400'
-              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8`}
-            >
-              Monthly billing
-            </button>
-            <button
-              onClick={() => setBillingInterval('year')}
-              type="button"
-              className={`${
-                billingInterval === 'year'
-                  ? 'relative w-1/2 bg-blue-500 border-accents-0 shadow-sm text-white'
-                  : 'ml-0.5 relative w-1/2 border border-transparent text-blue-400'
-              } rounded-lg m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink focus:ring-blue-500 focus:z-10 sm:w-auto sm:px-8`}
-            >
-              Yearly billing
-            </button>
+
+          <div className="relative self-center mt-6 sm:mt-8">
+            <div className="sticky top-0 z-10 flex justify-center items-center p-4 sm:static">
+              <div className="relative h-8 bg-[#1A1A1D] rounded-full w-56 flex items-center p-1">
+                <button
+                  onClick={() => setBillingInterval('month')}
+                  type="button"
+                  className={`${
+                    billingInterval === 'month'
+                      ? 'bg-gradient-to-r from-[#7B5CFF] to-[#985CFF] shadow-[0_0_12px_rgba(123,92,255,0.35)]'
+                      : ''
+                  } relative w-1/2 h-6 rounded-full transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]`}
+                >
+                  <span
+                    className={`absolute inset-0 flex items-center justify-center text-sm font-medium ${
+                      billingInterval === 'month'
+                        ? 'text-white'
+                        : 'text-[rgba(255,255,255,0.85)]'
+                    }`}
+                  >
+                    Monthly
+                  </span>
+                </button>
+                <button
+                  onClick={() => setBillingInterval('year')}
+                  type="button"
+                  className={`${
+                    billingInterval === 'year'
+                      ? 'bg-gradient-to-r from-[#7B5CFF] to-[#985CFF] shadow-[0_0_12px_rgba(123,92,255,0.35)]'
+                      : ''
+                  } relative w-1/2 h-6 rounded-full transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]`}
+                >
+                  <span
+                    className={`absolute inset-0 flex items-center justify-center text-sm font-medium ${
+                      billingInterval === 'year'
+                        ? 'text-white'
+                        : 'text-[rgba(255,255,255,0.85)]'
+                    }`}
+                  >
+                    Yearly
+                  </span>
+                </button>
+              </div>
+              {billingInterval === 'year' && (
+                <span className="ml-3 text-sm font-medium text-[#7B5CFF] bg-[rgba(123,92,255,0.1)] px-2 py-1 rounded-full transition-opacity duration-150">
+                  Save 18% yearly
+                </span>
+              )}
+            </div>
           </div>
         </div>
-        <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
+
+        <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
           {products.map((product) => {
             const price = product.prices.find(
               (price) =>
                 price.interval === billingInterval &&
-                price.product_id !== 'prod_SW7dE3i2msnicA' // $0 subscription plan for early users
+                price.product_id !== 'prod_SW7dE3i2msnicA'
             );
 
-            // Skip rendering this product if no valid price is found
             if (!price) return null;
 
             const priceString = new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: price.currency,
               minimumFractionDigits: 0
-            }).format(price.unit_amount / 100);
-            // Default to 0 if token counts are not defined
+            }).format(animatedPrices[product.id] || price.unit_amount / 100);
+
             const imageTokens = price.image_tokens || 0;
             const trainingTokens = price.training_tokens || 0;
             const captionTokens = price.caption_tokens || 0;
+
             return (
               <div
                 key={product.id}
                 className={cn(
-                  'rounded-lg shadow-sm divide-y divide-accents-2 bg-red-100-2',
+                  'rounded-2xl bg-[#1A1A1D] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:translate-y-[-6px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.45)]',
                   {
-                    'border border-pink': subscription
+                    'ring-2 ring-[#7B5CFF]': subscription
                       ? product.name === subscription?.prices?.products.name
                       : product.name === 'Freelancer'
                   }
                 )}
               >
                 <div className="p-6">
-                  <h2 className="text-2xl leading-6 font-semibold text-black">
+                  <h2 className="text-[20px] font-semibold tracking-[-0.2px] text-[rgba(255,255,255,0.95)]">
                     {product.name}
                   </h2>
-                  <p className="mt-4 text-accents-5 text-black">
+                  <p className="mt-4 text-[rgba(255,255,255,0.85)]">
                     {product.description}
                   </p>
-                  <p className="mt-4 text-accents-5 text-black">
-                    {imageTokens} product image renders
-                  </p>
-                  <p className="mt-4 text-accents-5 text-black">
-                    AI Videos of your product - coming soon
-                  </p>
-                  <p className="mt-4 text-accents-5 text-black">
-                    {captionTokens} caption creation credits
-                  </p>
-                  <p className="mt-8">
-                    <span className="text-5xl font-extrabold white text-black">
+                  <div className="mt-8">
+                    <span className="text-[48px] font-bold text-[rgba(255,255,255,0.95)]">
                       {priceString}
                     </span>
-                    <span className="text-base font-medium text-accents-8 text-black">
+                    <span className="text-base text-[rgba(255,255,255,0.85)]">
                       /{billingInterval}
                     </span>
-                  </p>
-                  <Button
-                    variant="slim"
-                    type="button"
+                  </div>
+
+                  <ul className="mt-8 space-y-4">
+                    <li className="flex items-center text-[rgba(255,255,255,0.85)]">
+                      <svg
+                        className="w-4 h-4 mr-3 text-[#7B5CFF]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {imageTokens} product image renders
+                    </li>
+                    <li className="flex items-center text-[rgba(255,255,255,0.85)] opacity-35">
+                      <svg
+                        className="w-4 h-4 mr-3 text-[#7B5CFF]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      AI Videos of your product - coming soon
+                    </li>
+                    <li className="flex items-center text-[rgba(255,255,255,0.85)]">
+                      <svg
+                        className="w-4 h-4 mr-3 text-[#7B5CFF]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {captionTokens} caption creation credits
+                    </li>
+                  </ul>
+
+                  <button
                     disabled={session && !userLoaded}
-                    loading={loading}
                     onClick={() => handleCheckout(price.id)}
-                    className="mt-8 block w-full rounded-lg py-2 text-sm font-semibold text-center bg-gray-900 text-white border border-gray-900 hover:bg-white hover:text-gray-900 transition-colors duration-200"
+                    className={`mt-8 w-full px-8 py-3.5 rounded-lg text-[rgba(255,255,255,0.95)] font-medium
+                      bg-transparent border border-transparent bg-gradient-to-r from-[#7B5CFF] to-[#985CFF] bg-clip-text
+                      hover:from-transparent hover:to-transparent hover:text-white
+                      hover:bg-gradient-to-r hover:from-[#7B5CFF] hover:to-[#985CFF]
+                      hover:shadow-[0_0_12px_rgba(123,92,255,0.35)]
+                      transition-all duration-300
+                      relative
+                      before:absolute before:inset-0 before:rounded-lg before:p-[1px]
+                      before:bg-gradient-to-r before:from-[#7B5CFF] before:to-[#985CFF]
+                      before:-z-10
+                    `}
                   >
-                    {product.name === subscription?.prices?.products.name
-                      ? 'Manage'
-                      : 'Subscribe'}
-                  </Button>
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 animate-spin"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      </span>
+                    ) : product.name === subscription?.prices?.products.name ? (
+                      'Manage'
+                    ) : (
+                      'Subscribe'
+                    )}
+                  </button>
                 </div>
               </div>
             );
