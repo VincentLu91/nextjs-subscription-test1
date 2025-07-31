@@ -38,7 +38,8 @@ const relevantEvents = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
-  'customer.subscription.deleted'
+  'customer.subscription.deleted',
+  'customer.subscription.trial_will_end'
 ]);
 
 const webhookHandler = async (req, res) => {
@@ -168,6 +169,26 @@ const webhookHandler = async (req, res) => {
               }
             }
             break;
+          case 'customer.subscription.trial_will_end':
+            const trialEndEvent = event.data.object;
+            try {
+              await manageSubscriptionStatusChange(
+                trialEndEvent.id,
+                trialEndEvent.customer,
+                false,
+                true // isTrialEnding flag
+              );
+              console.log('Successfully processed trial end notification');
+            } catch (error) {
+              console.error('Failed to process trial end:', {
+                error: error.message,
+                stack: error.stack,
+                customerId: trialEndEvent.customer
+              });
+              throw error;
+            }
+            break;
+
           default:
             throw new Error('Unhandled relevant event!');
         }

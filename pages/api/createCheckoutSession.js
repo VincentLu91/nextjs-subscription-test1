@@ -47,7 +47,7 @@ const createCheckoutSession = async (req, res) => {
               missing_payment_method: 'pause'
             }
           },
-          trial_period_days: 30
+          trial_period_days: 3 //30
         },
         // payment_method_collection: 'if_required',
         payment_method_collection: 'always',
