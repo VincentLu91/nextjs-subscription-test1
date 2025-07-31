@@ -116,7 +116,8 @@ const copyBillingDetailsToCustomer = async (uuid, payment_method) => {
 const manageSubscriptionStatusChange = async (
   subscriptionId,
   customerId,
-  createAction = false
+  createAction = false,
+  isTrialEnding = false
 ) => {
   // Get customer's UUID from mapping table.
   console.log('Looking up customer with Stripe ID:', customerId);
@@ -193,6 +194,7 @@ const manageSubscriptionStatusChange = async (
     id: subscription.id,
     user_id: uuid || null, // Allow null for unknown customers
     metadata: subscription.metadata,
+    trial_ending: isTrialEnding,
     status: subscription.status,
     price_id: subscription.items.data[0].price.id,
     quantity: subscription.quantity,

@@ -1,6 +1,6 @@
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '../components/UserContext';
 import { useRouter } from 'next/router';
 import { addCustomerIfMissing } from '../utils/provisionCustomer'; // add new users to 'customers' table w tokens
@@ -9,6 +9,40 @@ import { supabase } from '../utils/initSupabase';
 export default function Dashboard() {
   const { user, isLoadingUser } = useUser();
   const router = useRouter();
+  const [isTrialEnding, setIsTrialEnding] = useState(false);
+
+  const redirectToPortal = async () => {
+    try {
+      const response = await fetch('/api/createPortalLink', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const { url } = await response.json();
+      router.push(url);
+    } catch (error) {
+      console.error('Error redirecting to billing portal:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      const checkTrialStatus = async () => {
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('trial_ending')
+          .eq('user_id', user.id)
+          .single();
+
+        if (subscription) {
+          setIsTrialEnding(subscription.trial_ending);
+        }
+      };
+
+      checkTrialStatus();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
@@ -53,6 +87,22 @@ export default function Dashboard() {
   function renderView() {
     return (
       <section className="min-h-screen bg-[#0C0C0C] relative overflow-hidden">
+        {isTrialEnding && (
+          <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black py-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+              <p className="text-sm font-medium">
+                Your free trial is ending soon! Add your payment method to
+                continue using our services.
+              </p>
+              <button
+                onClick={redirectToPortal}
+                className="ml-4 px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors"
+              >
+                Update Billing
+              </button>
+            </div>
+          </div>
+        )}
         {/* Radial gradient background */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent)] pointer-events-none" />
 
