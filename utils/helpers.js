@@ -1,8 +1,8 @@
 const getURL = () => {
   const url =
-    process?.env?.URL ?? process?.env?.VERCEL_URL === ''
-      ? 'http://localhost:3000'
-      : process?.env?.VERCEL_URL ?? 'http://localhost:3000';
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this in production
+    process?.env?.VERCEL_URL ?? // Automatically set by Vercel
+    'http://localhost:3000';
   return url.includes('http') ? url : `https://${url}`;
 };
 
