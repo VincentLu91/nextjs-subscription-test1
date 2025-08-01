@@ -10,6 +10,7 @@ export default function Dashboard() {
   const { user, isLoadingUser } = useUser();
   const router = useRouter();
   const [isTrialEnding, setIsTrialEnding] = useState(false);
+  const [hasNoSubscription, setHasNoSubscription] = useState(false);
 
   const redirectToPortal = async () => {
     try {
@@ -33,25 +34,6 @@ export default function Dashboard() {
       console.error('Error redirecting to billing portal:', error);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      const checkTrialStatus = async () => {
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('trial_ending')
-          .eq('user_id', user.id)
-          .single();
-
-        if (subscription) {
-          console.log('Subscription data:', subscription);
-          setIsTrialEnding(subscription.trial_ending);
-        }
-      };
-
-      checkTrialStatus();
-    }
-  }, [user]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
@@ -80,23 +62,64 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    // A. page refresh after OAuth completes
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      addCustomerIfMissing(user);
-      console.log('User OAuth: ', user);
+    const initializeAndCheckStatus = async () => {
+      if (!user) return;
+
+      try {
+        // First ensure customer record exists
+        await addCustomerIfMissing(user);
+
+        // Check subscription status
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        // Show banner if no subscription exists
+        setHasNoSubscription(!subscription);
+
+        // Check trial status if subscription exists
+        if (subscription) {
+          setIsTrialEnding(subscription.trial_ending);
+        }
+      } catch (error) {
+        console.error('Error checking subscription status:', error);
+      }
+    };
+
+    initializeAndCheckStatus();
+
+    // Handle auth state changes
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      if (session?.user) {
+        initializeAndCheckStatus();
+      }
     });
 
-    // B. future auth events (magic link, sign‑out, etc.)
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      addCustomerIfMissing(session?.user);
-    });
     return () => sub.subscription.unsubscribe();
-  }, []);
+  }, [user]);
 
   function renderView() {
     return (
       <section className="min-h-screen bg-[#0C0C0C] relative overflow-hidden">
-        {isTrialEnding && (
+        {hasNoSubscription && (
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+              <p className="text-sm font-medium">
+                Unlock More with a Free Trial! You still have access to free
+                credits. Start your 7-day free trial to generate more images —
+                no card required.
+              </p>
+              <Link href="/pricing">
+                <button className="ml-4 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors">
+                  Start Free Trial
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
+        {isTrialEnding && !hasNoSubscription && (
           <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black py-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
               <p className="text-sm font-medium">
