@@ -49,8 +49,8 @@ const createCheckoutSession = async (req, res) => {
           },
           trial_period_days: 3 //30
         },
-        // payment_method_collection: 'if_required',
-        payment_method_collection: 'always',
+        payment_method_collection: 'if_required',
+        // payment_method_collection: 'always',
         success_url: `${getURL()}/account`,
         cancel_url: `${getURL()}/`
       });
