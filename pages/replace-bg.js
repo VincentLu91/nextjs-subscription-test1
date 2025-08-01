@@ -417,33 +417,28 @@ export default function ReplaceBg() {
 
   return (
     <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
-      {hasNoSubscription && (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <p className="text-sm font-medium">
-              Unlock More with a Free Trial! You still have access to free
-              credits. Start your 7-day free trial to generate more images — no
-              card required.
-            </p>
-            <Link href="/pricing">
-              <button className="ml-4 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors">
-                Start Free Trial
-              </button>
-            </Link>
-          </div>
-        </div>
-      )}
       <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <h1 className="text-5xl font-bold">Replace Background</h1>
 
-          {/* Credits Badge */}
-          <div
-            className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-              ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#8256FF] text-white ring-2 ring-[#8256FF]'}`}
-            aria-live="polite"
-          >
-            Credits: {numTokens} / {numTieredTokens}
+          {/* Credits Badge with Tooltip */}
+          <div className="relative">
+            {hasNoSubscription && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-gradient-to-r from-[#423680] to-[#7B63FA] text-white text-sm font-semibold rounded-lg shadow-lg whitespace-nowrap">
+                Need more credits? Start your free trial —{' '}
+                <Link href="/pricing" className="underline hover:text-blue-200">
+                  no card required
+                </Link>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
+              </div>
+            )}
+            <div
+              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
+                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
+              aria-live="polite"
+            >
+              Credits {numTokens} / {numTieredTokens}
+            </div>
           </div>
         </div>
 
