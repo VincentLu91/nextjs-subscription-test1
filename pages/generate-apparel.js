@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
-import { postData } from '../utils/helpers';
+import Link from 'next/link';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
@@ -14,6 +14,7 @@ const ATTEMPTS = 1;
 export default function GenerateApparel() {
   // Keep all existing state and hooks
   const [loading, setLoading] = useState(false);
+  const [hasNoSubscription, setHasNoSubscription] = useState(false);
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
   const [photoData, setPhotoData] = useState(null);
@@ -306,6 +307,37 @@ export default function GenerateApparel() {
     }
   }, [user, isImageUploaded]);
 
+  useEffect(() => {
+    const initializeAndCheckStatus = async () => {
+      if (!user) return;
+
+      try {
+        // Check subscription status
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        // Show banner if no subscription exists
+        setHasNoSubscription(!subscription);
+      } catch (error) {
+        console.error('Error checking subscription status:', error);
+      }
+    };
+
+    initializeAndCheckStatus();
+
+    // Handle auth state changes
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      if (session?.user) {
+        initializeAndCheckStatus();
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, [user]);
+
   const viewGeneratedContent = (url) => {
     setImageLink(url);
     localStorage.setItem('imageLink', url);
@@ -327,6 +359,22 @@ export default function GenerateApparel() {
 
   return (
     <div className="min-h-screen bg-[#0C0C0C] py-12">
+      {hasNoSubscription && (
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <p className="text-sm font-medium">
+              Unlock More with a Free Trial! You still have access to free
+              credits. Start your 7-day free trial to generate more images — no
+              card required.
+            </p>
+            <Link href="/pricing">
+              <button className="ml-4 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors">
+                Start Free Trial
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <h1 className="text-4xl font-extrabold text-white">
