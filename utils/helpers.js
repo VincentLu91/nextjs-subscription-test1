@@ -1,7 +1,7 @@
 const getURL = () => {
   const url =
-    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this in production...hopefully
-    process?.env?.VERCEL_URL ?? // Automatically set by Vercel
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this in production...hopefully (custom domain)
+    process?.env?.VERCEL_URL ?? // Automatically set by Vercel...basically the deployment link
     'http://localhost:3000';
   return url.includes('http') ? url : `https://${url}`;
 };
