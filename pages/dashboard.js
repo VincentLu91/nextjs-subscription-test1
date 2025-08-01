@@ -13,14 +13,22 @@ export default function Dashboard() {
 
   const redirectToPortal = async () => {
     try {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
       const response = await fetch('/api/createPortalLink', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          token: session?.access_token
         }
       });
-      const { url } = await response.json();
-      router.push(url);
+      const data = await response.json();
+      if (data.url) {
+        router.push(data.url);
+      } else {
+        throw new Error('No URL returned from billing portal');
+      }
     } catch (error) {
       console.error('Error redirecting to billing portal:', error);
     }
@@ -36,6 +44,7 @@ export default function Dashboard() {
           .single();
 
         if (subscription) {
+          console.log('Subscription data:', subscription);
           setIsTrialEnding(subscription.trial_ending);
         }
       };
