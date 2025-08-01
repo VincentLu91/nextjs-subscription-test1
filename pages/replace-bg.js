@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { postData } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
@@ -25,6 +26,7 @@ export default function ReplaceBg() {
   const [promptStatus, setPromptStatus] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [textareaFocused, setTextareaFocused] = useState(false);
+  const [hasNoSubscription, setHasNoSubscription] = useState(false);
 
   const router = useRouter();
   const {
@@ -254,6 +256,37 @@ export default function ReplaceBg() {
   }, [backgroundImagePredictions]);
 
   useEffect(() => {
+    const initializeAndCheckStatus = async () => {
+      if (!user) return;
+
+      try {
+        // Check subscription status
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        // Show banner if no subscription exists
+        setHasNoSubscription(!subscription);
+      } catch (error) {
+        console.error('Error checking subscription status:', error);
+      }
+    };
+
+    initializeAndCheckStatus();
+
+    // Handle auth state changes
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      if (session?.user) {
+        initializeAndCheckStatus();
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
     if (!isLoadingUser && !user) {
       router.replace('/signin');
     } else if (user) {
@@ -384,6 +417,22 @@ export default function ReplaceBg() {
 
   return (
     <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
+      {hasNoSubscription && (
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <p className="text-sm font-medium">
+              Unlock More with a Free Trial! You still have access to free
+              credits. Start your 7-day free trial to generate more images — no
+              card required.
+            </p>
+            <Link href="/pricing">
+              <button className="ml-4 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors">
+                Start Free Trial
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
       <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <h1 className="text-5xl font-bold">Replace Background</h1>
