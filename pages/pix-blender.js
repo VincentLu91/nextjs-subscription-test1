@@ -62,8 +62,68 @@ export default function GenerateImages() {
     setIsGeneratingBlenderImg
   } = useUser();
 
+  console.log('isGeneratingBlenderImg=', isGeneratingBlenderImg);
+
   const intervalPrompt = useRef();
   const intervalImage = useRef();
+
+  const clearUserData = () => {
+    // Clear state
+    setUploadedImages([]);
+    setImageForBg(null);
+    setPixBlenderImageList([]);
+    setPixBlenderPredictions({});
+    setImageFile(null);
+    setImageFileName('');
+    setIsImageUploaded(false);
+    setPixBlenderPrompt('');
+    setFinishMessage('');
+    setIsGeneratingBlenderImg(false); // this ensures when signed out, button will revert back
+
+    // Clear localStorage for current user if exists
+    if (user?.id) {
+      localStorage.removeItem(`generatedPhotos_${user.id}`);
+      localStorage.removeItem(`uploadedFilePath_${user.id}`);
+      localStorage.removeItem(`imageLink_${user.id}`);
+    }
+  };
+
+  // Clear other user data from localStorage
+  const clearOtherUserData = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        (key.startsWith('generatedPhotos_') ||
+          key.startsWith('uploadedFilePath_') ||
+          key.startsWith('imageLink_')) &&
+        !key.endsWith(user?.id || '')
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
+  // Load user's data from localStorage
+  const loadUserData = () => {
+    if (!user?.id) return;
+
+    const userKey = `generatedPhotos_${user.id}`;
+    const savedPhotos = localStorage.getItem(userKey);
+    if (savedPhotos) {
+      const photos = JSON.parse(savedPhotos);
+      setPixBlenderImageList(photos.map((url) => ({ url, text: '' })));
+    } else {
+      setPixBlenderImageList([]);
+    }
+
+    const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    if (savedFilePath) {
+      setUploadedFilePath(savedFilePath); // not sure
+      setIsImageUploaded(true);
+    } else {
+      setUploadedFilePath('');
+      setIsImageUploaded(false);
+    }
+  };
 
   // Update isImageUploaded based on uploadedImages length
   useEffect(() => {
@@ -178,6 +238,7 @@ export default function GenerateImages() {
         ...state,
         [attempt]: resp.data
       }));
+      console.log('setIsGeneratingBlenderImg set TRUE 240---');
       setIsGeneratingBlenderImg(true);
       return resp.data;
     } catch (error) {
@@ -522,13 +583,11 @@ export default function GenerateImages() {
           photo_url: data.publicUrl
         });
 
-        const localPhotos = localStorage.getItem('generatedPhotos');
+        const userKey = `generatedPhotos_${user.id}`;
+        const localPhotos = localStorage.getItem(userKey);
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
         localPhotosJson.push(data.publicUrl);
-        localStorage.setItem(
-          'generatedPhotos',
-          JSON.stringify(localPhotosJson)
-        );
+        localStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setPixBlenderImageList((current) => [
           ...current,
@@ -651,21 +710,27 @@ export default function GenerateImages() {
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       if (session?.user) {
         initializeAndCheckStatus();
+        clearOtherUserData(); // Clear other user data when a new user logs in
+        loadUserData(); // Load the new user's data
+      } else {
+        clearUserData(); // Clear all state and storage on logout
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      sub.subscription.unsubscribe();
+      clearInterval(intervalPrompt.current);
+      clearInterval(intervalImage.current);
+    };
   }, [user]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
       router.replace('/signin');
+      clearUserData(); // Clear all state when no user
     } else if (user) {
-      // Restore uploaded images from localStorage
-      const savedImages = localStorage.getItem('pixBlenderUploadedImages');
-      if (savedImages) {
-        setUploadedImages(JSON.parse(savedImages));
-      }
+      clearOtherUserData(); // Clear other user data when component mounts with a user
+      loadUserData(); // Load the current user's data
     }
   }, [user, isLoadingUser]);
 
@@ -688,7 +753,7 @@ export default function GenerateImages() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem('imageLink', url);
+    localStorage.setItem(`imageLink_${user.id}`, image.url);
     router.push('/view-image');
   };
 
@@ -850,6 +915,9 @@ export default function GenerateImages() {
                         setPixBlenderImageList([]);
                         setIsBlenderImgLoading(true);
                         setFinishMessage('');
+                        console.log(
+                          'setIsGeneratingBlenderImg set TRUE 920---'
+                        );
                         setIsGeneratingBlenderImg(true);
 
                         // Process all images at once
