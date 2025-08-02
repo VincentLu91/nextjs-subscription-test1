@@ -59,6 +59,7 @@ export default function ImageToVideo() {
     setImg2vidPrompt('');
     setFinishMessage('');
     setResultVideo(null); // Clear resultVideo state
+    setVideoRespObj(null); // Clear video response object
 
     // Clear localStorage for current user if exists
     if (user?.id) {
@@ -66,6 +67,7 @@ export default function ImageToVideo() {
       localStorage.removeItem(`resultVideo_${user.id}`);
       localStorage.removeItem(`imageLink_${user.id}`);
       localStorage.removeItem(`videoLink_${user.id}`);
+      localStorage.removeItem(`videoRespObj_${user.id}`);
     }
   };
 
@@ -76,7 +78,8 @@ export default function ImageToVideo() {
         (key.startsWith('generatedVideos_') ||
           key.startsWith('imageLink_') ||
           key.startsWith('videoLink_') ||
-          key.startsWith('resultVideo_')) &&
+          key.startsWith('resultVideo_') ||
+          key.startsWith('videoRespObj_')) &&
         !key.endsWith(user?.id || '')
       ) {
         localStorage.removeItem(key);
@@ -98,7 +101,8 @@ export default function ImageToVideo() {
         if (
           key.includes('resultVideo_') ||
           key.includes('videoLink_') ||
-          key.includes('generatedVideos_')
+          key.includes('generatedVideos_') ||
+          key.includes('videoRespObj_')
         ) {
           localStorage.removeItem(key);
         }
@@ -112,11 +116,19 @@ export default function ImageToVideo() {
         const storedResultVideo = localStorage.getItem(
           `resultVideo_${user.id}`
         );
+        const storedVideoRespObj = localStorage.getItem(
+          `videoRespObj_${user.id}`
+        );
+
         if (storedVideoLink) {
           setVideoLink(storedVideoLink);
         }
         if (storedResultVideo) {
           setResultVideo(storedResultVideo);
+        }
+        if (storedVideoRespObj) {
+          setVideoRespObj(JSON.parse(storedVideoRespObj));
+          setIsVideoLoading(true); // Resume loading state if we have a response object
         }
       }
       wasLoggedOut.current = false; // Reset flag
@@ -195,6 +207,11 @@ export default function ImageToVideo() {
       console.log('videoResp: ', videoResp);
       if (videoResp) {
         setVideoRespObj(videoResp);
+        // Store videoRespObj in localStorage
+        localStorage.setItem(
+          `videoRespObj_${user.id}`,
+          JSON.stringify(videoResp)
+        );
         console.log('videoResp status: ', videoResp.data.status);
         console.log('videoResp request_id: ', videoResp.data.request_id);
       } else {
@@ -242,27 +259,36 @@ export default function ImageToVideo() {
   };
 
   useEffect(() => {
-    // Only start polling when we have a response URL
-    if (videoRespObj?.data?.response_url && !interval.current) {
-      interval.current = setInterval(async () => {
+    // Only start polling when we have a response URL and we're loading
+    if (
+      videoRespObj?.data?.response_url &&
+      isVideoLoading &&
+      !interval.current
+    ) {
+      const pollVideo = async () => {
         const status = await getVideoResults(videoRespObj.data.status_url);
-        // Also stop polling if we get a failed status
         if (status === 'FAILED') {
           clearInterval(interval.current);
           interval.current = null;
           setIsVideoLoading(false);
         }
-      }, 3000);
+      };
+
+      // Initial poll
+      pollVideo();
+
+      // Set up interval for subsequent polls
+      interval.current = setInterval(pollVideo, 3000);
     }
 
-    // Cleanup function to clear interval when component unmounts or URL changes
+    // Cleanup function to clear interval when component unmounts or dependencies change
     return () => {
       if (interval.current) {
         clearInterval(interval.current);
         interval.current = null;
       }
     };
-  }, [videoRespObj?.data?.response_url]); // Only re-run when response_url changes
+  }, [videoRespObj?.data?.response_url, isVideoLoading, router.asPath]); // Add router.asPath and isVideoLoading to dependencies
 
   useEffect(() => {
     const initializeAndCheckStatus = async () => {
@@ -545,10 +571,7 @@ export default function ImageToVideo() {
               {loadingWithVideoPrompt && (
                 <div className="mt-4 text-[#A1A1AA]">
                   <p>Processing your request...</p>
-                  <p className="text-sm">
-                    Please do not refresh the page or navigate to different
-                    screens
-                  </p>
+                  <p className="text-sm">Please do not refresh the page</p>
                 </div>
               )}
 
