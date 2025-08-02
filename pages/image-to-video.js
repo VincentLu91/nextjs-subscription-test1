@@ -45,29 +45,84 @@ export default function ImageToVideo() {
   const [captionStatus, setCaptionStatus] = useState(null);
   const [numTokens, setNumTokens] = useState(null);
   const [videoRespObj, setVideoRespObj] = useState(null);
-  const [resultVideo, setResultVideo] = useState(() => {
-    // Initialize from localStorage if available
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('resultVideo');
-      return saved || null;
-    }
-    return null;
-  });
+  const [resultVideo, setResultVideo] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(18);
   const [finishMessage, setFinishMessage] = useState(null);
 
   const interval = useRef();
 
-  useEffect(() => {
-    if (!isLoadingUser && !user) router.replace('/signin');
-  }, [user]);
+  const clearUserData = () => {
+    // Clear state
+    setImageLink(null);
+    setVideoLink(null);
+    setIsVideoLoading(false);
+    setImg2vidPrompt('');
+    setFinishMessage('');
+    setResultVideo(null); // Clear resultVideo state
+
+    // Clear localStorage for current user if exists
+    if (user?.id) {
+      localStorage.removeItem(`generatedVideos_${user.id}`);
+      localStorage.removeItem(`resultVideo_${user.id}`);
+      localStorage.removeItem(`imageLink_${user.id}`);
+      localStorage.removeItem(`videoLink_${user.id}`);
+    }
+  };
+
+  // Clear other user data from localStorage
+  const clearOtherUserData = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        (key.startsWith('generatedVideos_') ||
+          key.startsWith('imageLink_') ||
+          key.startsWith('videoLink_') ||
+          key.startsWith('resultVideo_')) &&
+        !key.endsWith(user?.id || '')
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
+  const wasLoggedOut = useRef(false);
 
   useEffect(() => {
-    const storedVideoLink = localStorage.getItem('videoLink');
-    if (storedVideoLink) {
-      setVideoLink(storedVideoLink);
+    if (!isLoadingUser && !user) {
+      // Set flag to prevent restoration after logout
+      wasLoggedOut.current = true;
+      // Clear all video state and storage before redirecting to signin
+      setResultVideo(null);
+      setVideoLink(null);
+      // Clear all video-related data from localStorage on logout
+      Object.keys(localStorage).forEach((key) => {
+        if (
+          key.includes('resultVideo_') ||
+          key.includes('videoLink_') ||
+          key.includes('generatedVideos_')
+        ) {
+          localStorage.removeItem(key);
+        }
+      });
+      router.replace('/signin');
+      clearUserData(); // Clear all state when no user
+    } else if (user) {
+      if (!wasLoggedOut.current) {
+        // Only restore from localStorage if we're not coming from a logout
+        const storedVideoLink = localStorage.getItem(`videoLink_${user.id}`);
+        const storedResultVideo = localStorage.getItem(
+          `resultVideo_${user.id}`
+        );
+        if (storedVideoLink) {
+          setVideoLink(storedVideoLink);
+        }
+        if (storedResultVideo) {
+          setResultVideo(storedResultVideo);
+        }
+      }
+      wasLoggedOut.current = false; // Reset flag
+      clearOtherUserData(); // Clear other user data when component mounts with a user
     }
-  }, []); // Retrieve videoLink from localStorage on component mount
+  }, [user, isLoadingUser]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);
@@ -97,7 +152,7 @@ export default function ImageToVideo() {
       <button
         onClick={() => {
           setImageLink(null); // Clear the state
-          localStorage.removeItem('imageLink'); // Remove the key from localStorage
+          localStorage.removeItem(`imageLink_${user.id}`); // Remove the key from localStorage
         }}
         style={{
           position: 'absolute',
@@ -161,8 +216,8 @@ export default function ImageToVideo() {
       const videoUrl = result.data.video.url;
       setResultVideo(videoUrl);
       setVideoLink(videoUrl);
-      localStorage.setItem('resultVideo', videoUrl);
-      localStorage.setItem('videoLink', videoUrl);
+      localStorage.setItem(`resultVideo_${user.id}`, videoUrl);
+      localStorage.setItem(`videoLink_${user.id}`, videoUrl);
       //setResultVideo(result.data.video);
       // Clear interval when video is completed
       if (interval.current) {
@@ -253,7 +308,7 @@ export default function ImageToVideo() {
 
   const viewGeneratedContent = (videoUrl) => {
     setVideoLink(videoUrl); // Update state with the video URL
-    localStorage.setItem('videoLink', videoUrl); // Save videoLink to localStorage
+    localStorage.setItem(`videoLink_${user.id}`, videoUrl); // Save videoLink to localStorage
     router.push('/view-video'); // Navigate to the content page
   };
 
@@ -317,10 +372,13 @@ export default function ImageToVideo() {
         video_url: data.publicUrl
       });
 
-      const localVideos = localStorage.getItem('generatedVideos');
+      const localVideos = localStorage.getItem(`generatedVideos_${user.id}`);
       const localVideosJson = localVideos ? JSON.parse(localVideos) : [];
       localVideosJson.push(data.publicUrl);
-      localStorage.setItem('generatedVideos', JSON.stringify(localVideosJson));
+      localStorage.setItem(
+        `generatedVideos_${user.id}`,
+        JSON.stringify(localVideosJson)
+      );
 
       /*setBackgroundImageList((current) => [
           ...current,

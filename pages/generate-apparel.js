@@ -60,6 +60,63 @@ export default function GenerateApparel() {
 
   const intervalImage = useRef();
 
+  const clearUserData = () => {
+    // Clear state
+    setModelImagePath('');
+    setGarmentImagePath('');
+    //setImageForBg(null);
+    setTryOnImageList([]);
+    setTryOnPredictions({});
+    setImageFile(null);
+    setImageFileName('');
+    setIsImageUploaded(false);
+    setFinishMessage('');
+
+    // Clear localStorage for current user if exists
+    if (user?.id) {
+      localStorage.removeItem(`generatedPhotos_${user.id}`);
+      localStorage.removeItem(`uploadedFilePath_${user.id}`);
+      localStorage.removeItem(`imageLink_${user.id}`);
+    }
+  };
+
+  // Clear other user data from localStorage
+  const clearOtherUserData = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        (key.startsWith('generatedPhotos_') ||
+          key.startsWith('uploadedFilePath_') ||
+          key.startsWith('imageLink_')) &&
+        !key.endsWith(user?.id || '')
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
+  // Load user's data from localStorage
+  const loadUserData = () => {
+    if (!user?.id) return;
+
+    const userKey = `generatedPhotos_${user.id}`;
+    const savedPhotos = localStorage.getItem(userKey);
+    if (savedPhotos) {
+      const photos = JSON.parse(savedPhotos);
+      setTryOnImageList(photos.map((url) => ({ url, text: '' })));
+    } else {
+      setTryOnImageList([]);
+    }
+
+    /*const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    if (savedFilePath) {
+      setUploadedFilePath(savedFilePath);
+      setIsImageUploaded(true);
+    } else {
+      setUploadedFilePath('');
+      setIsImageUploaded(false);
+    }*/
+  };
+
   // Keep all existing functions
   const getImage = async (attempt) => {
     if (!modelImagePath || !garmentImagePath) {
@@ -167,13 +224,11 @@ export default function GenerateApparel() {
           photo_url: data.publicUrl
         });
 
-        const localPhotos = localStorage.getItem('generatedPhotos');
+        const userKey = `generatedPhotos_${user.id}`;
+        const localPhotos = localStorage.getItem(userKey);
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
         localPhotosJson.push(data.publicUrl);
-        localStorage.setItem(
-          'generatedPhotos',
-          JSON.stringify(localPhotosJson)
-        );
+        localStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setTryOnImageList((current) => [...current, { url: data.publicUrl }]);
         await getImageTokenData();
@@ -215,8 +270,14 @@ export default function GenerateApparel() {
   }, [tryOnPredictions]);
 
   useEffect(() => {
-    if (!isLoadingUser && !user) router.replace('/signin');
-  }, [user]);
+    if (!isLoadingUser && !user) {
+      router.replace('/signin');
+      clearUserData(); // Clear all state when no user
+    } else if (user) {
+      clearOtherUserData(); // Clear other user data when component mounts with a user
+      loadUserData(); // Load the current user's data
+    }
+  }, [user, isLoadingUser]);
 
   async function getImageTokenData() {
     const imageTokenData = await axios.get(
@@ -332,15 +393,22 @@ export default function GenerateApparel() {
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       if (session?.user) {
         initializeAndCheckStatus();
+        clearOtherUserData(); // Clear other user data when a new user logs in
+        loadUserData(); // Load the new user's data
+      } else {
+        clearUserData(); // Clear all state and storage on logout
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      sub.subscription.unsubscribe();
+      clearInterval(intervalImage.current);
+    };
   }, [user]);
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem('imageLink', url);
+    localStorage.setItem(`imageLink_${user.id}`, image.url);
     router.push('/view-image');
   };
 

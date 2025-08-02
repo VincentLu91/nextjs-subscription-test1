@@ -65,6 +65,64 @@ export default function ReplaceBg() {
   const intervalPrompt = useRef();
   const intervalImage = useRef();
 
+  // Clear all state and storage for current user
+  const clearUserData = () => {
+    // Clear state
+    setUploadedFilePath('');
+    setImageForBg(null);
+    setBackgroundImageList([]);
+    setBackgroundImagePredictions({});
+    setImageFile(null);
+    setImageFileName('');
+    setIsImageUploaded(false);
+    setBackgroundPrompt('');
+    setFinishMessage('');
+
+    // Clear localStorage for current user if exists
+    if (user?.id) {
+      localStorage.removeItem(`generatedPhotos_${user.id}`);
+      localStorage.removeItem(`uploadedFilePath_${user.id}`);
+      localStorage.removeItem(`imageLink_${user.id}`);
+    }
+  };
+
+  // Clear other user data from localStorage
+  const clearOtherUserData = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        (key.startsWith('generatedPhotos_') ||
+          key.startsWith('uploadedFilePath_') ||
+          key.startsWith('imageLink_')) &&
+        !key.endsWith(user?.id || '')
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
+  // Load user's data from localStorage
+  const loadUserData = () => {
+    if (!user?.id) return;
+
+    const userKey = `generatedPhotos_${user.id}`;
+    const savedPhotos = localStorage.getItem(userKey);
+    if (savedPhotos) {
+      const photos = JSON.parse(savedPhotos);
+      setBackgroundImageList(photos.map((url) => ({ url, text: '' })));
+    } else {
+      setBackgroundImageList([]);
+    }
+
+    const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    if (savedFilePath) {
+      setUploadedFilePath(savedFilePath);
+      setIsImageUploaded(true);
+    } else {
+      setUploadedFilePath('');
+      setIsImageUploaded(false);
+    }
+  };
+
   // Preserve all existing functionality
   const getImage = async (attempt, backgroundPrompt) => {
     if (!uploadedFilePath) {
@@ -193,13 +251,11 @@ export default function ReplaceBg() {
           photo_url: data.publicUrl
         });
 
-        const localPhotos = localStorage.getItem('generatedPhotos');
+        const userKey = `generatedPhotos_${user.id}`;
+        const localPhotos = localStorage.getItem(userKey);
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
         localPhotosJson.push(data.publicUrl);
-        localStorage.setItem(
-          'generatedPhotos',
-          JSON.stringify(localPhotosJson)
-        );
+        localStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setBackgroundImageList((current) => [
           ...current,
@@ -280,21 +336,27 @@ export default function ReplaceBg() {
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       if (session?.user) {
         initializeAndCheckStatus();
+        clearOtherUserData(); // Clear other user data when a new user logs in
+        loadUserData(); // Load the new user's data
+      } else {
+        clearUserData(); // Clear all state and storage on logout
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      sub.subscription.unsubscribe();
+      clearInterval(intervalPrompt.current);
+      clearInterval(intervalImage.current);
+    };
   }, [user]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
       router.replace('/signin');
+      clearUserData(); // Clear all state when no user
     } else if (user) {
-      const savedFilePath = localStorage.getItem('uploadedFilePath');
-      if (savedFilePath) {
-        setUploadedFilePath(savedFilePath);
-        setIsImageUploaded(true);
-      }
+      clearOtherUserData(); // Clear other user data when component mounts with a user
+      loadUserData(); // Load the current user's data
     }
   }, [user, isLoadingUser]);
 
@@ -354,7 +416,7 @@ export default function ReplaceBg() {
       if (publicUrlData) {
         setImageForBg(publicUrlData.publicUrl);
         setUploadedFilePath(filePath);
-        localStorage.setItem('uploadedFilePath', filePath);
+        localStorage.setItem(`uploadedFilePath_${user.id}`, filePath);
       }
       setIsImageUploaded(true);
       getFiles();
@@ -577,7 +639,7 @@ export default function ReplaceBg() {
                   className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
                   onClick={() => {
                     setImageLink(image.url);
-                    localStorage.setItem('imageLink', image.url);
+                    localStorage.setItem(`imageLink_${user.id}`, image.url);
                     router.push('/view-image');
                   }}
                 >
