@@ -115,14 +115,14 @@ export default function GenerateImages() {
       setPixBlenderImageList([]);
     }
 
-    const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    /*const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
     if (savedFilePath) {
       setUploadedFilePath(savedFilePath); // not sure
       setIsImageUploaded(true);
     } else {
       setUploadedFilePath('');
       setIsImageUploaded(false);
-    }
+    }*/
   };
 
   // Update isImageUploaded based on uploadedImages length
