@@ -42,15 +42,29 @@ export default function ViewImage() {
   const interval = useRef();
 
   useEffect(() => {
-    if (!isLoadingUser && !user) router.replace('/signin');
+    if (!isLoadingUser && !user) {
+      router.replace('/signin');
+      setImageLink(null);
+      if (typeof window !== 'undefined') {
+        // Clear any imageLink items from localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('imageLink_')) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    }
   }, [user]);
 
   useEffect(() => {
-    const storedImageLink = localStorage.getItem('imageLink');
-    if (storedImageLink) {
-      setImageLink(storedImageLink);
+    if (user?.id) {
+      const storedImageLink = localStorage.getItem(`imageLink_${user.id}`);
+      if (storedImageLink) {
+        setImageLink(storedImageLink);
+      }
     }
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     setPrompt(e.target.value);
@@ -66,7 +80,7 @@ export default function ViewImage() {
 
   const goGenerateVideo = (url) => {
     setImageLink(url);
-    localStorage.setItem('imageLink', url);
+    localStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/image-to-video');
   };
 
@@ -234,7 +248,7 @@ export default function ViewImage() {
                   <button
                     onClick={() => {
                       setImageLink(null);
-                      localStorage.removeItem('imageLink');
+                      localStorage.removeItem(`imageLink_${user.id}`);
                     }}
                     className={`absolute top-4 left-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center z-10 text-[#F87171] transition-transform duration-200 ${
                       !prefersReducedMotion && 'hover:scale-110'

@@ -45,15 +45,29 @@ export default function ViewVideo() {
   const interval = useRef();
 
   useEffect(() => {
-    if (!isLoadingUser && !user) router.replace('/signin');
+    if (!isLoadingUser && !user) {
+      router.replace('/signin');
+      setVideoLink(null);
+      if (typeof window !== 'undefined') {
+        // Clear any videoLink items from localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('videoLink_')) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    }
   }, [user]);
 
   useEffect(() => {
-    const storedVideoLink = localStorage.getItem('videoLink');
-    if (storedVideoLink) {
-      setVideoLink(storedVideoLink);
+    if (user?.id) {
+      const storedVideoLink = localStorage.getItem(`videoLink_${user.id}`);
+      if (storedVideoLink) {
+        setVideoLink(storedVideoLink);
+      }
     }
-  }, []); // Retrieve videoLink from localStorage on component mount
+  }, [user]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);
@@ -279,7 +293,7 @@ export default function ViewVideo() {
                   <button
                     onClick={() => {
                       setVideoLink(null);
-                      localStorage.removeItem('videoLink');
+                      localStorage.removeItem(`videoLink_${user.id}`);
                     }}
                     className="absolute top-4 left-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center z-10 text-[#F87171] transition-transform duration-200 hover:scale-110"
                     aria-label="Close preview"
