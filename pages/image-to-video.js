@@ -545,7 +545,10 @@ export default function ImageToVideo() {
               {loadingWithVideoPrompt && (
                 <div className="mt-4 text-[#A1A1AA]">
                   <p>Processing your request...</p>
-                  <p className="text-sm">Please do not refresh the page</p>
+                  <p className="text-sm">
+                    Please do not refresh the page or navigate to different
+                    screens
+                  </p>
                 </div>
               )}
 
