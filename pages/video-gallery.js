@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '../components/UserContext';
 import Button from '../components/ui/Button';
+import Image from 'next/image';
 import axios from 'axios';
 import { supabase } from '../utils/initSupabase';
 
@@ -14,7 +15,10 @@ const ATTEMPTS = 2;
 // components/UserContext.js
 export default function VideoGallery() {
   const [loading, setLoading] = useState(false);
-  const [visible, setVisible] = useState(5);
+  const [loadedVideos, setLoadedVideos] = useState(new Set());
+  const [visibleVideos, setVisibleVideos] = useState([]);
+  const observerRef = useRef();
+  const loadingRef = useRef();
   const [imageStyle, setImageStyle] = useState(null);
   const router = useRouter();
   const {
@@ -140,12 +144,50 @@ export default function VideoGallery() {
     }
   };
 
+  const loadMoreVideos = useCallback(() => {
+    const currentLength = visibleVideos.length;
+    const nextBatch = generatedVideos.slice(currentLength, currentLength + 8);
+    if (nextBatch.length > 0) {
+      setVisibleVideos((prev) => [...prev, ...nextBatch]);
+    }
+  }, [generatedVideos, visibleVideos]);
+
   useEffect(() => {
     // Fetch and store videos when user data is available
     if (user?.identities?.[0]?.id) {
       fetchAndStoreVideos(true);
     }
   }, [user]);
+
+  useEffect(() => {
+    setVisibleVideos(generatedVideos.slice(0, 8));
+  }, [generatedVideos]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          visibleVideos.length < generatedVideos.length
+        ) {
+          loadMoreVideos();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [loadMoreVideos, visibleVideos.length, generatedVideos.length]);
 
   // Clear localStorage on route change
   useEffect(() => {
@@ -216,8 +258,8 @@ export default function VideoGallery() {
               <p className="mb-6 text-[#E0E0E0] text-center">{message}</p>
             )}
 
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 justify-items-center">
-              {generatedVideos.map((videoUrl, index) => (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 justify-items-center relative">
+              {visibleVideos.map((videoUrl, index) => (
                 <div
                   key={index}
                   className="gallery-tile relative w-full aspect-square overflow-hidden rounded-[14px] transition-transform duration-220 ease-out hover:translate-y-[-4px] hover:scale-[1.03] hover:drop-shadow-lg"
@@ -227,11 +269,38 @@ export default function VideoGallery() {
                     onClick={() => viewGeneratedContent(videoUrl)}
                     style={{ position: 'relative' }}
                   >
-                    <video
-                      src={videoUrl}
-                      className="w-full h-full object-cover brightness-[0.92]"
-                      controls={false}
-                    />
+                    {!loadedVideos.has(videoUrl) && (
+                      <div className="w-full h-full bg-gray-800 absolute inset-0 animate-pulse" />
+                    )}
+                    <div className="w-full h-full relative">
+                      <video
+                        src={videoUrl}
+                        className="w-full h-full object-cover brightness-[0.92] opacity-0 transition-opacity duration-300"
+                        controls={false}
+                        preload="metadata"
+                        onLoadedMetadata={(e) => {
+                          e.target.currentTime = 0;
+                        }}
+                        onLoadedData={(e) => {
+                          e.target.style.opacity = '1';
+                          setLoadedVideos(
+                            (prev) => new Set([...prev, videoUrl])
+                          );
+                        }}
+                      />
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                        <div className="w-12 h-12 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="white"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
 
                     <button
                       onClick={(e) => {
@@ -268,6 +337,14 @@ export default function VideoGallery() {
                   </div>
                 </div>
               ))}
+              {visibleVideos.length < generatedVideos.length && (
+                <div
+                  ref={loadingRef}
+                  className="col-span-full flex justify-center items-center py-8"
+                >
+                  <div className="w-12 h-12 rounded-full border-4 border-t-[#943bdc] border-r-[#943bdc] border-b-transparent border-l-transparent animate-spin"></div>
+                </div>
+              )}
             </div>
           </>
         ) : (
