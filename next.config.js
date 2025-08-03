@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['eolmngjyubxaxlvtwbzs.supabase.co']
+    domains: ['eolmngjyubxaxlvtwbzs.supabase.co', 'cdn.sanity.io']
   },
   async headers() {
     return [

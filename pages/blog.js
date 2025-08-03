@@ -34,9 +34,9 @@ export default function Home({ posts }) {
     <div className="bg-[#0C0C0C]">
       <Toolbar />
       <div className={`${styles.main} ${styles.secondaryTextColor}`}>
-        <h1>Welcome To My Blog</h1>
+        <h1 className="text-white">Welcome To My Blog</h1>
 
-        <h3>Recent Posts:</h3>
+        <h3 className="text-white">Recent Posts:</h3>
 
         <div className={styles.feed}>
           {mappedPosts.length ? (
@@ -48,7 +48,7 @@ export default function Home({ posts }) {
                   className={styles.post}
                 >
                   {console.log('test', p)}
-                  <h3>{p.title}</h3>
+                  <h3 className="text-white">{p.title}</h3>
                   <Image
                     src={p.mainImage}
                     alt="main image"
