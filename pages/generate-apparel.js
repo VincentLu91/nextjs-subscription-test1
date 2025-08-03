@@ -426,12 +426,10 @@ export default function GenerateApparel() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0C0C0C] py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
+      <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <h1 className="text-4xl font-extrabold text-white">
-            Clothes Swapping
-          </h1>
+          <h1 className="text-5xl font-bold">Clothes Swapping</h1>
 
           {/* Credits Badge with Tooltip */}
           <div className="relative">
@@ -454,12 +452,12 @@ export default function GenerateApparel() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Left Column - Preview Frame */}
           <div
             className={`w-full transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${mounted ? 'opacity-100' : 'opacity-0'}`}
           >
-            <div className="w-[560px] h-[560px] mx-auto bg-[#16161A] rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col items-center justify-center relative">
+            <div className="w-full aspect-square mx-auto bg-[#181818] rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col items-center justify-center relative shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               {modelImageUrl ? (
                 <img
                   src={modelImageUrl}
@@ -496,7 +494,7 @@ export default function GenerateApparel() {
           <div
             className={`transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
           >
-            <div className="bg-[#16161A] rounded-[20px] p-8 shadow-[0_8px_24px_rgba(0,0,0,0.55)]">
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="grid gap-6">
                 {/* Model Upload Dropzone */}
                 <div>
@@ -504,7 +502,7 @@ export default function GenerateApparel() {
                     Upload Model Image (Person)
                   </label>
                   <div
-                    className="h-[140px] border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-xl relative group transition-all duration-300 ease-in-out hover:border-solid hover:border-[#8B5CF6] hover:bg-[rgba(139,92,246,0.08)]"
+                    className="h-[140px] border-2 border-dashed border-[#3F3F46] rounded-xl relative group transition-all duration-300 ease-in-out hover:border-[#8256FF] hover:bg-[rgba(130,86,255,0.08)]"
                     onDragOver={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -568,7 +566,7 @@ export default function GenerateApparel() {
                     Upload Clothing Piece
                   </label>
                   <div
-                    className="h-[140px] border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-xl relative group transition-all duration-300 ease-in-out hover:border-solid hover:border-[#8B5CF6] hover:bg-[rgba(139,92,246,0.08)]"
+                    className="h-[140px] border-2 border-dashed border-[#3F3F46] rounded-xl relative group transition-all duration-300 ease-in-out hover:border-[#8256FF] hover:bg-[rgba(130,86,255,0.08)]"
                     onDragOver={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -634,7 +632,7 @@ export default function GenerateApparel() {
                   <select
                     value={selectedOption}
                     onChange={handleOptionChange}
-                    className="w-full h-12 bg-[#0E0E11] border border-[rgba(255,255,255,0.08)] rounded-[10px] px-4 text-white focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] transition-all duration-120"
+                    className="w-full h-12 bg-[#0F0F0F] border border-[#27272A] rounded-lg px-4 text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                   >
                     <option value="tops">Top</option>
                     <option value="bottoms">Bottom</option>
@@ -660,7 +658,7 @@ export default function GenerateApparel() {
                         await getImageTokenData();
                       }
                     }}
-                    className="w-full h-14 rounded-[14px] bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white font-semibold transform hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(139,92,246,0.45)] active:scale-[0.98] transition-all duration-90 ease-out"
+                    className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Generate Image
                   </button>
@@ -692,15 +690,15 @@ export default function GenerateApparel() {
         {/* Results Grid */}
         {tryOnImageList.length > 0 && (
           <>
-            <h2 className="text-2xl text-white font-bold mt-10 mb-6">
+            <h2 className="text-2xl font-bold mt-10 mb-6">
               Your Generated Images
             </h2>
-            <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {tryOnImageList.map(renderCard)}
             </div>
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }
