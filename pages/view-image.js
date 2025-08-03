@@ -210,10 +210,10 @@ export default function ViewImage() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#0C0C0C] pt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
+      <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <h1 className="text-4xl font-extrabold text-white">
+          <h1 className="text-5xl font-bold">
             View Content & Generate Captions
           </h1>
 
@@ -239,10 +239,13 @@ export default function ViewImage() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-[72px] mt-[40px] sm:gap-[48px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Left Column - Image Preview */}
-          <div>
-            <div className="bg-[#0F0F0F] rounded-xl relative overflow-hidden">
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Preview Image
+            </label>
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               {imageLink ? (
                 <>
                   <button
@@ -291,18 +294,18 @@ export default function ViewImage() {
                 </div>
               )}
             </div>
-          </div>
+          </section>
 
           {/* Right Column - Action Panel */}
-          <div className="sm:mt-[24px]">
-            <div className="bg-[#181818] rounded-2xl p-6 sm:p-10 lg:p-12 space-y-6">
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Actions & Caption
+            </label>
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)] space-y-4">
               <button
                 onClick={() => download(imageLink)}
                 disabled={!imageLink}
-                className={`w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 ${
-                  !prefersReducedMotion &&
-                  'hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97]'
-                } disabled:opacity-50`}
+                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Download Content
               </button>
@@ -310,15 +313,12 @@ export default function ViewImage() {
               <button
                 onClick={() => goGenerateVideo(imageLink)}
                 disabled={!imageLink}
-                className={`w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 ${
-                  !prefersReducedMotion &&
-                  'hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97]'
-                } disabled:opacity-50`}
+                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Generate Video
               </button>
 
-              <p className="text-sm text-[#9CA3AF] max-w-[380px]">
+              <p className="text-sm text-[#A1A1AA]">
                 Enter your instruction for the AI to generate a caption,
                 including any product details or relevant context.
               </p>
@@ -328,16 +328,13 @@ export default function ViewImage() {
                 value={prompt}
                 onChange={handleChange}
                 placeholder="Describe the caption you want generated"
-                className="w-full h-12 px-4 bg-[#101010] border border-[#2A2A2A] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-shadow"
+                className="w-full h-12 px-4 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
               />
 
               <button
                 onClick={() => generateCaptionsReplicate(prompt, imageLink)}
                 disabled={!prompt || !imageLink}
-                className={`w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 ${
-                  !prefersReducedMotion &&
-                  'hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97]'
-                } disabled:opacity-50`}
+                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Generate Caption
               </button>
@@ -346,15 +343,15 @@ export default function ViewImage() {
                 value={caption}
                 onChange={handleChangeCaption}
                 placeholder="Caption will appear here..."
-                className="w-full h-60 p-5 bg-[#0F0F0F] border border-dashed border-[#2A2A2A] rounded-xl text-[#E5E7EB] text-sm leading-relaxed placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7]/20 transition-shadow resize-none"
+                className="w-full h-60 p-5 bg-[#0F0F0F] border border-dashed border-[#27272A] rounded-lg text-[#E4E4E7] text-sm leading-relaxed placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none resize-none"
               />
 
               {isLoading && <LoadingDots />}
             </div>
-          </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

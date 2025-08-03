@@ -116,26 +116,10 @@ export default function ViewVideo() {
     saveAs(url, 'video');
   };
 
-  /*const generateCaptionsCohere = async (prompt) => {
-    if (prompt == null || prompt.trim() == '') {
-      setCaption("You haven't entered anything!");
-    } else {
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
-      const rawCaption = await axios.post(
-        '/api/socialCaptions?prompt=' + prompt
-      );
-      console.log('raw caption', rawCaption);
-      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
-      console.log(rawCaption.data.text);
-      setCaption(rawCaption.data.text.trim());
-    }
-  };*/
-
   const generateCaption = async (prompt, videoLink) => {
     if (prompt == null || prompt.trim() == '' || !videoLink) {
       setCaption("You haven't entered anything!");
     } else {
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
       const rawCaption = await axios.post(
         '/api/videoCaption?prompt=' +
           prompt +
@@ -147,9 +131,6 @@ export default function ViewVideo() {
       console.log('raw caption', rawCaption);
       setCaptionObject(rawCaption);
       setCaptionStatus(rawCaption.data.status); // should be "starting"
-      //console.log(rawCaption['data'].replace(/(\r\n|\n|\r)/gm, ""));
-      //console.log(rawCaption.data.text);
-      //setCaption(rawCaption.data.text.trim());
     }
   };
 
@@ -177,11 +158,7 @@ export default function ViewVideo() {
         getCaptionResults(captionObject.data.status_url);
       }, 3000);
     }
-    // at every 2 seconds, an 'interval' is created via calling setInterval().
-    // clearInterval literally 'clears' the interval at the end of every 2 seconds before a new interval is created
-    // otherwise, new instances of 'interval' are created, and you end up printing past + present values of status
     return () => clearInterval(interval.current);
-    // why is the useEffect running continuously, even though it's finished?
   }, [captionStatus]);
 
   async function getCaptionTokenData() {
@@ -255,12 +232,10 @@ export default function ViewVideo() {
     }).format(subscription.prices.unit_amount / 100);
 
   return (
-    <div className="min-h-screen bg-[#0C0C0C] pt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
+      <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <h1 className="text-4xl font-extrabold text-white">
-            View Video & Generate Captions
-          </h1>
+          <h1 className="text-5xl font-bold">View Video & Generate Captions</h1>
 
           {/* Credits Badge with Tooltip */}
           <div className="relative">
@@ -284,10 +259,13 @@ export default function ViewVideo() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-[72px] mt-[40px] sm:gap-[48px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Left Column - Video Preview */}
-          <div>
-            <div className="bg-[#0F0F0F] rounded-xl relative overflow-hidden">
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Video Preview
+            </label>
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               {videoLink ? (
                 <>
                   <button
@@ -331,52 +309,57 @@ export default function ViewVideo() {
                 </div>
               )}
             </div>
-          </div>
+          </section>
 
           {/* Right Column - Action Panel */}
-          <div className="sm:mt-[24px]">
-            <div className="bg-[#181818] rounded-2xl p-6 sm:p-10 lg:p-12 space-y-6">
-              <button
-                onClick={() => download(videoLink)}
-                disabled={!videoLink}
-                className="w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97] disabled:opacity-50"
-              >
-                Download Video
-              </button>
+          <section>
+            <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
+              Generate Caption
+            </label>
+            <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+              <div className="space-y-4">
+                <button
+                  onClick={() => download(videoLink)}
+                  disabled={!videoLink}
+                  className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Download Video
+                </button>
 
-              <p className="text-sm text-[#9CA3AF] max-w-[380px]">
-                Enter your instruction for the AI to generate a caption,
-                including any product details or relevant context.
-              </p>
+                <p className="text-sm text-[#A1A1AA]">
+                  Enter your instruction for the AI to generate a caption,
+                  including any product details or relevant context.
+                </p>
 
-              <input
-                type="text"
-                value={prompt}
-                onChange={handleChange}
-                placeholder="Describe the caption you want generated"
-                className="w-full h-12 px-4 bg-[#101010] border border-[#2A2A2A] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-shadow"
-              />
+                <input
+                  type="text"
+                  value={prompt}
+                  onChange={handleChange}
+                  placeholder="Describe the caption you want generated"
+                  className="w-full h-12 p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                />
 
-              <button
-                onClick={() => generateCaption(prompt, videoLink)}
-                disabled={!prompt || !videoLink}
-                className="w-full h-[52px] bg-gradient-to-r from-[#A855F7] to-[#C084FC] text-white text-base font-semibold rounded-xl transition-all duration-150 hover:shadow-lg hover:shadow-[#A855F7]/45 active:scale-[0.97] disabled:opacity-50"
-              >
-                Generate Caption
-              </button>
+                <button
+                  onClick={() => generateCaption(prompt, videoLink)}
+                  disabled={!prompt || !videoLink}
+                  className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Generate Caption
+                </button>
 
-              <textarea
-                value={caption}
-                onChange={handleChangeCaption}
-                placeholder="Caption will appear here..."
-                className="w-full h-60 p-5 bg-[#0F0F0F] border border-dashed border-[#2A2A2A] rounded-xl text-[#E5E7EB] text-sm leading-relaxed placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#A855F7]/20 transition-shadow resize-none"
-              />
+                <textarea
+                  value={caption}
+                  onChange={handleChangeCaption}
+                  placeholder="Caption will appear here..."
+                  className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                />
+              </div>
 
               {isLoading && <LoadingDots />}
             </div>
-          </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
