@@ -170,7 +170,7 @@ export default function Dashboard() {
                 <div className="aspect-[4/3] max-w-[220px] mx-auto mb-6 relative">
                   <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-indigo-600/10 rounded-[12px]" />
                   <img
-                    src="/demo.png"
+                    src="/replace-bg.png"
                     alt="Replace backgrounds"
                     className="w-full h-full object-cover rounded-[12px] shadow-inner"
                   />
@@ -199,7 +199,7 @@ export default function Dashboard() {
                 <div className="aspect-[4/3] max-w-[220px] mx-auto mb-6 relative">
                   <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-indigo-600/10 rounded-[12px]" />
                   <img
-                    src="/random.png"
+                    src="/pix-blender.png"
                     alt="Pix Blender"
                     className="w-full h-full object-cover rounded-[12px] shadow-inner"
                   />
@@ -235,7 +235,7 @@ export default function Dashboard() {
                 <div className="aspect-[4/3] max-w-[220px] mx-auto mb-6 relative">
                   <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-indigo-600/10 rounded-[12px]" />
                   <img
-                    src="/demo.png"
+                    src="/image-to-video.png"
                     alt="Image to Video"
                     className="w-full h-full object-cover rounded-[12px] shadow-inner"
                   />
@@ -266,7 +266,7 @@ export default function Dashboard() {
                 <div className="aspect-[4/3] max-w-[220px] mx-auto mb-6 relative">
                   <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-indigo-600/10 rounded-[12px]" />
                   <img
-                    src="/random.png"
+                    src="/caption-generator.png"
                     alt="Caption Generator"
                     className="w-full h-full object-cover rounded-[12px] shadow-inner"
                   />
