@@ -235,7 +235,7 @@ export default function ImageGallery() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem('imageLink', url);
+    localStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/view-image');
   };
 

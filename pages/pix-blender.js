@@ -753,7 +753,7 @@ export default function GenerateImages() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem(`imageLink_${user.id}`, image.url);
+    localStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/view-image');
   };
 
