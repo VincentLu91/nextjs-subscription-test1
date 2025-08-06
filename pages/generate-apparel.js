@@ -408,7 +408,7 @@ export default function GenerateApparel() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem(`imageLink_${user.id}`, image.url);
+    localStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/view-image');
   };
 
@@ -424,6 +424,10 @@ export default function GenerateApparel() {
       </Card>
     );
   };
+
+  useEffect(() => {
+    setFinishMessage('');
+  }, []);
 
   return (
     <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
