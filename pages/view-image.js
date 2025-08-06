@@ -81,7 +81,7 @@ export default function ViewImage() {
   const goGenerateVideo = (url) => {
     setImageLink(url);
     sessionStorage.setItem(`imageLink_${user.id}`, url);
-    router.push('/image-to-video');
+    router.push('/image-to-video?show=true');
   };
 
   async function uploadFile(e) {
