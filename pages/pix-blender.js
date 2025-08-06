@@ -725,6 +725,18 @@ export default function GenerateImages() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) {
+      setFinishMessage('');
+      setPixBlenderImageList([]);
+      localStorage.removeItem('pixBlenderImageList');
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setFinishMessage('');
+  }, []);
+
+  useEffect(() => {
     if (!isLoadingUser && !user) {
       router.replace('/signin');
       clearUserData(); // Clear all state when no user

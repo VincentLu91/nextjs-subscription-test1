@@ -378,6 +378,10 @@ export default function ReplaceBg() {
     }
   }, [user]);
 
+  useEffect(() => {
+    setFinishMessage('');
+  }, []);
+
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
