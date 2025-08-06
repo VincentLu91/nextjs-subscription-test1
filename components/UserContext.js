@@ -150,7 +150,12 @@ export const UserContextProvider = (props) => {
         }
       });
       Object.keys(sessionStorage).forEach((key) => {
-        if (key.startsWith('imageLink_')) {
+        if (
+          key.startsWith('videoLink_') ||
+          key.startsWith('resultVideo_') ||
+          key.startsWith('generatedVideos_') ||
+          key.startsWith('imageLink_')
+        ) {
           sessionStorage.removeItem(key);
         }
       });
