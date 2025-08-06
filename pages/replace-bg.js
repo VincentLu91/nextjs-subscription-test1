@@ -78,34 +78,34 @@ export default function ReplaceBg() {
     setBackgroundPrompt('');
     setFinishMessage('');
 
-    // Clear localStorage for current user if exists
+    // Clear sessionStorage for current user if exists
     if (user?.id) {
-      localStorage.removeItem(`generatedPhotos_${user.id}`);
-      localStorage.removeItem(`uploadedFilePath_${user.id}`);
-      localStorage.removeItem(`imageLink_${user.id}`);
+      sessionStorage.removeItem(`replacebgImages_${user.id}`);
+      sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
+      sessionStorage.removeItem(`imageLink_${user.id}`);
     }
   };
 
-  // Clear other user data from localStorage
+  // Clear other user data from sessionStorage
   const clearOtherUserData = () => {
-    Object.keys(localStorage).forEach((key) => {
+    Object.keys(sessionStorage).forEach((key) => {
       if (
         (key.startsWith('generatedPhotos_') ||
           key.startsWith('uploadedFilePath_') ||
           key.startsWith('imageLink_')) &&
         !key.endsWith(user?.id || '')
       ) {
-        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
       }
     });
   };
 
-  // Load user's data from localStorage
+  // Load user's data from sessionStorage
   const loadUserData = () => {
     if (!user?.id) return;
 
-    const userKey = `generatedPhotos_${user.id}`;
-    const savedPhotos = localStorage.getItem(userKey);
+    const userKey = `replacebgImages_${user.id}`;
+    const savedPhotos = sessionStorage.getItem(userKey);
     if (savedPhotos) {
       const photos = JSON.parse(savedPhotos);
       setBackgroundImageList(photos.map((url) => ({ url, text: '' })));
@@ -113,7 +113,7 @@ export default function ReplaceBg() {
       setBackgroundImageList([]);
     }
 
-    const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    const savedFilePath = sessionStorage.getItem(`uploadedFilePath_${user.id}`);
     if (savedFilePath) {
       setUploadedFilePath(savedFilePath);
       setIsImageUploaded(true);
@@ -251,11 +251,11 @@ export default function ReplaceBg() {
           photo_url: data.publicUrl
         });
 
-        const userKey = `generatedPhotos_${user.id}`;
-        const localPhotos = localStorage.getItem(userKey);
+        const userKey = `replacebgImages_${user.id}`;
+        const localPhotos = sessionStorage.getItem(userKey);
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
         localPhotosJson.push(data.publicUrl);
-        localStorage.setItem(userKey, JSON.stringify(localPhotosJson));
+        sessionStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setBackgroundImageList((current) => [
           ...current,
@@ -420,7 +420,7 @@ export default function ReplaceBg() {
       if (publicUrlData) {
         setImageForBg(publicUrlData.publicUrl);
         setUploadedFilePath(filePath);
-        localStorage.setItem(`uploadedFilePath_${user.id}`, filePath);
+        sessionStorage.setItem(`uploadedFilePath_${user.id}`, filePath);
       }
       setIsImageUploaded(true);
       getFiles();
@@ -643,7 +643,7 @@ export default function ReplaceBg() {
                   className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
                   onClick={() => {
                     setImageLink(image.url);
-                    localStorage.setItem(`imageLink_${user.id}`, image.url);
+                    sessionStorage.setItem(`imageLink_${user.id}`, image.url);
                     router.push('/view-image');
                   }}
                 >

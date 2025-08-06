@@ -80,34 +80,34 @@ export default function GenerateImages() {
     setFinishMessage('');
     setIsGeneratingBlenderImg(false); // this ensures when signed out, button will revert back
 
-    // Clear localStorage for current user if exists
+    // Clear sessionStorage for current user if exists
     if (user?.id) {
-      localStorage.removeItem(`generatedPhotos_${user.id}`);
-      localStorage.removeItem(`uploadedFilePath_${user.id}`);
-      localStorage.removeItem(`imageLink_${user.id}`);
+      sessionStorage.removeItem(`pixblenderImages_${user.id}`);
+      sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
+      sessionStorage.removeItem(`imageLink_${user.id}`);
     }
   };
 
-  // Clear other user data from localStorage
+  // Clear other user data from sessionStorage
   const clearOtherUserData = () => {
-    Object.keys(localStorage).forEach((key) => {
+    Object.keys(sessionStorage).forEach((key) => {
       if (
         (key.startsWith('generatedPhotos_') ||
           key.startsWith('uploadedFilePath_') ||
           key.startsWith('imageLink_')) &&
         !key.endsWith(user?.id || '')
       ) {
-        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
       }
     });
   };
 
-  // Load user's data from localStorage
+  // Load user's data from sessionStorage
   const loadUserData = () => {
     if (!user?.id) return;
 
-    const userKey = `generatedPhotos_${user.id}`;
-    const savedPhotos = localStorage.getItem(userKey);
+    const userKey = `pixblenderImages_${user.id}`;
+    const savedPhotos = sessionStorage.getItem(userKey);
     if (savedPhotos) {
       const photos = JSON.parse(savedPhotos);
       setPixBlenderImageList(photos.map((url) => ({ url, text: '' })));
@@ -115,7 +115,7 @@ export default function GenerateImages() {
       setPixBlenderImageList([]);
     }
 
-    /*const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    /*const savedFilePath = sessionStorage.getItem(`uploadedFilePath_${user.id}`);
     if (savedFilePath) {
       setUploadedFilePath(savedFilePath); // not sure
       setIsImageUploaded(true);
@@ -158,9 +158,9 @@ export default function GenerateImages() {
     // Reset the generate attempt state to allow fresh generation
     setHasAttemptedGenerate(false);
 
-    // If no images left, clean up localStorage
+    // If no images left, clean up sessionStorage
     if (newImages.length === 0) {
-      localStorage.removeItem('pixBlenderUploadedImages');
+      sessionStorage.removeItem('pixBlenderUploadedImages');
     }
   }
 
@@ -583,11 +583,11 @@ export default function GenerateImages() {
           photo_url: data.publicUrl
         });
 
-        const userKey = `generatedPhotos_${user.id}`;
-        const localPhotos = localStorage.getItem(userKey);
+        const userKey = `pixblenderImages_${user.id}`;
+        const localPhotos = sessionStorage.getItem(userKey);
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
         localPhotosJson.push(data.publicUrl);
-        localStorage.setItem(userKey, JSON.stringify(localPhotosJson));
+        sessionStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setPixBlenderImageList((current) => [
           ...current,
@@ -728,7 +728,7 @@ export default function GenerateImages() {
     if (!user) {
       setFinishMessage('');
       setPixBlenderImageList([]);
-      localStorage.removeItem('pixBlenderImageList');
+      sessionStorage.removeItem('pixBlenderImageList');
     }
   }, [user]);
 
@@ -746,15 +746,15 @@ export default function GenerateImages() {
     }
   }, [user, isLoadingUser]);
 
-  // Save uploaded images to localStorage whenever they change
+  // Save uploaded images to sessionStorage whenever they change
   useEffect(() => {
     if (uploadedImages.length > 0) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         'pixBlenderUploadedImages',
         JSON.stringify(uploadedImages)
       );
     } else {
-      localStorage.removeItem('pixBlenderUploadedImages');
+      sessionStorage.removeItem('pixBlenderUploadedImages');
     }
   }, [uploadedImages]);
 
@@ -765,7 +765,7 @@ export default function GenerateImages() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem(`imageLink_${user.id}`, url);
+    sessionStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/view-image');
   };
 

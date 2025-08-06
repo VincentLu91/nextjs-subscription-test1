@@ -72,34 +72,34 @@ export default function GenerateApparel() {
     setIsImageUploaded(false);
     setFinishMessage('');
 
-    // Clear localStorage for current user if exists
+    // Clear sessionStorage for current user if exists
     if (user?.id) {
-      localStorage.removeItem(`generatedPhotos_${user.id}`);
-      localStorage.removeItem(`uploadedFilePath_${user.id}`);
-      localStorage.removeItem(`imageLink_${user.id}`);
+      sessionStorage.removeItem(`apparelImages_${user.id}`);
+      sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
+      sessionStorage.removeItem(`imageLink_${user.id}`);
     }
   };
 
-  // Clear other user data from localStorage
+  // Clear other user data from sessionStorage
   const clearOtherUserData = () => {
-    Object.keys(localStorage).forEach((key) => {
+    Object.keys(sessionStorage).forEach((key) => {
       if (
         (key.startsWith('generatedPhotos_') ||
           key.startsWith('uploadedFilePath_') ||
           key.startsWith('imageLink_')) &&
         !key.endsWith(user?.id || '')
       ) {
-        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
       }
     });
   };
 
-  // Load user's data from localStorage
+  // Load user's data from sessionStorage
   const loadUserData = () => {
     if (!user?.id) return;
 
-    const userKey = `generatedPhotos_${user.id}`;
-    const savedPhotos = localStorage.getItem(userKey);
+    const userKey = `apparelImages_${user.id}`;
+    const savedPhotos = sessionStorage.getItem(userKey);
     if (savedPhotos) {
       const photos = JSON.parse(savedPhotos);
       setTryOnImageList(photos.map((url) => ({ url, text: '' })));
@@ -107,7 +107,7 @@ export default function GenerateApparel() {
       setTryOnImageList([]);
     }
 
-    /*const savedFilePath = localStorage.getItem(`uploadedFilePath_${user.id}`);
+    /*const savedFilePath = sessionStorage.getItem(`uploadedFilePath_${user.id}`);
     if (savedFilePath) {
       setUploadedFilePath(savedFilePath);
       setIsImageUploaded(true);
@@ -224,11 +224,11 @@ export default function GenerateApparel() {
           photo_url: data.publicUrl
         });
 
-        const userKey = `generatedPhotos_${user.id}`;
-        const localPhotos = localStorage.getItem(userKey);
+        const userKey = `apparelImages_${user.id}`;
+        const localPhotos = sessionStorage.getItem(userKey);
         const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
         localPhotosJson.push(data.publicUrl);
-        localStorage.setItem(userKey, JSON.stringify(localPhotosJson));
+        sessionStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setTryOnImageList((current) => [...current, { url: data.publicUrl }]);
         await getImageTokenData();
@@ -408,7 +408,7 @@ export default function GenerateApparel() {
 
   const viewGeneratedContent = (url) => {
     setImageLink(url);
-    localStorage.setItem(`imageLink_${user.id}`, url);
+    sessionStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/view-image');
   };
 
