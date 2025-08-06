@@ -136,14 +136,19 @@ export const UserContextProvider = (props) => {
       setBackgroundPrompt(null);
       setPixBlenderPrompt(null);
 
-      // Clear localStorage items for this user
+      // Clear sessionStorage items for this user
       if (userId) {
-        localStorage.removeItem(`generatedPhotos_${userId}`);
-        localStorage.removeItem(`uploadedFilePath_${userId}`);
-        localStorage.removeItem(`imageLink_${userId}`);
+        sessionStorage.removeItem(`generatedPhotos_${userId}`);
+        sessionStorage.removeItem(`uploadedFilePath_${userId}`);
+        sessionStorage.removeItem(`imageLink_${userId}`);
       }
 
-      localStorage.removeItem('pixBlenderImageList');
+      sessionStorage.removeItem('pixBlenderImageList');
+      Object.keys(sessionStorage).forEach((key) => {
+        if (user?.id && key.includes(user.id)) {
+          sessionStorage.removeItem(key);
+        }
+      });
 
       await supabase.auth.signOut();
     },
