@@ -119,10 +119,33 @@ export const UserContextProvider = (props) => {
     subscription,
     signIn: (options) => supabase.auth.signInWithPassword(options),
     signUp: (options) => supabase.auth.signUp(options),
-    signOut: () => {
+    signOut: async () => {
+      const userId = user?.id; // cache before clearing user state
+
       setUserDetails(null);
       setSubscription(null);
-      return supabase.auth.signOut();
+      setPixBlenderImageList([]);
+      setImageList([]);
+      setVideoList([]);
+      setBackgroundImageList([]);
+      setImageLink(null);
+      setVideoLink(null);
+      setImageForBg(null);
+      setcontentPrompt(null);
+      setImg2vidPrompt(null);
+      setBackgroundPrompt(null);
+      setPixBlenderPrompt(null);
+
+      // Clear localStorage items for this user
+      if (userId) {
+        localStorage.removeItem(`generatedPhotos_${userId}`);
+        localStorage.removeItem(`uploadedFilePath_${userId}`);
+        localStorage.removeItem(`imageLink_${userId}`);
+      }
+
+      localStorage.removeItem('pixBlenderImageList');
+
+      await supabase.auth.signOut();
     },
     imageLink,
     setImageLink,
