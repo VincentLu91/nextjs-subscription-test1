@@ -59,7 +59,7 @@ export default function ViewImage() {
 
   useEffect(() => {
     if (user?.id) {
-      const storedImageLink = localStorage.getItem(`imageLink_${user.id}`);
+      const storedImageLink = sessionStorage.getItem(`imageLink_${user.id}`);
       if (storedImageLink) {
         setImageLink(storedImageLink);
       }
@@ -80,7 +80,7 @@ export default function ViewImage() {
 
   const goGenerateVideo = (url) => {
     setImageLink(url);
-    localStorage.setItem(`imageLink_${user.id}`, url);
+    sessionStorage.setItem(`imageLink_${user.id}`, url);
     router.push('/image-to-video');
   };
 
@@ -251,7 +251,7 @@ export default function ViewImage() {
                   <button
                     onClick={() => {
                       setImageLink(null);
-                      localStorage.removeItem(`imageLink_${user.id}`);
+                      sessionStorage.removeItem(`imageLink_${user.id}`);
                     }}
                     className={`absolute top-4 left-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center z-10 text-[#F87171] transition-transform duration-200 ${
                       !prefersReducedMotion && 'hover:scale-110'
