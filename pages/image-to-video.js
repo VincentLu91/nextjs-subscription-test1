@@ -21,6 +21,7 @@ export default function ImageToVideo() {
   const [loading, setLoading] = useState(false);
   const [hasNoSubscription, setHasNoSubscription] = useState(false);
   const [visible, setVisible] = useState(5);
+  const [showImage, setShowImage] = useState(false);
   const router = useRouter();
   const {
     userLoaded,
@@ -60,6 +61,7 @@ export default function ImageToVideo() {
     setFinishMessage('');
     setResultVideo(null); // Clear resultVideo state
     setVideoRespObj(null); // Clear video response object
+    setShowImage(false); // Reset showImage state
 
     // Clear sessionStorage for current user if exists
     if (user?.id) {
@@ -68,6 +70,7 @@ export default function ImageToVideo() {
       sessionStorage.removeItem(`imageLink_${user.id}`);
       sessionStorage.removeItem(`videoLink_${user.id}`);
       sessionStorage.removeItem(`videoRespObj_${user.id}`);
+      sessionStorage.removeItem(`showImage_${user.id}`); // Remove showImage from storage
     }
   };
 
@@ -79,7 +82,8 @@ export default function ImageToVideo() {
           key.startsWith('imageLink_') ||
           key.startsWith('videoLink_') ||
           key.startsWith('resultVideo_') ||
-          key.startsWith('videoRespObj_')) &&
+          key.startsWith('videoRespObj_') ||
+          key.startsWith('showImage_')) && // Include showImage in cleanup
         !key.endsWith(user?.id || '')
       ) {
         sessionStorage.removeItem(key);
@@ -88,6 +92,27 @@ export default function ImageToVideo() {
   };
 
   const wasLoggedOut = useRef(false);
+
+  // Check URL parameter and sessionStorage to show image
+  useEffect(() => {
+    if (user?.id) {
+      const storedShowImage = sessionStorage.getItem(`showImage_${user.id}`);
+      if (storedShowImage === 'true' || router.query.show === 'true') {
+        setShowImage(true);
+      }
+    }
+  }, [router.query, user]);
+
+  // Persist showImage state to sessionStorage
+  useEffect(() => {
+    if (user?.id) {
+      if (showImage) {
+        sessionStorage.setItem(`showImage_${user.id}`, 'true');
+      } else {
+        sessionStorage.removeItem(`showImage_${user.id}`);
+      }
+    }
+  }, [showImage, user]);
 
   useEffect(() => {
     if (!isLoadingUser && !user) {
@@ -102,7 +127,8 @@ export default function ImageToVideo() {
           key.includes('resultVideo_') ||
           key.includes('videoLink_') ||
           key.includes('generatedVideos_') ||
-          key.includes('videoRespObj_')
+          key.includes('videoRespObj_') ||
+          key.includes('showImage_') // Include showImage in cleanup
         ) {
           sessionStorage.removeItem(key);
         }
@@ -119,6 +145,7 @@ export default function ImageToVideo() {
         const storedVideoRespObj = sessionStorage.getItem(
           `videoRespObj_${user.id}`
         );
+        const storedShowImage = sessionStorage.getItem(`showImage_${user.id}`);
 
         if (storedVideoLink) {
           setVideoLink(storedVideoLink);
@@ -129,6 +156,9 @@ export default function ImageToVideo() {
         if (storedVideoRespObj) {
           setVideoRespObj(JSON.parse(storedVideoRespObj));
           setIsVideoLoading(true); // Resume loading state if we have a response object
+        }
+        if (storedShowImage === 'true') {
+          setShowImage(true);
         }
       }
       wasLoggedOut.current = false; // Reset flag
@@ -158,13 +188,15 @@ export default function ImageToVideo() {
     console.log('Caption: ', e.target.value);
   };
 
-  const displayContent = imageLink && (
+  const displayContent = showImage && imageLink && (
     <div className={styles['display-image']} style={{ position: 'relative' }}>
       {/* Close button */}
       <button
         onClick={() => {
           setImageLink(null); // Clear the state
           sessionStorage.removeItem(`imageLink_${user.id}`); // Remove the key from sessionStorage
+          setShowImage(false); // Hide the image
+          sessionStorage.removeItem(`showImage_${user.id}`); // Remove showImage from storage
         }}
         style={{
           position: 'absolute',
@@ -194,6 +226,8 @@ export default function ImageToVideo() {
     if (prompt == null || prompt.trim() == '' || !image) {
       setCaption("You haven't entered anything!");
     } else {
+      setShowImage(true); // Show the image when generating video
+      sessionStorage.setItem(`showImage_${user.id}`, 'true'); // Store showImage state
       setFinishMessage(null); // Clear any existing finish message
       //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
       const videoResp = await axios.post(
@@ -334,7 +368,7 @@ export default function ImageToVideo() {
 
   const viewGeneratedContent = (videoUrl) => {
     setVideoLink(videoUrl); // Update state with the video URL
-    sessionStorage.setItem(`videoLink_${user.id}`, videoUrl); // Save videoLink to sessionStorage
+    sessionStorage.setItem(`selectedVideo_${user.id}`, videoUrl); // ✅ Use a dedicated key
     router.push('/view-video'); // Navigate to the content page
   };
 

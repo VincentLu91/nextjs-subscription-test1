@@ -48,26 +48,31 @@ export default function ViewVideo() {
     if (!isLoadingUser && !user) {
       router.replace('/signin');
       setVideoLink(null);
-      if (typeof window !== 'undefined') {
-        // Clear any videoLink items from sessionStorage
-        for (let i = 0; i < sessionStorage.length; i++) {
-          const key = sessionStorage.key(i);
-          if (key && key.startsWith('videoLink_')) {
-            sessionStorage.removeItem(key);
-          }
-        }
-      }
     }
   }, [user]);
 
   useEffect(() => {
-    if (user?.id) {
-      const storedVideoLink = sessionStorage.getItem(`videoLink_${user.id}`);
-      if (storedVideoLink) {
-        setVideoLink(storedVideoLink);
+    if (user?.id && router.isReady) {
+      // Check for video link in query params first
+      const videoLinkFromQuery = router.query.videoLink;
+      if (videoLinkFromQuery) {
+        setVideoLink(videoLinkFromQuery);
+        return;
+      }
+
+      // Only restore video if explicitly selected
+      const storedSelectedVideo = sessionStorage.getItem(
+        `selectedVideo_${user.id}`
+      );
+      if (storedSelectedVideo) {
+        setVideoLink(storedSelectedVideo);
       }
     }
-  }, [user]);
+
+    return () => {
+      setVideoLink(null);
+    };
+  }, [user, router.isReady, router.query]);
 
   const redirectToCustomerPortal = async () => {
     setLoading(true);
@@ -271,7 +276,6 @@ export default function ViewVideo() {
                   <button
                     onClick={() => {
                       setVideoLink(null);
-                      sessionStorage.removeItem(`videoLink_${user.id}`);
                     }}
                     className="absolute top-4 left-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center z-10 text-[#F87171] transition-transform duration-200 hover:scale-110"
                     aria-label="Close preview"
