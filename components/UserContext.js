@@ -149,6 +149,11 @@ export const UserContextProvider = (props) => {
           sessionStorage.removeItem(key);
         }
       });
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith('imageLink_')) {
+          sessionStorage.removeItem(key);
+        }
+      });
 
       await supabase.auth.signOut();
     },
