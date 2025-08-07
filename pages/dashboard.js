@@ -141,12 +141,19 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 relative">
           <div className="sm:flex sm:flex-col sm:align-center mb-16">
             <h1 className="text-4xl font-extrabold text-[#FAFAFA] sm:text-center sm:text-6xl animate-on-scroll">
-              Welcome to Your Dashboard
+              Your Shortcut to Viral
             </h1>
             <p className="mt-4 text-[#B0B0B0] sm:text-center text-xl animate-on-scroll">
-              Create social media content in seconds—visuals and captions
-              included.
+              AI-crafted videos, carousels & captions—built for the algorithm.
             </p>
+            {/* A/B test:
+            1. Headline: From Idea to Reel in Seconds
+            Subheader: AI-powered videos, carousels, and captions that stop the scroll.
+            2. Headline: Built for the Algorithm
+            Subheader: Get feed-ready content—fast, fresh, and ready to trend.
+            3. Headline: Create. Post. Blow Up.
+            Subheader: Your personal AI studio for TikTok & Instagram success.
+             */}
           </div>
 
           {/* Two-column grid for feature cards */}
