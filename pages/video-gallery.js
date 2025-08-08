@@ -213,7 +213,9 @@ export default function VideoGallery() {
 
   const viewGeneratedContent = (url) => {
     setVideoLink(url);
-    localStorage.setItem('videoLink', url); // Save imageLink to localStorage
+    if (typeof window !== 'undefined' && user?.id) {
+      sessionStorage.setItem(`selectedVideo_${user.id}`, url);
+    }
     router.push('/view-video');
   };
 
