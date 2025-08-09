@@ -191,6 +191,7 @@ export default function Pricing({ products }) {
             const imageTokens = price.image_tokens || 0;
             const trainingTokens = price.training_tokens || 0;
             const captionTokens = price.caption_tokens || 0;
+            const videoTokens = price.video_tokens || 0;
 
             return (
               <div
@@ -239,7 +240,23 @@ export default function Pricing({ products }) {
                       </svg>
                       {imageTokens} product image renders
                     </li>
-                    <li className="flex items-center text-[rgba(255,255,255,0.55)]">
+                    <li className="flex items-center text-[rgba(255,255,255,0.85)]">
+                      <svg
+                        className="w-4 h-4 mr-3 text-[#7B5CFF]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {videoTokens} AI Videos of your product
+                    </li>
+                    {/*<li className="flex items-center text-[rgba(255,255,255,0.55)]">
                       <svg
                         className="w-4 h-4 mr-3 text-[#7B5CFF]"
                         fill="none"
@@ -254,7 +271,7 @@ export default function Pricing({ products }) {
                         />
                       </svg>
                       AI Videos of your product - coming soon
-                    </li>
+                    </li>*/}
                     <li className="flex items-center text-[rgba(255,255,255,0.85)]">
                       <svg
                         className="w-4 h-4 mr-3 text-[#7B5CFF]"
