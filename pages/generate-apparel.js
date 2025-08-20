@@ -243,8 +243,8 @@ export default function GenerateApparel() {
       clearInterval(intervalImage.current);
       setIsGeneratingTryOn(false);
       setFinishMessage(
-        'Clothes swapping complete! The results have been saved to your gallery.\n' +
-          'Please go to the Gallery page to see your clothes swapping results.'
+        'Image is generated and saved to gallery.\n' +
+          'Click thumbnail below to view your image and generate video.'
       );
     }
   }, [tryOnPredictions]);

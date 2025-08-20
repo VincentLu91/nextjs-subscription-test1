@@ -556,7 +556,8 @@ export default function ImageToVideo() {
                     />
                   </svg>
                   <p className="text-sm text-[#A1A1AA]">
-                    No image selected. Go to Dashboard to select an image first.
+                    No image selected. Please select an AI image you already
+                    generated, and click Generate Video.
                   </p>
                 </div>
               )}
