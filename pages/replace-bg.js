@@ -284,9 +284,8 @@ export default function ReplaceBg() {
       setisBGImagesLoading(false);
       setisGeneratingBGImages(false);
       setFinishMessage(
-        'All images are generated and saved to gallery. You can also view them below. \n' +
-          'Please go to the Gallery page to see all your generated images \n' +
-          'Please wait for all 7 images to be loaded before generating another set'
+        'Images are generated and saved to gallery. \n' +
+          'Click thumbnail below to view your image and generate video.'
       );
     }
   }, [backgroundImagePredictions]);

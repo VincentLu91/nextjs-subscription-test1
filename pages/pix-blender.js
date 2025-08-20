@@ -626,7 +626,7 @@ export default function GenerateImages() {
               failed > 0
                 ? `\n${failed} generation${failed > 1 ? 's' : ''} failed.`
                 : ''
-            }\nPlease go to the Gallery page to see all your generated images.`
+            }\nClick thumbnail below to view your image and generate video.`
           );
         } else {
           setFinishMessage(
