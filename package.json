@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
-    "@sanity/image-url": "^1.1.0",
+    "@sanity/image-url": "^1.2.0",
     "@stripe/stripe-js": "^7.9.0",
     "@supabase/supabase-js": "^2.56.0",
     "@swc/helpers": "^0.5.17",
@@ -20,9 +20,9 @@
     "cohere-ai": "^7.18.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "next": "^15.5.1",
+    "next": "^15.5.2",
     "npm-check-updates": "^18.0.3",
-    "posthog-js": "^1.260.3",
+    "posthog-js": "^1.261.0",
     "raw-body": "^3.0.0",
     "react": "^19.1.1",
     "react-aria": "^3.43.0",
@@ -31,7 +31,7 @@
     "react-hot-toast": "^2.6.0",
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.2",
-    "stripe": "^18.4.0",
+    "stripe": "^18.5.0",
     "swr": "2.3.6",
     "tailwindcss": "^4.1.12",
     "uuid": "^11.1.0"
@@ -42,7 +42,7 @@
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^13.0.2",
-    "postcss-preset-env": "^10.3.0",
+    "postcss-preset-env": "^10.3.1",
     "prettier": "^3.6.2"
   },
   "prettier": {
