@@ -108,7 +108,7 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
               <p className="text-sm font-medium">
                 Unlock More with a Free Trial! You still have access to free
-                credits. Start your 7-day free trial to generate more images —
+                credits. Start your 15-day free trial to generate more images —
                 no card required.
               </p>
               <Link href="/pricing">
