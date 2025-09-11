@@ -42,14 +42,16 @@ export default function Pricing({ products }) {
   useEffect(() => {
     // Animate prices when billing interval changes
     products.forEach((product) => {
-      const price = product.prices.find(
-        (p) =>
-          p.interval === billingInterval &&
-          p.product_id !== 'prod_SW7dE3i2msnicA'
-      );
+      const price = product.prices
+        .filter((p) => p.active)
+        .find(
+          (p) =>
+            p.interval === billingInterval &&
+            p.product_id !== 'prod_SW7dE3i2msnicA'
+        );
       if (price) {
         const amount = price.unit_amount / 100;
-        const startAmount = animatedPrices[product.id] || 0;
+        const startAmount = animatedPrices[product.id] ?? 0;
         const duration = 200;
         const startTime = performance.now();
 
@@ -59,9 +61,9 @@ export default function Pricing({ products }) {
 
           // Easing function (ease-out)
           const eased = 1 - Math.pow(1 - progress, 2);
-          const currentAmount = Math.floor(
-            startAmount + (amount - startAmount) * eased
-          );
+          const currentAmount =
+            Math.round((startAmount + (amount - startAmount) * eased) * 100) /
+            100;
 
           setAnimatedPrices((prev) => ({
             ...prev,
@@ -182,11 +184,17 @@ export default function Pricing({ products }) {
 
             if (!price) return null;
 
+            const displayAmount =
+              animatedPrices[product.id] ?? price.unit_amount / 100;
+            const showCents =
+              price.unit_amount % 100 !== 0 ||
+              Math.abs(displayAmount % 1) > 1e-6;
             const priceString = new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: price.currency,
-              minimumFractionDigits: 0
-            }).format(animatedPrices[product.id] || price.unit_amount / 100);
+              minimumFractionDigits: showCents ? 2 : 0,
+              maximumFractionDigits: 2
+            }).format(displayAmount);
 
             const imageTokens = price.image_tokens || 0;
             const trainingTokens = price.training_tokens || 0;

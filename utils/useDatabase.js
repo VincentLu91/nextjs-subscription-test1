@@ -14,7 +14,7 @@ const upsertProductRecord = async (product) => {
 
   const { error } = await supabaseAdmin
     .from('products')
-    .insert([productData], { upsert: true });
+    .upsert(productData, { onConflict: 'id' }); // v2: real upsert
   if (error) throw error;
   console.log(`Product inserted/updated: ${product.id}`);
 };
@@ -36,7 +36,7 @@ const upsertPriceRecord = async (price) => {
 
   const { error } = await supabaseAdmin
     .from('prices')
-    .insert([priceData], { upsert: true });
+    .upsert(priceData, { onConflict: 'id' }); // v2: real upsert
   if (error) throw error;
   console.log(`Price inserted/updated: ${price.id}`);
 };
