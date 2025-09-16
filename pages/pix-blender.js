@@ -228,7 +228,7 @@ export default function GenerateImages() {
       }
 
       // Send images to API
-      const resp = await axios.post('/api/fluxUno', {
+      const resp = await axios.post('/api/blendImages', {
         prompt: pixBlenderPrompt,
         images: urls,
         user: user.id
