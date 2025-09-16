@@ -22,10 +22,12 @@ export default async function handler(req, res) {
       });
 
     const resp = await axios.post(
-      'https://queue.fal.run/fal-ai/uno',
+      'https://queue.fal.run/fal-ai/nano-banana/edit',
       {
-        input_image_urls: images, // Pass the array directly
-        prompt
+        image_urls: images, // Pass the array directly
+        prompt,
+        num_images: 1,
+        output_format: 'png'
       },
       {
         headers: {
