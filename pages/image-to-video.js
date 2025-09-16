@@ -52,6 +52,31 @@ export default function ImageToVideo() {
 
   const interval = useRef();
 
+  const hasSavedRef = useRef(new Set());
+
+  const savedKeyFor = (userId, url) =>
+    `savedVideo_${userId}_${encodeURIComponent(url)}`;
+
+  const hasAlreadySaved = (userId, url) => {
+    const k = savedKeyFor(userId, url);
+    return hasSavedRef.current.has(k) || sessionStorage.getItem(k) === '1';
+  };
+
+  const markSaved = (userId, url) => {
+    const k = savedKeyFor(userId, url);
+    hasSavedRef.current.add(k);
+    sessionStorage.setItem(k, '1');
+  };
+
+  const savedMapKey = (userId, url) =>
+    `savedMap_${userId}_${encodeURIComponent(url)}`;
+
+  const getSavedPublicUrl = (userId, url) =>
+    sessionStorage.getItem(savedMapKey(userId, url));
+
+  const setSavedPublicUrl = (userId, url, publicUrl) =>
+    sessionStorage.setItem(savedMapKey(userId, url), publicUrl);
+
   const clearUserData = () => {
     // Clear state
     setImageLink(null);
@@ -154,9 +179,21 @@ export default function ImageToVideo() {
           setResultVideo(storedResultVideo);
         }
         if (storedVideoRespObj) {
-          setVideoRespObj(JSON.parse(storedVideoRespObj));
-          setIsVideoLoading(true); // Resume loading state if we have a response object
+          const obj = JSON.parse(storedVideoRespObj);
+          setVideoRespObj(obj);
+
+          const storedResultVideo = sessionStorage.getItem(
+            `resultVideo_${user.id}`
+          );
+
+          // ✅ Only resume loading if we *don’t* already have a finished result
+          if (!storedResultVideo) {
+            setIsVideoLoading(true);
+          } else {
+            setIsVideoLoading(false);
+          }
         }
+
         if (storedShowImage === 'true') {
           setShowImage(true);
         }
@@ -295,6 +332,10 @@ export default function ImageToVideo() {
         console.log('Result video url:', result.data.video.url);
         const videoUrl = result.data.video.url;
 
+        // Save first (idempotent)
+        await addVideos(videoUrl);
+
+        // Then update UI state / storage
         setResultVideo(videoUrl);
         setVideoLink(videoUrl);
         sessionStorage.setItem(`resultVideo_${user.id}`, videoUrl);
@@ -337,18 +378,16 @@ export default function ImageToVideo() {
   useEffect(() => {
     let mounted = true;
 
-    // Only start polling when we have a response URL and we're loading
     if (
       videoRespObj?.data?.response_url &&
       isVideoLoading &&
+      !resultVideo && // ✅ don't poll if we already have a result
       !interval.current
     ) {
       const pollVideo = async () => {
         if (!mounted) return;
-
         const status = await getVideoResults(videoRespObj.data.status_url);
         if (!mounted) return;
-
         if (status === 'FAILED') {
           clearInterval(interval.current);
           interval.current = null;
@@ -356,14 +395,10 @@ export default function ImageToVideo() {
         }
       };
 
-      // Initial poll
       pollVideo();
-
-      // Set up interval for subsequent polls
       interval.current = setInterval(pollVideo, 3000);
     }
 
-    // Cleanup function to clear interval and prevent state updates after unmount
     return () => {
       mounted = false;
       if (interval.current) {
@@ -371,7 +406,8 @@ export default function ImageToVideo() {
         interval.current = null;
       }
     };
-  }, [videoRespObj?.data?.response_url, isVideoLoading, router.asPath]); // Add router.asPath and isVideoLoading to dependencies
+    // ✅ deps trimmed so route changes don't re-trigger it
+  }, [videoRespObj?.data?.response_url, isVideoLoading, resultVideo]);
 
   useEffect(() => {
     const initializeAndCheckStatus = async () => {
@@ -462,50 +498,70 @@ export default function ImageToVideo() {
     }
   }
 
-  const addVideos = async (vid_url) => {
-    console.log('Processing video: ', vid_url);
+  const addVideos = async (remoteUrl) => {
+    if (!user?.id) return;
 
-    const uniqueFileName = await copyVideoToSupabase(vid_url);
-    if (uniqueFileName) {
-      const { data, error: urlError } = supabase.storage
-        .from('videos')
-        .getPublicUrl(uniqueFileName);
-
-      if (urlError) {
-        console.error('Error generating public URL:', urlError.message);
-      }
-
-      // Save to database and local state
-      await supabase.from('videos').insert({
-        customer_id: user.identities[0].id,
-        video_url: data.publicUrl
-      });
-
-      const localVideos = sessionStorage.getItem(
-        `generatedVideos_${user.id}_img2vid`
+    // ✅ If we already have a public URL for this remote URL, skip re-upload/insert
+    const existingPublic = getSavedPublicUrl(user.id, remoteUrl);
+    if (existingPublic) {
+      console.log(
+        'Already saved mapping; skipping:',
+        remoteUrl,
+        '→',
+        existingPublic
       );
-      const localVideosJson = localVideos ? JSON.parse(localVideos) : [];
-      localVideosJson.push(data.publicUrl);
-      sessionStorage.setItem(
-        `generatedVideos_${user.id}_img2vid`,
-        JSON.stringify(localVideosJson)
-      );
-
-      /*setBackgroundImageList((current) => [
-          ...current,
-          { url: data.publicUrl, text: '' }
-        ]);*/
-
-      await getVideoTokenData();
+      return;
     }
+
+    // 1) Copy to Supabase storage
+    const uniqueFileName = await copyVideoToSupabase(remoteUrl);
+    if (!uniqueFileName) return;
+
+    const { data, error: urlError } = supabase.storage
+      .from('videos')
+      .getPublicUrl(uniqueFileName);
+    if (urlError) {
+      console.error('Error generating public URL:', urlError.message);
+      return;
+    }
+
+    const publicUrl = data.publicUrl;
+
+    // 2) (Optional extra safety) Check DB by the *same* URL you actually insert
+    const { data: existing, error: existingErr } = await supabase
+      .from('videos')
+      .select('id')
+      .eq('video_url', publicUrl)
+      .maybeSingle();
+
+    if (!existingErr && existing) {
+      console.log('DB already has this public URL; mapping and exit.');
+      setSavedPublicUrl(user.id, remoteUrl, publicUrl);
+      return;
+    }
+
+    // 3) Insert row
+    const { error: insertErr } = await supabase.from('videos').insert({
+      customer_id: user.identities?.[0]?.id ?? user.id,
+      video_url: publicUrl
+      // Optional but recommended if your API returns it:
+      // request_id: videoRespObj?.data?.request_id
+    });
+
+    if (insertErr) {
+      console.error('Insert error:', insertErr);
+      return;
+    }
+
+    // 4) Update local cache & mapping
+    const localKey = `generatedVideos_${user.id}_img2vid`;
+    const localList = JSON.parse(sessionStorage.getItem(localKey) || '[]');
+    localList.push(publicUrl);
+    sessionStorage.setItem(localKey, JSON.stringify(localList));
+
+    setSavedPublicUrl(user.id, remoteUrl, publicUrl); // ✅ remember mapping
+    await getVideoTokenData();
   };
-
-  useEffect(() => {
-    if (resultVideo) {
-      console.log('resultVideo: ', resultVideo);
-      addVideos(resultVideo);
-    }
-  }, [resultVideo]);
 
   async function getVideoTokenData() {
     console.log('user is: ', user.id);
