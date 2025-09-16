@@ -225,11 +225,30 @@ export default function ImageToVideo() {
   const generateVideo = async (prompt, image) => {
     if (prompt == null || prompt.trim() == '' || !image) {
       setCaption("You haven't entered anything!");
-    } else {
-      setShowImage(true); // Show the image when generating video
-      sessionStorage.setItem(`showImage_${user.id}`, 'true'); // Store showImage state
-      setFinishMessage(null); // Clear any existing finish message
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+      return;
+    }
+
+    // Clear previous video state
+    setResultVideo(null);
+    setVideoRespObj(null);
+    setFinishMessage(null);
+
+    // Clear previous video from session storage
+    sessionStorage.removeItem(`resultVideo_${user.id}`);
+    sessionStorage.removeItem(`videoLink_${user.id}`);
+    sessionStorage.removeItem(`videoRespObj_${user.id}`);
+
+    // Clear any existing polling interval
+    if (interval.current) {
+      clearInterval(interval.current);
+      interval.current = null;
+    }
+
+    setIsVideoLoading(true);
+    try {
+      setShowImage(true);
+      sessionStorage.setItem(`showImage_${user.id}`, 'true');
+
       const videoResp = await axios.post(
         '/api/img2vid?prompt=' +
           prompt +
@@ -238,61 +257,86 @@ export default function ImageToVideo() {
           image +
           `&user=${user.id}`
       );
-      console.log('videoResp: ', videoResp);
-      if (videoResp) {
-        setVideoRespObj(videoResp);
-        // Store videoRespObj in sessionStorage
-        sessionStorage.setItem(
-          `videoRespObj_${user.id}`,
-          JSON.stringify(videoResp)
-        );
-        console.log('videoResp status: ', videoResp.data.status);
-        console.log('videoResp request_id: ', videoResp.data.request_id);
-      } else {
-        alert(
-          'There is an error generating your video. Please try using proper image and prompt'
-        );
+
+      if (!videoResp?.data) {
+        throw new Error('Invalid response from video generation API');
       }
+
+      setVideoRespObj(videoResp);
+      sessionStorage.setItem(
+        `videoRespObj_${user.id}`,
+        JSON.stringify(videoResp)
+      );
+      console.log('videoResp status:', videoResp.data.status);
+      console.log('videoResp request_id:', videoResp.data.request_id);
+    } catch (error) {
+      console.error('Error generating video:', error);
+      alert(
+        'There was an error generating your video. Please try using proper image and prompt'
+      );
+      setIsVideoLoading(false);
     }
   };
 
   const getVideoResults = async (url) => {
-    console.log('video response url response: ', url);
-    const output = await axios.get('/api/imageresults?url=' + url);
-    if (output.data.status === 'COMPLETED') {
-      const result = await axios.get(
-        '/api/imageresults?url=' + output.data.response_url
-      );
-      console.log('Result video url:', result.data.video.url);
-      const videoUrl = result.data.video.url;
-      setResultVideo(videoUrl);
-      setVideoLink(videoUrl);
-      sessionStorage.setItem(`resultVideo_${user.id}`, videoUrl);
-      sessionStorage.setItem(`videoLink_${user.id}`, videoUrl);
-      //setResultVideo(result.data.video);
-      // Clear interval when video is completed
-      if (interval.current) {
-        clearInterval(interval.current);
-        interval.current = null;
+    try {
+      console.log('video response url response: ', url);
+      const output = await axios.get('/api/imageresults?url=' + url);
+
+      if (output.data.status === 'COMPLETED') {
+        const result = await axios.get(
+          '/api/imageresults?url=' + output.data.response_url
+        );
+
+        if (!result.data.video?.url) {
+          throw new Error('No video URL in response');
+        }
+
+        console.log('Result video url:', result.data.video.url);
+        const videoUrl = result.data.video.url;
+
+        setResultVideo(videoUrl);
+        setVideoLink(videoUrl);
+        sessionStorage.setItem(`resultVideo_${user.id}`, videoUrl);
+        sessionStorage.setItem(`videoLink_${user.id}`, videoUrl);
+
+        // Clear interval when video is completed
+        if (interval.current) {
+          clearInterval(interval.current);
+          interval.current = null;
+        }
+
+        setIsVideoLoading(false);
+        setFinishMessage(
+          <div>
+            Video has been generated and saved to gallery. You can view it below
+            or in the Video Gallery. To view content or generate captions,{' '}
+            <Link href={`/view-video?videoLink=${videoUrl}`}>
+              <span className="text-[#8256FF] hover:underline cursor-pointer">
+                click here
+              </span>
+            </Link>
+            .
+          </div>
+        );
       }
+
+      return output.data.status;
+    } catch (error) {
+      console.error('Error getting video results:', error);
       setIsVideoLoading(false);
       setFinishMessage(
-        <div>
-          Video has been generated and saved to gallery. You can view it below
-          or in the Video Gallery. To view content or generate captions,{' '}
-          <Link href={`/view-video?videoLink=${videoUrl}`}>
-            <span className="text-[#8256FF] hover:underline cursor-pointer">
-              click here
-            </span>
-          </Link>
-          .
+        <div className="text-red-500">
+          An error occurred while generating the video. Please try again.
         </div>
       );
+      return 'FAILED';
     }
-    return output.data.status;
   };
 
   useEffect(() => {
+    let mounted = true;
+
     // Only start polling when we have a response URL and we're loading
     if (
       videoRespObj?.data?.response_url &&
@@ -300,7 +344,11 @@ export default function ImageToVideo() {
       !interval.current
     ) {
       const pollVideo = async () => {
+        if (!mounted) return;
+
         const status = await getVideoResults(videoRespObj.data.status_url);
+        if (!mounted) return;
+
         if (status === 'FAILED') {
           clearInterval(interval.current);
           interval.current = null;
@@ -315,8 +363,9 @@ export default function ImageToVideo() {
       interval.current = setInterval(pollVideo, 3000);
     }
 
-    // Cleanup function to clear interval when component unmounts or dependencies change
+    // Cleanup function to clear interval and prevent state updates after unmount
     return () => {
+      mounted = false;
       if (interval.current) {
         clearInterval(interval.current);
         interval.current = null;
@@ -580,10 +629,7 @@ export default function ImageToVideo() {
                 />
 
                 <button
-                  onClick={() => {
-                    generateVideo(img2vidPrompt, imageLink);
-                    setIsVideoLoading(true);
-                  }}
+                  onClick={() => generateVideo(img2vidPrompt, imageLink)}
                   disabled={
                     isVideoLoading || !imageLink || !img2vidPrompt?.trim()
                   }
