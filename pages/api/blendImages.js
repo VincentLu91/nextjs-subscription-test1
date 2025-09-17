@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { prompt, images, user } = req.body; // Expect 'images' to be an array
+  const { prompt, images, user, image_size } = req.body; // Expect 'images' to be an array
 
   if (!Array.isArray(images)) {
     return res.status(400).json({ error: 'images must be an array of URLs' });
@@ -22,12 +22,14 @@ export default async function handler(req, res) {
       });
 
     const resp = await axios.post(
-      'https://queue.fal.run/fal-ai/nano-banana/edit',
+      'https://queue.fal.run/fal-ai/bytedance/seedream/v4/edit',
       {
         image_urls: images, // Pass the array directly
         prompt,
         num_images: 1,
-        output_format: 'png'
+        max_images: 1,
+        enable_safety_checker: true,
+        image_size
       },
       {
         headers: {
