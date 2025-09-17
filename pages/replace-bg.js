@@ -132,7 +132,6 @@ export default function ReplaceBg() {
       setisBGImagesLoading(false);
       return;
     }
-    setResultImages([]);
     const { data: freshUrlData } = supabase.storage
       .from('images')
       .getPublicUrl(uploadedFilePath);
@@ -213,9 +212,23 @@ export default function ReplaceBg() {
         }));
 
         return result.data.images;
+      } else if (output.data.status === 'FAILED') {
+        setBackgroundImagePredictions((state) => ({
+          ...state,
+          [attempt]: {
+            ...state[attempt],
+            status: 'FAILED',
+            error: output.data.error || 'Generation failed'
+          }
+        }));
+        return [];
       }
     } catch (error) {
       console.error('Error in getImageResults:', error.message);
+      setBackgroundImagePredictions((state) => ({
+        ...state,
+        [attempt]: { ...state[attempt], status: 'FAILED', error: error.message }
+      }));
     }
     return [];
   };
@@ -266,16 +279,19 @@ export default function ReplaceBg() {
           photo_url: data.publicUrl
         });
 
+        // Update state and storage atomically
         const userKey = `replacebgImages_${user.id}`;
-        const localPhotos = sessionStorage.getItem(userKey);
-        const localPhotosJson = localPhotos ? JSON.parse(localPhotos) : [];
-        localPhotosJson.push(data.publicUrl);
-        sessionStorage.setItem(userKey, JSON.stringify(localPhotosJson));
-
-        setBackgroundImageList((current) => [
-          ...current,
-          { url: data.publicUrl, text: '' }
-        ]);
+        setBackgroundImageList((current) => {
+          const newList = [...current, { url: data.publicUrl, text: '' }];
+          // Only update session storage if we're not in the middle of generating
+          if (!isGeneratingBGImages) {
+            sessionStorage.setItem(
+              userKey,
+              JSON.stringify(newList.map((img) => img.url))
+            );
+          }
+          return newList;
+        });
 
         await getImageTokenData();
       }
@@ -294,16 +310,61 @@ export default function ReplaceBg() {
 
   useEffect(() => {
     const list = Object.values(backgroundImagePredictions);
-    if (list.length > 0 && list.every((item) => item.status === 'COMPLETED')) {
+    const isComplete =
+      list.length > 0 &&
+      list.every(
+        (item) => item.status === 'COMPLETED' || item.status === 'FAILED'
+      );
+
+    if (isComplete) {
       clearInterval(intervalImage.current);
       setisBGImagesLoading(false);
       setisGeneratingBGImages(false);
+
+      const hasSuccessfulGeneration = list.some(
+        (item) => item.status === 'COMPLETED'
+      );
+
+      if (!hasSuccessfulGeneration) {
+        const errors = list
+          .filter((item) => item.status === 'FAILED')
+          .map((item) => item.error)
+          .filter(Boolean);
+
+        setFinishMessage(
+          errors.length > 0
+            ? `Generation failed: ${errors.join('. ')}. Please try again.`
+            : 'No images were generated. Please try again with a different prompt.'
+        );
+      }
+    }
+  }, [backgroundImagePredictions]);
+
+  // Set success message after images are actually added and generation is complete
+  useEffect(() => {
+    const list = Object.values(backgroundImagePredictions);
+    const isComplete =
+      list.length > 0 &&
+      list.every(
+        (item) => item.status === 'COMPLETED' || item.status === 'FAILED'
+      );
+
+    if (isComplete && backgroundImageList.length > 0) {
       setFinishMessage(
         'Images are generated and saved to gallery. \n' +
           'Click thumbnail below to view your image and generate video.'
       );
     }
-  }, [backgroundImagePredictions]);
+  }, [backgroundImageList, backgroundImagePredictions]);
+
+  // Handle storage updates after images are added
+  useEffect(() => {
+    if (backgroundImageList.length > 0) {
+      const userKey = `replacebgImages_${user.id}`;
+      const currentList = backgroundImageList.map((img) => img.url);
+      sessionStorage.setItem(userKey, JSON.stringify(currentList));
+    }
+  }, [backgroundImageList, user?.id]);
 
   useEffect(() => {
     if (resultImages) {
@@ -313,7 +374,8 @@ export default function ReplaceBg() {
 
   useEffect(() => {
     const predictionAry = Object.entries(backgroundImagePredictions).filter(
-      ([attempt, item]) => item.status !== 'COMPLETED'
+      ([attempt, item]) =>
+        item.status !== 'COMPLETED' && item.status !== 'FAILED'
     );
     if (predictionAry.length > 0) {
       intervalImage.current = setInterval(() => {
@@ -483,9 +545,22 @@ export default function ReplaceBg() {
       return;
     }
 
+    // Clear all intervals and states
     clearInterval(intervalImage.current);
     setBackgroundImagePredictions({});
-    setBackgroundImageList([]);
+    setBackgroundImageList([]); // Clear previous images
+    setResultImages([]); // Clear result images
+
+    // Get stored photos before clearing storage
+    const userKey = `replacebgImages_${user.id}`;
+    const photos = JSON.parse(sessionStorage.getItem(userKey) || '[]');
+
+    // Clear all relevant session storage
+    sessionStorage.removeItem(userKey);
+    photos.forEach((url) => {
+      const imageKey = `imageLink_${user.id}_${url}`;
+      sessionStorage.removeItem(imageKey);
+    });
     setisBGImagesLoading(true);
     setFinishMessage('');
 
