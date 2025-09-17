@@ -2,7 +2,7 @@ import axios from 'axios';
 import { deductUserImageGenerationToken } from '../../utils/useDatabase';
 
 export default async function GET(req, res) {
-  const { prompt, image, user } = req.query;
+  const { prompt, image, user, size } = req.query;
   try {
     let result = await deductUserImageGenerationToken(user, 1);
 
@@ -23,7 +23,7 @@ export default async function GET(req, res) {
         num_results: 1,
         fast: true,
         placement_type: 'automatic',
-        shot_size: [1000, 1000],
+        shot_size: size ? JSON.parse(size) : [1000, 1000],
         manual_placement_selection: 'bottom_center'
       },
       {
