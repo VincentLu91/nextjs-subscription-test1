@@ -27,6 +27,7 @@ export default function GenerateImages() {
   const [promptObject, setPromptObject] = useState(null);
   const [promptStatus, setPromptStatus] = useState(null);
   const [hasAttemptedGenerate, setHasAttemptedGenerate] = useState(false);
+  const [selectedImageSize, setSelectedImageSize] = useState('square_hd');
 
   const router = useRouter();
   const {
@@ -231,7 +232,8 @@ export default function GenerateImages() {
       const resp = await axios.post('/api/blendImages', {
         prompt: pixBlenderPrompt,
         images: urls,
-        user: user.id
+        user: user.id,
+        image_size: selectedImageSize
       });
 
       setPixBlenderPredictions((state) => ({
@@ -893,12 +895,27 @@ export default function GenerateImages() {
                   Generate Prompt
                 </button>
 
-                <textarea
-                  value={pixBlenderPrompt || ''}
-                  onChange={handleChange}
-                  placeholder="Describe how you want to combine your images..."
-                  className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
-                />
+                <div className="space-y-4">
+                  <select
+                    value={selectedImageSize}
+                    onChange={(e) => setSelectedImageSize(e.target.value)}
+                    className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                  >
+                    <option value="square_hd">Square HD</option>
+                    <option value="square">Square</option>
+                    <option value="portrait_4_3">Portrait 4:3</option>
+                    <option value="portrait_16_9">Portrait 16:9</option>
+                    <option value="landscape_4_3">Landscape 4:3</option>
+                    <option value="landscape_16_9">Landscape 16:9</option>
+                  </select>
+
+                  <textarea
+                    value={pixBlenderPrompt || ''}
+                    onChange={handleChange}
+                    placeholder="Describe how you want to combine your images..."
+                    className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                  />
+                </div>
 
                 <div className="space-y-2">
                   {uploadedImages.length === 0 &&
