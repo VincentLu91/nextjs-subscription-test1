@@ -49,6 +49,8 @@ export default function ImageToVideo() {
   const [resultVideo, setResultVideo] = useState(null);
   const [numTieredTokens, setNumTieredTokens] = useState(18);
   const [finishMessage, setFinishMessage] = useState(null);
+  const [uploadedFilePath, setUploadedFilePath] = useState('');
+  const [dragActive, setDragActive] = useState(false);
 
   const interval = useRef();
 
@@ -87,6 +89,12 @@ export default function ImageToVideo() {
     setResultVideo(null); // Clear resultVideo state
     setVideoRespObj(null); // Clear video response object
     setShowImage(false); // Reset showImage state
+    setUploadedFilePath(''); // Clear uploaded file path
+
+    // Clear sessionStorage for current user if exists
+    if (user?.id) {
+      sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
+    }
 
     // Clear sessionStorage for current user if exists
     if (user?.id) {
@@ -117,6 +125,18 @@ export default function ImageToVideo() {
   };
 
   const wasLoggedOut = useRef(false);
+
+  // Restore uploadedFilePath from sessionStorage
+  useEffect(() => {
+    if (user?.id) {
+      const storedFilePath = sessionStorage.getItem(
+        `uploadedFilePath_${user.id}`
+      );
+      if (storedFilePath) {
+        setUploadedFilePath(storedFilePath);
+      }
+    }
+  }, [user]);
 
   // Check URL parameter and sessionStorage to show image
   useEffect(() => {
@@ -225,15 +245,76 @@ export default function ImageToVideo() {
     console.log('Caption: ', e.target.value);
   };
 
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      uploadFile({ target: { files: [e.dataTransfer.files[0]] } });
+    }
+  };
+
+  async function uploadFile(e) {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
+
+    const { data, error } = await supabase.storage
+      .from('images')
+      .upload(filePath, file);
+
+    if (data) {
+      const { data: publicUrlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      if (publicUrlData) {
+        setImageLink(publicUrlData.publicUrl);
+        setUploadedFilePath(filePath);
+        sessionStorage.setItem(`uploadedFilePath_${user.id}`, filePath);
+        setShowImage(true);
+        sessionStorage.setItem(`showImage_${user.id}`, 'true');
+      }
+    } else {
+      console.error('Error uploading file:', error);
+      alert('Failed to upload image. Please try again.');
+    }
+  }
+
   const displayContent = showImage && imageLink && (
     <div className={styles['display-image']} style={{ position: 'relative' }}>
       {/* Close button */}
       <button
-        onClick={() => {
-          setImageLink(null); // Clear the state
-          sessionStorage.removeItem(`imageLink_${user.id}`); // Remove the key from sessionStorage
-          setShowImage(false); // Hide the image
-          sessionStorage.removeItem(`showImage_${user.id}`); // Remove showImage from storage
+        onClick={async () => {
+          if (uploadedFilePath) {
+            // Remove file from Supabase storage
+            const { error } = await supabase.storage
+              .from('images')
+              .remove([uploadedFilePath]);
+            if (error) {
+              console.error('Error removing file from storage:', error);
+            }
+          }
+          // Clear state
+          setImageLink(null);
+          setUploadedFilePath('');
+          setShowImage(false);
+          // Clear storage
+          sessionStorage.removeItem(`imageLink_${user.id}`);
+          sessionStorage.removeItem(`showImage_${user.id}`);
+          sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
         }}
         style={{
           position: 'absolute',
@@ -638,15 +719,59 @@ export default function ImageToVideo() {
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               {displayContent ? (
-                <div className="relative rounded-lg overflow-hidden">
+                <div
+                  className={`relative rounded-lg overflow-hidden ${!isVideoLoading && 'cursor-pointer'} ${dragActive && !isVideoLoading ? 'ring-2 ring-[#8256FF]' : ''}`}
+                  onClick={() =>
+                    !isVideoLoading &&
+                    document.getElementById('file-upload').click()
+                  }
+                  onDragEnter={(e) => !isVideoLoading && handleDrag(e)}
+                  onDragLeave={(e) => !isVideoLoading && handleDrag(e)}
+                  onDragOver={(e) => !isVideoLoading && handleDrag(e)}
+                  onDrop={(e) => !isVideoLoading && handleDrop(e)}
+                >
                   <img
                     src={imageLink}
                     alt="Selected image"
                     className="w-full h-auto"
                   />
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
+                    <p className="text-white text-sm">
+                      {isVideoLoading
+                        ? 'Cannot replace image while generating video'
+                        : dragActive
+                          ? 'Drop to replace image'
+                          : 'Click or drag to replace image'}
+                    </p>
+                  </div>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={uploadFile}
+                  />
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center min-h-[220px] sm:min-h-[260px] border-2 border-dashed border-[#3F3F46] rounded-xl">
+                <div
+                  className={`relative flex flex-col items-center justify-center min-h-[220px] sm:min-h-[260px] border-2 border-dashed border-[#3F3F46] rounded-xl ${!isVideoLoading && 'cursor-pointer'} transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none
+                    ${dragActive && !isVideoLoading ? 'scale-[1.03] shadow-[0_4px_24px_rgba(0,0,0,0.6)]' : ''}`}
+                  onDragEnter={(e) => !isVideoLoading && handleDrag(e)}
+                  onDragLeave={(e) => !isVideoLoading && handleDrag(e)}
+                  onDragOver={(e) => !isVideoLoading && handleDrag(e)}
+                  onDrop={(e) => !isVideoLoading && handleDrop(e)}
+                  onClick={() =>
+                    !isVideoLoading &&
+                    document.getElementById('file-upload').click()
+                  }
+                >
+                  <input
+                    id="file-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={uploadFile}
+                  />
                   <svg
                     className="w-12 h-12 text-[#52525B] opacity-40 mb-4"
                     fill="none"
@@ -661,8 +786,9 @@ export default function ImageToVideo() {
                     />
                   </svg>
                   <p className="text-sm text-[#A1A1AA]">
-                    No image selected. Please select an AI image you already
-                    generated, and click Generate Video.
+                    {isVideoLoading
+                      ? 'Cannot upload image while generating video'
+                      : 'Drag and drop your image here, or click to select'}
                   </p>
                 </div>
               )}
