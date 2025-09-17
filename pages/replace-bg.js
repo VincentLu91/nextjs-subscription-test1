@@ -574,7 +574,7 @@ export default function ReplaceBg() {
     <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
       <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <h1 className="text-5xl font-bold">Replace Background</h1>
+          <h1 className="text-5xl font-bold">Replace Background of Product</h1>
 
           {/* Credits Badge with Tooltip */}
           <div className="relative">
@@ -596,7 +596,10 @@ export default function ReplaceBg() {
             </div>
           </div>
         </div>
-
+        <p>
+          Upload 1 image of your product. Describe your scenery and let the AI
+          create different backgrounds for your product.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Upload Card */}
           <section>
@@ -637,7 +640,7 @@ export default function ReplaceBg() {
                 </svg>
 
                 <p className="text-sm text-[#A1A1AA]">
-                  Drag and drop your image here, or click to select
+                  Drag and drop your product image here, or click to select
                 </p>
               </div>
 
