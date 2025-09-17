@@ -27,6 +27,7 @@ export default function ReplaceBg() {
   const [dragActive, setDragActive] = useState(false);
   const [textareaFocused, setTextareaFocused] = useState(false);
   const [hasNoSubscription, setHasNoSubscription] = useState(false);
+  const [selectedSize, setSelectedSize] = useState('square');
 
   const router = useRouter();
   const {
@@ -143,12 +144,26 @@ export default function ReplaceBg() {
       return;
     }
 
+    // Determine shot size based on selection
+    let shotSize;
+    switch (selectedSize) {
+      case '16:9':
+        shotSize = [563, 1000];
+        break;
+      case '9:16':
+        shotSize = [1000, 563];
+        break;
+      default: // square
+        shotSize = [1000, 1000];
+    }
+
     const resp = await axios.get(
       '/api/modifyImage?prompt=' +
         backgroundPrompt +
         '&image=' +
         freshUrlData.publicUrl +
-        `&user=${user.id}`
+        `&user=${user.id}` +
+        `&size=${JSON.stringify(shotSize)}`
     );
     setBackgroundImagePredictions((state) => ({
       ...state,
@@ -578,6 +593,16 @@ export default function ReplaceBg() {
                 >
                   Generate Prompt
                 </button>
+
+                <select
+                  value={selectedSize}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="square">Square (1000x1000)</option>
+                  <option value="16:9">16:9 (563x1000)</option>
+                  <option value="9:16">9:16 (1000x563)</option>
+                </select>
 
                 <textarea
                   value={backgroundPrompt || ''}
