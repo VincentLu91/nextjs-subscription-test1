@@ -302,22 +302,6 @@ export default function ViewImage() {
               Actions & Caption
             </label>
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)] space-y-4">
-              <button
-                onClick={() => download(imageLink)}
-                disabled={!imageLink}
-                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Download Content
-              </button>
-
-              <button
-                onClick={() => goGenerateVideo(imageLink)}
-                disabled={!imageLink}
-                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Generate Video
-              </button>
-
               <p className="text-sm text-[#A1A1AA]">
                 Enter your instruction for the AI to generate a caption,
                 including any product details or relevant context.
@@ -347,6 +331,22 @@ export default function ViewImage() {
               />
 
               {isLoading && <LoadingDots />}
+
+              <button
+                onClick={() => download(imageLink)}
+                disabled={!imageLink}
+                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Download Image
+              </button>
+
+              <button
+                onClick={() => goGenerateVideo(imageLink)}
+                disabled={!imageLink}
+                className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Animate Product Image to Video
+              </button>
             </div>
           </section>
         </div>

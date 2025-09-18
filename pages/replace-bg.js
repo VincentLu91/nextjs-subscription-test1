@@ -597,8 +597,9 @@ export default function ReplaceBg() {
           </div>
         </div>
         <p>
-          Upload 1 image of your product. Describe your scenery and let the AI
-          create different backgrounds for your product.
+          Upload one photo of your product. Describe the scene. Our
+          eCommerce-trained AI generates studio-quality backgrounds
+          automatically.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Upload Card */}
@@ -664,6 +665,18 @@ export default function ReplaceBg() {
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="space-y-4">
+                <select
+                  value={selectedSize}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="square">1:1 (Square)</option>
+                  <option value="16:9">16:9 (Landscape)</option>
+                  <option value="9:16">
+                    9:16 (Portrait - perfect for animating TikTok/Reels)
+                  </option>
+                </select>
+
                 <button
                   onClick={() => suggestPromptReplicate(imageForBg)}
                   className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -671,16 +684,6 @@ export default function ReplaceBg() {
                 >
                   Generate Prompt
                 </button>
-
-                <select
-                  value={selectedSize}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
-                >
-                  <option value="square">Square (1000x1000)</option>
-                  <option value="16:9">16:9 (563x1000)</option>
-                  <option value="9:16">9:16 (1000x563)</option>
-                </select>
 
                 <textarea
                   value={backgroundPrompt || ''}
