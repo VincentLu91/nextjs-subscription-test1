@@ -93,7 +93,7 @@ const Navbar = () => {
                     className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center"
                     onBlur={() => setTimeout(() => setIsOpen(false), 200)}
                   >
-                    Generate Visuals
+                    Product Visuals
                   </button>
                   {isOpen && (
                     <div className="absolute top-full left-0 bg-zinc-900/90 backdrop-blur-md shadow-lg rounded-xl py-2 mt-1 border border-white/5">

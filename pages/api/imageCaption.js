@@ -9,6 +9,7 @@ export default async function handler(req, res) {
     // first, make an api call to GENERATE a prediction (HTTP method is POST):
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
+      // model: https://replicate.com/yorickvp/llava-13b
       'https://api.replicate.com/v1/predictions',
       {
         version:
