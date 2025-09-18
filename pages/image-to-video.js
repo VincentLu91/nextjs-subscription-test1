@@ -346,6 +346,70 @@ export default function ImageToVideo() {
       return;
     }
 
+    // Check if image contains a product
+    try {
+      // Start product check
+      const productCheck = await axios.post('/api/isProduct', {
+        imageLink: image,
+        user: user.id,
+        prompt:
+          'Does this image have a product - no animals or humans - just a standalone product? Please respond with only yes or no'
+      });
+
+      // Poll for result
+      let checkComplete = false;
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (!checkComplete && attempts < maxAttempts) {
+        const output = await axios.get(
+          '/api/captionresults?url=' + productCheck.data.urls.get
+        );
+        console.log('Product check attempt', attempts + 1, ':', output.data);
+
+        if (output.data.status === 'succeeded') {
+          const result = output.data.output;
+          if (!result || result.length === 0) {
+            alert(
+              'Error checking if image contains product. Please try again.'
+            );
+            setIsVideoLoading(false);
+            return;
+          }
+          const response = result.join('').toLowerCase().trim();
+          console.log('Product check response:', response);
+          if (response === 'no') {
+            alert(
+              'Please upload a product image. The uploaded image does not appear to contain a product.'
+            );
+            setIsVideoLoading(false);
+            return;
+          }
+          checkComplete = true;
+        } else if (output.data.status === 'failed') {
+          alert('Error checking if image contains product. Please try again.');
+          setIsVideoLoading(false);
+          return;
+        }
+
+        if (!checkComplete) {
+          attempts++;
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds between attempts
+        }
+      }
+
+      if (!checkComplete) {
+        alert('Timeout checking if image contains product. Please try again.');
+        setIsVideoLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking if image contains product:', error);
+      alert('Error checking if image contains product. Please try again.');
+      setIsVideoLoading(false);
+      return;
+    }
+
     // Clear previous video state
     setResultVideo(null);
     setVideoRespObj(null);
