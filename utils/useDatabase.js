@@ -448,13 +448,14 @@ const deductUserCaptionToken = async (customerId, tokensToDeduct) => {
 
 const initializeFreeUser = async (uuid) => {
   const { error } = await supabaseAdmin.from('customers').insert([
+    // set very minimal tokens to prevent GPU burn while still allowing some element of trying before buying
     {
       id: uuid,
       stripe_customer_id: null,
-      image_tokens: 12,
-      training_tokens: 14,
-      caption_tokens: 16,
-      video_tokens: 18
+      image_tokens: 3,
+      training_tokens: 1,
+      caption_tokens: 3,
+      video_tokens: 1
     }
   ]);
 
