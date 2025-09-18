@@ -937,6 +937,76 @@ export default function GenerateImages() {
                         return;
                       }
 
+                      // Check if any of the images contain a product
+                      try {
+                        let hasProduct = false;
+                        for (const image of uploadedImages) {
+                          const response = await fetch(image.url);
+                          const blob = await response.blob();
+                          const fileExt = image.name
+                            .split('.')
+                            .pop()
+                            .toLowerCase();
+                          const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
+
+                          const { data, error } = await supabase.storage
+                            .from('images')
+                            .upload(filePath, blob);
+
+                          if (error) continue;
+
+                          const { data: publicUrlData } = supabase.storage
+                            .from('images')
+                            .getPublicUrl(filePath);
+
+                          if (!publicUrlData) continue;
+
+                          const productCheck = await axios.post(
+                            '/api/isProduct',
+                            {
+                              imageLink: publicUrlData.publicUrl,
+                              user: user.id,
+                              prompt:
+                                'Does this image have a product - no animals or humans - just a standalone product? Please respond with only yes or no'
+                            }
+                          );
+
+                          let attempts = 0;
+                          while (attempts < 10) {
+                            const output = await axios.get(
+                              '/api/captionresults?url=' +
+                                productCheck.data.urls.get
+                            );
+                            if (output.data.status === 'succeeded') {
+                              const result = output.data.output;
+                              if (result && result.length > 0) {
+                                const response = result
+                                  .join('')
+                                  .toLowerCase()
+                                  .trim();
+                                if (response === 'yes') {
+                                  hasProduct = true;
+                                }
+                              }
+                              break;
+                            }
+                            attempts++;
+                            await new Promise((resolve) =>
+                              setTimeout(resolve, 2000)
+                            );
+                          }
+                        }
+
+                        if (!hasProduct) {
+                          alert(
+                            'Please upload at least one product image. None of the uploaded images appear to contain a product.'
+                          );
+                          return;
+                        }
+                      } catch (error) {
+                        console.error('Error checking images:', error);
+                      }
+
                       try {
                         clearInterval(intervalImage.current);
                         setPixBlenderPredictions({});
