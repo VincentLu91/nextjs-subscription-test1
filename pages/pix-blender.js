@@ -799,12 +799,11 @@ export default function GenerateImages() {
         </div>
 
         <p className="text-[#A1A1AA] mb-6">
-          Our most flexible option: Combine multiple product images into one.
+          Combine items, restage scenes, or clean up a single photo.
         </p>
-        <p className="text-[#A1A1AA] mb-10">
-          <strong>For Best Results:</strong> Avoid uploading images with labels,
-          text, or highly detailed patterns, as these might not merge smoothly
-          in the final image.
+        <p className="text-[#A1A1AA] mb-6">
+          Great for: virtual fashion try-ons, showcasing multiple products in
+          one photo, products without labels
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -885,16 +884,6 @@ export default function GenerateImages() {
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="space-y-4">
-                <button
-                  onClick={suggestPromptMultiImages}
-                  className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={
-                    uploadedImages.length === 0 || isGeneratingBlenderImg
-                  }
-                >
-                  Generate Prompt
-                </button>
-
                 <div className="space-y-4">
                   <select
                     value={selectedImageSize}
@@ -908,6 +897,16 @@ export default function GenerateImages() {
                     <option value="landscape_4_3">Landscape 4:3</option>
                     <option value="landscape_16_9">Landscape 16:9</option>
                   </select>
+
+                  <button
+                    onClick={suggestPromptMultiImages}
+                    className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={
+                      uploadedImages.length === 0 || isGeneratingBlenderImg
+                    }
+                  >
+                    Generate Prompt
+                  </button>
 
                   <textarea
                     value={pixBlenderPrompt || ''}

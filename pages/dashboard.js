@@ -141,10 +141,11 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 relative">
           <div className="sm:flex sm:flex-col sm:align-center mb-16">
             <h1 className="text-4xl font-extrabold text-[#FAFAFA] sm:text-center sm:text-6xl animate-on-scroll">
-              Your Shortcut to Viral
+              Your Social Media Suite for eCommerce
             </h1>
             <p className="mt-4 text-[#B0B0B0] sm:text-center text-xl animate-on-scroll">
-              AI-crafted videos, carousels & captions—built for the algorithm.
+              Tools to create photos, videos, and captions of your product for
+              TikTok and Instagram
             </p>
             {/* A/B test:
             1. Headline: From Idea to Reel in Seconds
@@ -156,6 +157,12 @@ export default function Dashboard() {
              */}
           </div>
 
+          {/* Microcopy for sellers */}
+          <p className="text-[#B0B0B0] text-center text-sm mb-8">
+            For Shopify/Etsy/Amazon sellers — pick a template to create ad-ready
+            product visuals.
+          </p>
+
           {/* Two-column grid for feature cards */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-10"
@@ -166,7 +173,7 @@ export default function Dashboard() {
             {/* Visual Creation Tools */}
             <div className="space-y-8">
               <h2 className="text-[28px] font-semibold text-[#F9FAFB] pb-4 mt-16 font-inter animate-on-scroll">
-                Visual Creation Tools
+                Create Product Photos
               </h2>
 
               <Link
@@ -184,7 +191,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                    Replace backgrounds
+                    Change Scenery for Your Product
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
                     Use one product image to create lifestyle shots.
@@ -216,13 +223,13 @@ export default function Dashboard() {
                     Pix Blender
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Showcase multiple products and subjects into a single image.
+                    Add multiple products into a single image.
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
                     transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
                   >
-                    Start Blending
+                    Start Editing
                   </button>
                 </div>
               </Link>
@@ -231,7 +238,7 @@ export default function Dashboard() {
             {/* Content Generation Tools */}
             <div className="space-y-8">
               <h2 className="text-[28px] font-semibold text-[#F9FAFB] pb-4 mt-16 font-inter animate-on-scroll">
-                Content Generation Tools
+                Create Videos and Captions
               </h2>
 
               <Link
@@ -253,8 +260,7 @@ export default function Dashboard() {
                     <span className="text-indigo-400 text-sm">NEW</span>
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Turn AI images into quick videos for TikTok, Instagram, or
-                    YouTube.
+                    Animate your AI product photos into TikToks and Reels
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
@@ -280,10 +286,11 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                    Caption Generator
+                    Write Product Caption
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Generate engaging captions for your images instantly.
+                    Generate engaging captions for your product images and
+                    videos.
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 

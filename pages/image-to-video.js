@@ -709,6 +709,14 @@ export default function ImageToVideo() {
             </div>
           </div>
         </div>
+        <p className="text-[#A1A1AA] mb-6">
+          Animate a product photo that you generated into a TikTok/Reel. Select
+          photo from{' '}
+          <Link href="/image-gallery" className="underline hover:text-white">
+            image gallery
+          </Link>
+          , or upload a product photo.
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Image Preview Card */}
@@ -848,7 +856,6 @@ export default function ImageToVideo() {
             </div>
           </section>
         </div>
-
         {/* Results Section */}
         {resultVideo && (
           <>
