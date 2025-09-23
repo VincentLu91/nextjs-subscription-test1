@@ -380,13 +380,13 @@ const getTieredTokens = async (customerId, typeOfToken) => {
     // Return token allocation based on initializeFreeUser values
     switch (typeOfToken) {
       case 'image_tokens':
-        return 3;
+        return 0;
       case 'training_tokens':
-        return 1;
+        return 0;
       case 'caption_tokens':
-        return 3;
+        return 0;
       case 'video_tokens':
-        return 1;
+        return 0;
     }
   }
 
@@ -452,23 +452,6 @@ const deductUserCaptionToken = async (customerId, tokensToDeduct) => {
   }
 };
 
-const initializeFreeUser = async (uuid) => {
-  const { error } = await supabaseAdmin.from('customers').insert([
-    // set very minimal tokens to prevent GPU burn while still allowing some element of trying before buying
-    {
-      id: uuid,
-      stripe_customer_id: null,
-      image_tokens: 3,
-      training_tokens: 1,
-      caption_tokens: 3,
-      video_tokens: 1
-    }
-  ]);
-
-  if (error) throw error;
-  console.log(`Initialized free user: ${uuid}`);
-};
-
 export {
   upsertProductRecord,
   upsertPriceRecord,
@@ -479,6 +462,5 @@ export {
   deductUserTrainingToken,
   deductUserCaptionToken,
   getTokens,
-  getTieredTokens,
-  initializeFreeUser
+  getTieredTokens
 };

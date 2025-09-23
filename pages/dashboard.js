@@ -107,13 +107,15 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
               <p className="text-sm font-medium">
-                Unlock More with a Free Trial! You still have access to free
+                Built for merchants. Upgrade to start generating product ads and
+                captions for your brand
+                {/*Unlock More with a Free Trial! You still have access to free
                 credits. Start your 15-day free trial to generate more images —
-                no card required.
+                no card required.*/}
               </p>
               <Link href="/pricing">
                 <button className="ml-4 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors">
-                  Start Free Trial
+                  Choose a Plan
                 </button>
               </Link>
             </div>
