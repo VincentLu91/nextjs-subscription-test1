@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useUser } from '../components/UserContext';
+import { CreditBadge, useCreditsFetcher } from '../utils/helpers';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
@@ -18,8 +19,6 @@ export default function GenerateApparel() {
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
   const [photoData, setPhotoData] = useState(null);
-  const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(12);
   const [resultImages, setResultImages] = useState([]);
   const [modelImagePath, setModelImagePath] = useState('');
   const [garmentImagePath, setGarmentImagePath] = useState('');
@@ -33,6 +32,7 @@ export default function GenerateApparel() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
   const {
     userLoaded,
     isLoadingUser,
@@ -59,6 +59,38 @@ export default function GenerateApparel() {
   } = useUser();
 
   const intervalImage = useRef();
+
+  const { numTokens, numTieredTokens, isCreditsLoading, fetchCredits } =
+    useCreditsFetcher(user, 'image_tokens');
+
+  // Initial load and whenever subscription presence changes
+  useEffect(() => {
+    if (user) fetchCredits('mount/user', { silent: true });
+  }, [user, subscription]);
+
+  // Refresh credits on window focus and visibility change
+  useEffect(() => {
+    const onFocus = () => fetchCredits('focus', { silent: true });
+    const onVisible = () =>
+      document.visibilityState === 'visible' &&
+      fetchCredits('visible', { silent: true });
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [user]);
+
+  // Poll for credits while generating
+  useEffect(() => {
+    if (!isGeneratingTryOn) return;
+    const id = setInterval(
+      () => fetchCredits('gen-poll', { silent: true }),
+      3000
+    );
+    return () => clearInterval(id);
+  }, [isGeneratingTryOn]);
 
   const clearUserData = () => {
     // Clear state
@@ -106,15 +138,6 @@ export default function GenerateApparel() {
     } else {
       setTryOnImageList([]);
     }
-
-    /*const savedFilePath = sessionStorage.getItem(`uploadedFilePath_${user.id}`);
-    if (savedFilePath) {
-      setUploadedFilePath(savedFilePath);
-      setIsImageUploaded(true);
-    } else {
-      setUploadedFilePath('');
-      setIsImageUploaded(false);
-    }*/
   };
 
   // Keep all existing functions
@@ -231,7 +254,7 @@ export default function GenerateApparel() {
         sessionStorage.setItem(userKey, JSON.stringify(localPhotosJson));
 
         setTryOnImageList((current) => [...current, { url: data.publicUrl }]);
-        await getImageTokenData();
+        await fetchCredits('post-insert', { silent: true });
       }
     }
   };
@@ -278,32 +301,6 @@ export default function GenerateApparel() {
       loadUserData(); // Load the current user's data
     }
   }, [user, isLoadingUser]);
-
-  async function getImageTokenData() {
-    const imageTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
-    );
-    setNumTokens(imageTokenData.data);
-  }
-
-  useEffect(() => {
-    if (user) {
-      getImageTokenData();
-    }
-  }, [user]);
-
-  async function getTieredImageData() {
-    const imageTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
-    );
-    setNumTieredTokens(imageTieredData.data);
-  }
-
-  useEffect(() => {
-    if (user && subscription) {
-      getTieredImageData();
-    }
-  }, [user]);
 
   async function uploadFile(e, type) {
     let file = e.target.files[0];
@@ -435,25 +432,14 @@ export default function GenerateApparel() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <h1 className="text-5xl font-bold">Clothes Swapping</h1>
 
-          {/* Credits Badge with Tooltip */}
-          <div className="relative">
-            {hasNoSubscription && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-gradient-to-r from-[#423680] to-[#7B63FA] text-white text-sm font-semibold rounded-lg shadow-lg whitespace-nowrap">
-                Need more credits? Start your free trial —{' '}
-                <Link href="/pricing" className="underline hover:text-blue-200">
-                  no card required
-                </Link>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
-              </div>
-            )}
-            <div
-              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
-              aria-live="polite"
-            >
-              Credits {numTokens} / {numTieredTokens}
-            </div>
-          </div>
+          {/* Credits Badge */}
+          <CreditBadge
+            user={user}
+            numTokens={numTokens}
+            numTieredTokens={numTieredTokens}
+            isCreditsLoading={isCreditsLoading}
+            hasNoSubscription={hasNoSubscription}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
@@ -656,10 +642,11 @@ export default function GenerateApparel() {
                         setTryOnImageList([]);
                         setIsGeneratingTryOn(true);
                         setFinishMessage('');
+                        fetchCredits('gen-start', { silent: true });
                         for (let i = 0; i < ATTEMPTS; i++) {
                           getImage(i);
                         }
-                        await getImageTokenData();
+                        await fetchCredits('post-mutation', { silent: true });
                       }
                     }}
                     className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
