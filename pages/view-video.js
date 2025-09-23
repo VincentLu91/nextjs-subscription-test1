@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
-import { postData } from '../utils/helpers';
+import { postData, CreditBadge, useCreditsFetcher } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
@@ -39,8 +39,8 @@ export default function ViewVideo() {
   const [caption, setCaption] = useState('');
   const [captionObject, setCaptionObject] = useState(null);
   const [captionStatus, setCaptionStatus] = useState(null);
-  const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(16);
+  const { numTokens, numTieredTokens, isCreditsLoading, fetchCredits } =
+    useCreditsFetcher(user, 'caption_tokens');
 
   const interval = useRef();
 
@@ -162,23 +162,36 @@ export default function ViewVideo() {
         console.log(captionStatus);
         getCaptionResults(captionObject.data.status_url);
       }, 3000);
+
+      // Poll credits while generating
+      const creditsInterval = setInterval(
+        () => fetchCredits('gen-poll', { silent: true }),
+        3000
+      );
+      return () => {
+        clearInterval(interval.current);
+        clearInterval(creditsInterval);
+      };
     }
     return () => clearInterval(interval.current);
   }, [captionStatus]);
 
-  async function getCaptionTokenData() {
-    console.log('user is: ', user.id);
-    const captionTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}` + `&tokenType=caption_tokens`
-    );
-    console.log('captionTokenData: ', captionTokenData.data);
-    setNumTokens(captionTokenData.data);
-  }
+  // Initial load and whenever subscription presence changes
+  useEffect(() => {
+    if (user) fetchCredits('mount/user', { silent: true });
+  }, [user, subscription]);
 
   useEffect(() => {
-    if (user) {
-      getCaptionTokenData();
-    }
+    const onFocus = () => fetchCredits('focus', { silent: true });
+    const onVisible = () =>
+      document.visibilityState === 'visible' &&
+      fetchCredits('visible', { silent: true });
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [user]);
 
   useEffect(() => {
@@ -212,21 +225,6 @@ export default function ViewVideo() {
     return () => sub.subscription.unsubscribe();
   }, [user]);
 
-  async function getTieredTokenData() {
-    console.log('user is: ', user.id);
-    const captionTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=caption_tokens`
-    );
-    console.log('captionTieredData: ', captionTieredData.data);
-    setNumTieredTokens(captionTieredData.data);
-  }
-
-  useEffect(() => {
-    if (user && subscription) {
-      getTieredTokenData();
-    }
-  }, [user]);
-
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
     subscription &&
@@ -242,25 +240,14 @@ export default function ViewVideo() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <h1 className="text-5xl font-bold">View Video & Generate Captions</h1>
 
-          {/* Credits Badge with Tooltip */}
-          <div className="relative">
-            {hasNoSubscription && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-gradient-to-r from-[#423680] to-[#7B63FA] text-white text-sm font-semibold rounded-lg shadow-lg whitespace-nowrap">
-                Need more credits? Start your free trial —{' '}
-                <Link href="/pricing" className="underline hover:text-blue-200">
-                  no card required
-                </Link>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
-              </div>
-            )}
-            <div
-              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
-              aria-live="polite"
-            >
-              Credits {numTokens} / {numTieredTokens}
-            </div>
-          </div>
+          {/* Credits Badge */}
+          <CreditBadge
+            user={user}
+            numTokens={numTokens}
+            numTieredTokens={numTieredTokens}
+            isCreditsLoading={isCreditsLoading}
+            hasNoSubscription={hasNoSubscription}
+          />
         </div>
 
         {/* Content Grid */}

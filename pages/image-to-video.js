@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
-import { postData } from '../utils/helpers';
+import { postData, useCreditsFetcher, CreditBadge } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
@@ -44,10 +44,10 @@ export default function ImageToVideo() {
   const [caption, setCaption] = useState('');
   const [captionObject, setCaptionObject] = useState(null);
   const [captionStatus, setCaptionStatus] = useState(null);
-  const [numTokens, setNumTokens] = useState(null);
+  const { numTokens, numTieredTokens, isCreditsLoading, fetchCredits } =
+    useCreditsFetcher(user, 'video_tokens');
   const [videoRespObj, setVideoRespObj] = useState(null);
   const [resultVideo, setResultVideo] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(18);
   const [finishMessage, setFinishMessage] = useState(null);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
   const [dragActive, setDragActive] = useState(false);
@@ -427,6 +427,7 @@ export default function ImageToVideo() {
     }
 
     setIsVideoLoading(true);
+    fetchCredits('gen-start', { silent: true });
     try {
       setShowImage(true);
       sessionStorage.setItem(`showImage_${user.id}`, 'true');
@@ -705,38 +706,37 @@ export default function ImageToVideo() {
     sessionStorage.setItem(localKey, JSON.stringify(localList));
 
     setSavedPublicUrl(user.id, remoteUrl, publicUrl); // ✅ remember mapping
-    await getVideoTokenData();
+    await fetchCredits('post-mutation', { silent: true });
   };
 
-  async function getVideoTokenData() {
-    console.log('user is: ', user.id);
-    const videoTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}` + `&tokenType=video_tokens`
-    );
-    console.log('videoTokenData: ', videoTokenData.data);
-    setNumTokens(videoTokenData.data);
-  }
-
+  // Initial load and whenever subscription presence changes
   useEffect(() => {
-    if (user) {
-      getVideoTokenData();
-    }
+    if (user) fetchCredits('mount/user', { silent: true });
+  }, [user, subscription]);
+
+  // Update credits on window focus/visibility
+  useEffect(() => {
+    const onFocus = () => fetchCredits('focus', { silent: true });
+    const onVisible = () =>
+      document.visibilityState === 'visible' &&
+      fetchCredits('visible', { silent: true });
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [user]);
 
-  async function getTieredVideoData() {
-    console.log('user is: ', user.id);
-    const videoTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=video_tokens`
-    );
-    console.log('videoTieredData: ', videoTieredData.data);
-    setNumTieredTokens(videoTieredData.data);
-  }
-
+  // Poll credits during video generation
   useEffect(() => {
-    if (user && subscription) {
-      getTieredVideoData();
-    }
-  }, [user]);
+    if (!isVideoLoading) return;
+    const id = setInterval(
+      () => fetchCredits('gen-poll', { silent: true }),
+      3000
+    );
+    return () => clearInterval(id);
+  }, [isVideoLoading]);
 
   const subscriptionName = subscription && subscription.prices.products.name;
   const subscriptionPrice =
@@ -764,13 +764,13 @@ export default function ImageToVideo() {
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
               </div>
             )}
-            <div
-              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
-              aria-live="polite"
-            >
-              Credits {numTokens} / {numTieredTokens}
-            </div>
+            <CreditBadge
+              user={user}
+              numTokens={numTokens}
+              numTieredTokens={numTieredTokens}
+              isCreditsLoading={isCreditsLoading}
+              hasNoSubscription={hasNoSubscription}
+            />
           </div>
         </div>
         <p className="text-[#A1A1AA] mb-6">

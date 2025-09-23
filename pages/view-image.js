@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
-import { postData } from '../utils/helpers';
+import { postData, CreditBadge, useCreditsFetcher } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
@@ -31,8 +31,8 @@ export default function ViewImage() {
   const [caption, setCaption] = useState('');
   const [captionObject, setCaptionObject] = useState(null);
   const [captionStatus, setCaptionStatus] = useState(null);
-  const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(16);
+  const { numTokens, numTieredTokens, isCreditsLoading, fetchCredits } =
+    useCreditsFetcher(user, 'caption_tokens');
   const [prefersReducedMotion] = useState(
     typeof window !== 'undefined'
       ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -112,17 +112,26 @@ export default function ViewImage() {
       return;
     }
 
-    const rawCaption = await axios.post(
-      '/api/imageCaption?prompt=' +
-        prompt +
-        'in the style of a social media caption' +
-        '&imageLink=' +
-        imageLink +
-        `&user=${user.id}`
-    );
+    fetchCredits('gen-start', { silent: true });
 
-    setCaptionObject(rawCaption);
-    setCaptionStatus(rawCaption.data.status);
+    try {
+      const rawCaption = await axios.post(
+        '/api/imageCaption?prompt=' +
+          prompt +
+          'in the style of a social media caption' +
+          '&imageLink=' +
+          imageLink +
+          `&user=${user.id}`
+      );
+
+      setCaptionObject(rawCaption);
+      setCaptionStatus(rawCaption.data.status);
+
+      await fetchCredits('post-mutation', { silent: true });
+    } catch (error) {
+      console.error('Error generating caption:', error);
+      alert('Failed to generate caption. Please try again.');
+    }
   };
 
   const getCaptionResults = async (url) => {
@@ -146,36 +155,36 @@ export default function ViewImage() {
       interval.current = setInterval(() => {
         getCaptionResults(captionObject.data.urls.get);
       }, 3000);
+
+      // Poll credits while generating
+      const creditsPollId = setInterval(
+        () => fetchCredits('gen-poll', { silent: true }),
+        3000
+      );
+      return () => {
+        clearInterval(interval.current);
+        clearInterval(creditsPollId);
+      };
     }
     return () => clearInterval(interval.current);
   }, [captionStatus]);
 
-  async function getCaptionTokenData() {
-    if (!user?.id) return;
-    const captionTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}&tokenType=caption_tokens`
-    );
-    setNumTokens(captionTokenData.data);
-  }
+  // Initial load and whenever subscription presence changes
+  useEffect(() => {
+    if (user) fetchCredits('mount/user', { silent: true });
+  }, [user, subscription]);
 
   useEffect(() => {
-    if (user) {
-      getCaptionTokenData();
-    }
-  }, [user]);
-
-  async function getTieredTokenData() {
-    if (!user?.id) return;
-    const captionTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}&tokenType=caption_tokens`
-    );
-    setNumTieredTokens(captionTieredData.data);
-  }
-
-  useEffect(() => {
-    if (user && subscription) {
-      getTieredTokenData();
-    }
+    const onFocus = () => fetchCredits('focus', { silent: true });
+    const onVisible = () =>
+      document.visibilityState === 'visible' &&
+      fetchCredits('visible', { silent: true });
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [user]);
 
   useEffect(() => {
@@ -217,25 +226,14 @@ export default function ViewImage() {
             View Content & Generate Captions
           </h1>
 
-          {/* Credits Badge with Tooltip */}
-          <div className="relative">
-            {hasNoSubscription && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-gradient-to-r from-[#423680] to-[#7B63FA] text-white text-sm font-semibold rounded-lg shadow-lg whitespace-nowrap">
-                Need more credits? Start your free trial —{' '}
-                <Link href="/pricing" className="underline hover:text-blue-200">
-                  no card required
-                </Link>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
-              </div>
-            )}
-            <div
-              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
-              aria-live="polite"
-            >
-              Credits {numTokens} / {numTieredTokens}
-            </div>
-          </div>
+          {/* Credits Badge */}
+          <CreditBadge
+            user={user}
+            numTokens={numTokens}
+            numTieredTokens={numTieredTokens}
+            isCreditsLoading={isCreditsLoading}
+            hasNoSubscription={hasNoSubscription}
+          />
         </div>
 
         {/* Content Grid */}

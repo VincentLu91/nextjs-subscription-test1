@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { postData } from '../utils/helpers';
+import { postData, CreditBadge, useCreditsFetcher } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
@@ -17,8 +17,6 @@ export default function GenerateImages() {
   const [hasNoSubscription, setHasNoSubscription] = useState(false);
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
-  const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(12);
   const [photoData, setPhotoData] = useState(null);
   const [resultImages, setResultImages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -62,6 +60,9 @@ export default function GenerateImages() {
     isGeneratingBlenderImg,
     setIsGeneratingBlenderImg
   } = useUser();
+
+  const { numTokens, numTieredTokens, isCreditsLoading, fetchCredits } =
+    useCreditsFetcher(user, 'image_tokens');
 
   console.log('isGeneratingBlenderImg=', isGeneratingBlenderImg);
 
@@ -535,35 +536,32 @@ export default function GenerateImages() {
     setLoading(false);
   };
 
-  async function getImageTokenData() {
-    console.log('user is: ', user.id);
-    const imageTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
-    );
-    console.log('imageTokenData: ', imageTokenData.data);
-    setNumTokens(imageTokenData.data);
-  }
+  // Initial load and whenever subscription presence changes
+  useEffect(() => {
+    if (user) fetchCredits('mount/user', { silent: true });
+  }, [user, subscription]);
 
   useEffect(() => {
-    if (user) {
-      getImageTokenData();
-    }
+    const onFocus = () => fetchCredits('focus', { silent: true });
+    const onVisible = () =>
+      document.visibilityState === 'visible' &&
+      fetchCredits('visible', { silent: true });
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [user]);
-
-  async function getTieredImageData() {
-    console.log('user is: ', user.id);
-    const imageTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
-    );
-    console.log('imageTieredData: ', imageTieredData.data);
-    setNumTieredTokens(imageTieredData.data);
-  }
 
   useEffect(() => {
-    if (user && subscription) {
-      getTieredImageData();
-    }
-  }, [user]);
+    if (!isGeneratingBlenderImg) return;
+    const id = setInterval(
+      () => fetchCredits('gen-poll', { silent: true }),
+      3000
+    );
+    return () => clearInterval(id);
+  }, [isGeneratingBlenderImg]);
 
   const addImages = async (images) => {
     for (const imageObj of images) {
@@ -596,8 +594,8 @@ export default function GenerateImages() {
           { url: data.publicUrl, text: '' }
         ]);
 
-        // Update token count after successful image addition
-        await getImageTokenData();
+        // Update credits after successful image addition
+        await fetchCredits('post-insert', { silent: true });
       }
     }
   };
@@ -788,13 +786,13 @@ export default function GenerateImages() {
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
               </div>
             )}
-            <div
-              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
-              aria-live="polite"
-            >
-              Credits {numTokens} / {numTieredTokens}
-            </div>
+            <CreditBadge
+              user={user}
+              numTokens={numTokens}
+              numTieredTokens={numTieredTokens}
+              isCreditsLoading={isCreditsLoading}
+              hasNoSubscription={hasNoSubscription}
+            />
           </div>
         </div>
 
@@ -1008,11 +1006,27 @@ export default function GenerateImages() {
                       }
 
                       try {
+                        // Clear all intervals and states
                         clearInterval(intervalImage.current);
                         setPixBlenderPredictions({});
-                        setPixBlenderImageList([]);
+                        setPixBlenderImageList([]); // Clear previous images
+                        setResultImages([]); // Clear result images
                         setIsBlenderImgLoading(true);
                         setFinishMessage('');
+
+                        // Get stored photos before clearing storage
+                        const userKey = `pixblenderImages_${user.id}`;
+                        const photos = JSON.parse(
+                          sessionStorage.getItem(userKey) || '[]'
+                        );
+
+                        // Clear all relevant session storage
+                        sessionStorage.removeItem(userKey);
+                        photos.forEach((url) => {
+                          const imageKey = `imageLink_${user.id}_${url}`;
+                          sessionStorage.removeItem(imageKey);
+                        });
+
                         console.log(
                           'setIsGeneratingBlenderImg set TRUE 920---'
                         );
@@ -1031,7 +1045,7 @@ export default function GenerateImages() {
                         // Clear uploaded images after successful generation
                         setUploadedImages([]);
                         setHasAttemptedGenerate(false); // Reset since we're starting fresh
-                        await getImageTokenData();
+                        await fetchCredits('post-gen', { silent: true });
                       } catch (error) {
                         console.error('Error generating images:', error);
                         alert('Failed to generate images. Please try again.');
