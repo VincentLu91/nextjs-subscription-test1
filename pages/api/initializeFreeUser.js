@@ -27,10 +27,10 @@ export default async function handler(req, res) {
       {
         id: user_id,
         stripe_customer_id: null,
-        image_tokens: 12,
-        training_tokens: 14,
-        caption_tokens: 16,
-        video_tokens: 18
+        image_tokens: 0, // 12, otherwise no credits for users to generate
+        training_tokens: 0, // 14, otherwise no credits for users to generate
+        caption_tokens: 0, // 16,  otherwise no credits for users to generate
+        video_tokens: 0 // 18, otherwise no credits for users to generate
       }
     ]);
 
