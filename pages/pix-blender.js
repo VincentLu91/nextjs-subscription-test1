@@ -777,15 +777,6 @@ export default function GenerateImages() {
 
           {/* Credits Badge with Tooltip */}
           <div className="relative">
-            {hasNoSubscription && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-gradient-to-r from-[#423680] to-[#7B63FA] text-white text-sm font-semibold rounded-lg shadow-lg whitespace-nowrap">
-                Need more credits? Start your free trial —{' '}
-                <Link href="/pricing" className="underline hover:text-blue-200">
-                  no card required
-                </Link>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
-              </div>
-            )}
             <CreditBadge
               user={user}
               numTokens={numTokens}
