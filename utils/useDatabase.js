@@ -355,20 +355,6 @@ const getTokens = async (customerId, typeOfToken) => {
 };
 
 const getTieredTokens = async (customerId, typeOfToken) => {
-  const {
-    data: { price_id },
-    error: noPriceDataError
-  } = await supabaseAdmin
-    .from('subscriptions')
-    .select('price_id')
-    .eq('user_id', customerId)
-    .or('status.eq.active,status.eq.trialing')
-    .single();
-
-  if (noPriceDataError) return false;
-
-  console.log(`price_id: `, price_id);
-
   // Validate typeOfToken
   const validTokenTypes = [
     'image_tokens',
@@ -380,20 +366,40 @@ const getTieredTokens = async (customerId, typeOfToken) => {
     throw new Error(`Invalid typeOfToken: ${typeOfToken}`);
   }
 
-  // Get customer's UUID from mapping table.
-  const {
-    data: { [typeOfToken]: tokens }, // Use computed property to select the token based on typeOfToken
-    error: noPriceError
-  } = await supabaseAdmin
+  // Check if user has an active subscription
+  const { data: subscriptionData, error: noPriceDataError } =
+    await supabaseAdmin
+      .from('subscriptions')
+      .select('price_id')
+      .eq('user_id', customerId)
+      .or('status.eq.active,status.eq.trialing')
+      .single();
+
+  // If no subscription or error, return free user allocation
+  if (!subscriptionData || noPriceDataError) {
+    // Return token allocation based on initializeFreeUser values
+    switch (typeOfToken) {
+      case 'image_tokens':
+        return 3;
+      case 'training_tokens':
+        return 1;
+      case 'caption_tokens':
+        return 3;
+      case 'video_tokens':
+        return 1;
+    }
+  }
+
+  // For paid users, get allocation from prices table
+  const { data, error: noPriceError } = await supabaseAdmin
     .from('prices')
-    .select('id, ' + typeOfToken) // Select the token based on typeOfToken
-    .eq('id', price_id)
+    .select(typeOfToken)
+    .eq('id', subscriptionData.price_id)
     .single();
 
   if (noPriceError) return false;
 
-  console.log(`tiered${typeOfToken}: `, tokens.data);
-  return tokens;
+  return data[typeOfToken];
 };
 
 const deductUserTrainingToken = async (customerId, tokensToDeduct) => {

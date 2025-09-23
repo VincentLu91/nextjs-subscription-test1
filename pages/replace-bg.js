@@ -1,13 +1,21 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
-import { postData } from '../utils/helpers';
+import { postData, CreditBadge, useCreditsFetcher } from '../utils/helpers';
 import { useUser } from '../components/UserContext';
 import LoadingDots from '../components/ui/LoadingDots';
 import Button from '../components/ui/Button';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../utils/initSupabase';
+
+// Stable number state to avoid flicker and stale overwrites
+const useStableNumber = (initial = null) => {
+  const [value, setValue] = useState(initial);
+  const ref = useRef(initial);
+  ref.current = value;
+  return [value, setValue, ref];
+};
 
 const ATTEMPTS = 1;
 const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
@@ -17,8 +25,6 @@ export default function ReplaceBg() {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(5);
   const [finishMessage, setFinishMessage] = useState('');
-  const [numTokens, setNumTokens] = useState(null);
-  const [numTieredTokens, setNumTieredTokens] = useState(12);
   const [photoData, setPhotoData] = useState(null);
   const [resultImages, setResultImages] = useState([]);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
@@ -62,6 +68,9 @@ export default function ReplaceBg() {
     isGeneratingBGImages,
     setisGeneratingBGImages
   } = useUser();
+
+  const { numTokens, numTieredTokens, isCreditsLoading, fetchCredits } =
+    useCreditsFetcher(user, 'image_tokens');
 
   const intervalPrompt = useRef();
   const intervalImage = useRef();
@@ -293,7 +302,7 @@ export default function ReplaceBg() {
           return newList;
         });
 
-        await getImageTokenData();
+        await fetchCredits('post-insert', { silent: true });
       }
     }
   };
@@ -443,20 +452,35 @@ export default function ReplaceBg() {
   }, [user, isImageUploaded]);
 
   useEffect(() => {
-    if (user) {
-      getImageTokenData();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (user && subscription) {
-      getTieredImageData();
-    }
-  }, [user]);
-
-  useEffect(() => {
     setFinishMessage('');
   }, []);
+
+  // Initial load and whenever subscription presence changes
+  useEffect(() => {
+    if (user) fetchCredits('mount/user', { silent: true });
+  }, [user, subscription]);
+
+  useEffect(() => {
+    const onFocus = () => fetchCredits('focus', { silent: true });
+    const onVisible = () =>
+      document.visibilityState === 'visible' &&
+      fetchCredits('visible', { silent: true });
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (!isGeneratingBGImages) return;
+    const id = setInterval(
+      () => fetchCredits('gen-poll', { silent: true }),
+      3000
+    );
+    return () => clearInterval(id);
+  }, [isGeneratingBGImages]);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -519,20 +543,6 @@ export default function ReplaceBg() {
       alert('Error loading images');
       console.log(error);
     }
-  }
-
-  async function getImageTokenData() {
-    const imageTokenData = await axios.get(
-      `/api/tokenInfo?user=${user.id}` + `&tokenType=image_tokens`
-    );
-    setNumTokens(imageTokenData.data);
-  }
-
-  async function getTieredImageData() {
-    const imageTieredData = await axios.get(
-      `/api/tieredToken?user=${user.id}` + `&tokenType=image_tokens`
-    );
-    setNumTieredTokens(imageTieredData.data);
   }
 
   const handlePromptChange = (e) => {
@@ -638,11 +648,12 @@ export default function ReplaceBg() {
     });
     setisBGImagesLoading(true);
     setFinishMessage('');
+    fetchCredits('gen-start', { silent: true });
 
     for (let i = 0; i < ATTEMPTS; i++) {
       getImage(i, backgroundPrompt);
     }
-    await getImageTokenData();
+    await fetchCredits('post-mutation', { silent: true });
   };
 
   return (
@@ -662,13 +673,13 @@ export default function ReplaceBg() {
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-[#7B63FA]"></div>
               </div>
             )}
-            <div
-              className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-colors duration-200 motion-reduce:transition-none
-                ${numTokens <= 10 ? 'bg-[#FFC107] text-black ring-2 ring-[#FFC107]' : 'bg-[#7B63FA] text-white ring-2 ring-[#7B63FA]'}`}
-              aria-live="polite"
-            >
-              Credits {numTokens} / {numTieredTokens}
-            </div>
+            <CreditBadge
+              user={user}
+              numTokens={numTokens}
+              numTieredTokens={numTieredTokens}
+              isCreditsLoading={isCreditsLoading}
+              hasNoSubscription={hasNoSubscription}
+            />
           </div>
         </div>
         <p>
