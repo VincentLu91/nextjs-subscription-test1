@@ -74,9 +74,10 @@ export default function Dashboard() {
           .from('subscriptions')
           .select('*')
           .eq('user_id', user.id)
+          .eq('status', 'active')
           .single();
 
-        // Show banner if no subscription exists
+        // Show banner if no active subscription exists
         setHasNoSubscription(!subscription);
 
         // Check trial status if subscription exists

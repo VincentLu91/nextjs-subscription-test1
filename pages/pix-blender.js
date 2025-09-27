@@ -695,6 +695,7 @@ export default function GenerateImages() {
           .from('subscriptions')
           .select('*')
           .eq('user_id', user.id)
+          .eq('status', 'active')
           .single();
 
         // Show banner if no subscription exists
