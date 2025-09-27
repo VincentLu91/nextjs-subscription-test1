@@ -204,6 +204,7 @@ export default function ViewVideo() {
           .from('subscriptions')
           .select('*')
           .eq('user_id', user.id)
+          .eq('status', 'active')
           .single();
 
         // Show banner if no subscription exists
