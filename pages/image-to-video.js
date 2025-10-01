@@ -352,8 +352,10 @@ export default function ImageToVideo() {
       const productCheck = await axios.post('/api/isProduct', {
         imageLink: image,
         user: user.id,
+        /*prompt:
+          'Does this image have a product - no animals or humans - just a standalone product? Please respond with only yes or no'*/
         prompt:
-          'Does this image have a product - no animals or humans - just a standalone product? Please respond with only yes or no'
+          'Does this image have a product? Please respond with only yes or no'
       });
 
       // Poll for result
