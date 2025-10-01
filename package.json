@@ -11,10 +11,10 @@
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^1.2.0",
-    "@stripe/stripe-js": "^7.9.0",
+    "@stripe/stripe-js": "^8.0.0",
     "@supabase/supabase-js": "^2.58.0",
     "@swc/helpers": "^0.5.17",
-    "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/postcss": "^4.1.14",
     "axios": "^1.12.2",
     "classnames": "^2.5.1",
     "cohere-ai": "^7.19.0",
@@ -31,9 +31,9 @@
     "react-hot-toast": "^2.6.0",
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.2",
-    "stripe": "^18.5.0",
+    "stripe": "^19.0.0",
     "swr": "2.3.6",
-    "tailwindcss": "^4.1.13",
+    "tailwindcss": "^4.1.14",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
