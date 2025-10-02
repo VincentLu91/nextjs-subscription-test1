@@ -133,18 +133,18 @@ const useCreditsFetcher = (user, tokenType = 'image_tokens') => {
       if (nextTokens !== numTokensRef.current) setNumTokens(nextTokens);
       if (nextTier !== numTieredTokensRef.current) setNumTieredTokens(nextTier);
 
-      // Cache last known good
+      // Cache last known good (include tokenType to prevent cross-contamination)
       try {
         sessionStorage.setItem(
-          `credits_${user.id}`,
+          `credits_${user.id}_${tokenType}`,
           JSON.stringify({ tokens: nextTokens, tier: nextTier })
         );
       } catch {}
     } catch {
-      // Fall back to cached values
+      // Fall back to cached values (include tokenType to prevent cross-contamination)
       try {
         const cached = JSON.parse(
-          sessionStorage.getItem(`credits_${user?.id}`) || 'null'
+          sessionStorage.getItem(`credits_${user?.id}_${tokenType}`) || 'null'
         );
         if (cached) {
           if (typeof cached.tokens === 'number') setNumTokens(cached.tokens);
