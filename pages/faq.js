@@ -50,9 +50,9 @@ const FAQItem = ({ question, answer, id }) => {
 const faqData = [
   {
     id: 1,
-    question: 'Do I need a credit card to start the free trial?',
+    question: 'Can Brandpix.ai be used for ads?',
     answer:
-      "No you don't! Even if you're not part of any paid plan, you could start generating content right away. However, the credits you start off with are limited. Once they're used, you can't renew them. With the monthly plans, you could renew them month by month. With annual plans, you get a year's worth of credits and they renew after each year."
+      'Absolutely. We generate ad-ready visuals and copy that you can use across Meta, TikTok, Google, and more. The focus is on strong creative - use the same assets for organic posting while you build presence, and for paid campaigns when you scale. Brandpix.ai is designed to be flexible for your marketing and creative needs. Just treat captions as "copy".'
   },
   {
     id: 2,
@@ -77,7 +77,7 @@ const faqData = [
     id: 5,
     question: 'What types of visual content is the AI capable of making?',
     answer:
-      "Currently it generates product images and videos. However as new advancements emerge, we will enable new cases. We've heard from a few users who had asked for other capabilities beyond product visuals so we will continue to push the envelope for other types of brands that will benefit from brandpix.ai."
+      'Currently it generates product images and videos. However as new advancements emerge, we will enable new cases.'
   }
 ];
 
