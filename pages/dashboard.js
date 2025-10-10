@@ -108,8 +108,10 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
               <p className="text-sm font-medium">
-                Built for merchants. Upgrade to start generating product ads and
-                captions for your brand
+                {/*Built for merchants. Upgrade to start generating product ads and
+                captions for your brand*/}
+                Unlock more with renewable credits. Upgrade to start generating
+                product ads and captions for your brand every month or year
                 {/*Unlock More with a Free Trial! You still have access to free
                 credits. Start your 15-day free trial to generate more images —
                 no card required.*/}
