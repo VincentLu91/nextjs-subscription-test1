@@ -606,6 +606,10 @@ export default function ImageToVideo() {
     router.push('/view-video'); // Navigate to the content page
   };
 
+  const download = (url) => {
+    saveAs(url, 'video');
+  };
+
   const renderCard = (resultVideo, index) => {
     return (
       <Card
@@ -919,15 +923,33 @@ export default function ImageToVideo() {
           <>
             <h1 className="text-2xl font-bold mt-10 mb-6">Generated Video</h1>
             <div className="grid grid-cols-1 gap-6">
-              <div
-                className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none bg-[#181818] p-4"
-                onClick={() => viewGeneratedContent(resultVideo)}
-              >
-                <video
-                  src={resultVideo}
-                  controls
-                  className="w-full h-auto rounded-lg"
-                />
+              <div className="relative rounded-lg overflow-hidden bg-[#181818] p-4">
+                <div
+                  className="cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
+                  onClick={() => viewGeneratedContent(resultVideo)}
+                >
+                  <video
+                    src={resultVideo}
+                    controls
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+                <div className="flex gap-3 mt-4">
+                  <Button
+                    variant="slim"
+                    onClick={() => viewGeneratedContent(resultVideo)}
+                    className="flex-1 bg-[#8256FF] text-white hover:bg-[#6F48DB] border-[#8256FF] hover:border-[#6F48DB] hover:opacity-90"
+                  >
+                    Generate Captions/Ad copy
+                  </Button>
+                  <Button
+                    variant="slim"
+                    onClick={() => download(resultVideo)}
+                    className="flex-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                  >
+                    Download Video
+                  </Button>
+                </div>
               </div>
             </div>
           </>
