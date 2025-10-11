@@ -8,6 +8,7 @@ import Button from '../components/ui/Button';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../utils/initSupabase';
+import { saveAs } from 'file-saver';
 
 // Stable number state to avoid flicker and stale overwrites
 const useStableNumber = (initial = null) => {
@@ -550,6 +551,22 @@ export default function ReplaceBg() {
     setBackgroundPrompt(e.target.value);
   };
 
+  const download = (url) => {
+    saveAs(url, 'image');
+  };
+
+  const viewGeneratedContent = (url) => {
+    setImageLink(url);
+    sessionStorage.setItem(`imageLink_${user.id}`, url);
+    router.push('/view-image');
+  };
+
+  const goGenerateVideo = (url) => {
+    setImageLink(url);
+    sessionStorage.setItem(`imageLink_${user.id}`, url);
+    router.push('/image-to-video?show=true');
+  };
+
   const handleGenerateClick = async () => {
     if (!backgroundPrompt?.trim() || !isImageUploaded) {
       alert('Please enter all prompts and upload your image!');
@@ -823,18 +840,43 @@ export default function ReplaceBg() {
               {backgroundImageList.map((image, index) => (
                 <div
                   key={index}
-                  className="relative rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
-                  onClick={() => {
-                    setImageLink(image.url);
-                    sessionStorage.setItem(`imageLink_${user.id}`, image.url);
-                    router.push('/view-image');
-                  }}
+                  className="relative rounded-lg overflow-hidden bg-[#181818] p-4"
                 >
-                  <img
-                    src={image.url}
-                    alt={`Generated background ${index + 1}`}
-                    className="w-full h-auto"
-                  />
+                  <div
+                    className="cursor-pointer transition-transform duration-200 hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
+                    onClick={() => viewGeneratedContent(image.url)}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`Generated background ${index + 1}`}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-3 mt-4">
+                    <div className="flex gap-3">
+                      <Button
+                        variant="slim"
+                        onClick={() => viewGeneratedContent(image.url)}
+                        className="flex-1 bg-[#8256FF] text-white hover:bg-[#6F48DB] border-[#8256FF] hover:border-[#6F48DB] hover:opacity-90"
+                      >
+                        Caption
+                      </Button>
+                      <Button
+                        variant="slim"
+                        onClick={() => download(image.url)}
+                        className="flex-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                      >
+                        Download
+                      </Button>
+                    </div>
+                    <Button
+                      variant="slim"
+                      onClick={() => goGenerateVideo(image.url)}
+                      className="w-full bg-[#8256FF] text-white hover:bg-[#6F48DB] border-[#8256FF] hover:border-[#6F48DB] hover:opacity-90"
+                    >
+                      Animate Product Image to Video
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
