@@ -51,6 +51,7 @@ export default function ImageToVideo() {
   const [finishMessage, setFinishMessage] = useState(null);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState('auto');
 
   const interval = useRef();
 
@@ -440,7 +441,8 @@ export default function ImageToVideo() {
           'in the style of a social media caption' +
           '&image=' +
           image +
-          `&user=${user.id}`
+          `&user=${user.id}` +
+          `&aspect_ratio=${selectedAspectRatio}`
       );
 
       if (!videoResp?.data) {
@@ -873,6 +875,20 @@ export default function ImageToVideo() {
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="space-y-4">
+                <select
+                  value={selectedAspectRatio}
+                  onChange={(e) => setSelectedAspectRatio(e.target.value)}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="21:9">21:9</option>
+                  <option value="16:9">16:9</option>
+                  <option value="4:3">4:3</option>
+                  <option value="1:1">1:1</option>
+                  <option value="3:4">3:4</option>
+                  <option value="9:16">9:16</option>
+                  <option value="auto">Default</option>
+                </select>
+
                 <textarea
                   value={img2vidPrompt}
                   onChange={handleChange}
