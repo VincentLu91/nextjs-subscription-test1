@@ -3,7 +3,7 @@ import { deductUserVideoGenerationToken } from '../../utils/useDatabase';
 
 export default async function POST(req, res) {
   // it's a POST request...
-  const { prompt, image, user } = req.query;
+  const { prompt, image, user, aspect_ratio } = req.query;
   try {
     let result = await deductUserVideoGenerationToken(user, 1);
 
@@ -17,7 +17,8 @@ export default async function POST(req, res) {
       'https://queue.fal.run/fal-ai/bytedance/seedance/v1/lite/image-to-video',
       {
         image_url: image,
-        prompt
+        prompt,
+        aspect_ratio: aspect_ratio
       },
       {
         headers: {
