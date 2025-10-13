@@ -180,7 +180,34 @@ export default function Dashboard() {
               <h2 className="text-[28px] font-semibold text-[#F9FAFB] pb-4 mt-16 font-inter animate-on-scroll">
                 Create Product Photos
               </h2>
-
+              <Link
+                href="/pix-blender"
+                className="block bg-[#1A1A1A] rounded-[20px] p-6 shadow-[0_6px_20px_rgba(0,0,0,0.4)]
+                  transform transition-all duration-300 hover:scale-[1.02] animate-on-scroll flex flex-col justify-between"
+              >
+                <div className="aspect-[4/3] max-w-[220px] mx-auto mb-6 relative">
+                  <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-indigo-600/10 rounded-[12px]" />
+                  <img
+                    src="/pix-blender.png"
+                    alt="Pix Blender"
+                    className="w-full h-full object-cover rounded-[12px] shadow-inner"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
+                    Pix Blender
+                  </h3>
+                  <p className="text-[16px] text-[#B0B0B0] mb-4">
+                    General Purpose Image Editor for eCommerce
+                  </p>
+                  <button
+                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
+                    transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
+                  >
+                    Start Editing
+                  </button>
+                </div>
+              </Link>
               <Link
                 href="/replace-bg"
                 className="block bg-[#1A1A1A] rounded-[20px] p-6 shadow-[0_6px_20px_rgba(0,0,0,0.4)] 
@@ -205,36 +232,7 @@ export default function Dashboard() {
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
                     transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
                   >
-                    Get Started
-                  </button>
-                </div>
-              </Link>
-
-              <Link
-                href="/pix-blender"
-                className="block bg-[#1A1A1A] rounded-[20px] p-6 shadow-[0_6px_20px_rgba(0,0,0,0.4)]
-                  transform transition-all duration-300 hover:scale-[1.02] animate-on-scroll flex flex-col justify-between"
-              >
-                <div className="aspect-[4/3] max-w-[220px] mx-auto mb-6 relative">
-                  <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-indigo-600/10 rounded-[12px]" />
-                  <img
-                    src="/pix-blender.png"
-                    alt="Pix Blender"
-                    className="w-full h-full object-cover rounded-[12px] shadow-inner"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                    Pix Blender
-                  </h3>
-                  <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Add multiple products into a single image.
-                  </p>
-                  <button
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
-                    transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
-                  >
-                    Start Editing
+                    Change backgrounds
                   </button>
                 </div>
               </Link>
