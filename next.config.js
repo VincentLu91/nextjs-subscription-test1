@@ -2,10 +2,19 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [
-      'eolmngjyubxaxlvtwbzs.supabase.co',
-      'onncpyhdgecduwjddbma.supabase.co',
-      'cdn.sanity.io'
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'eolmngjyubxaxlvtwbzs.supabase.co'
+      },
+      {
+        protocol: 'https',
+        hostname: 'onncpyhdgecduwjddbma.supabase.co'
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io'
+      }
     ]
   },
   async headers() {
