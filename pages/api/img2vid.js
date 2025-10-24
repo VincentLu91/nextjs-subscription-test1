@@ -14,7 +14,7 @@ export default async function POST(req, res) {
 
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
-      'https://queue.fal.run/fal-ai/bytedance/seedance/v1/lite/image-to-video',
+      'https://queue.fal.run/fal-ai/bytedance/seedance/v1/pro/fast/image-to-video',
       {
         image_url: image,
         prompt,
