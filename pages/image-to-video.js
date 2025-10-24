@@ -347,70 +347,81 @@ export default function ImageToVideo() {
       return;
     }
 
-    // Check if image contains a product
-    try {
-      // Start product check
-      const productCheck = await axios.post('/api/isProduct', {
-        imageLink: image,
-        user: user.id,
-        /*prompt:
-          'Does this image have a product - no animals or humans - just a standalone product? Please respond with only yes or no'*/
-        prompt:
-          'Does this image have a product? Please respond with only yes or no'
-      });
+    // Only check if image contains a product for uploaded files
+    // Skip the check for image URLs/links (e.g., generated images from other services)
+    // Check if the current imageLink actually contains the uploadedFilePath
+    // (if uploadedFilePath is set but imageLink doesn't contain it, user selected from gallery)
+    const isUploadedFile = uploadedFilePath && image.includes(uploadedFilePath);
 
-      // Poll for result
-      let checkComplete = false;
-      let attempts = 0;
-      const maxAttempts = 10;
+    if (isUploadedFile) {
+      try {
+        // Start product check
+        const productCheck = await axios.post('/api/isProduct', {
+          imageLink: image,
+          user: user.id,
+          /*prompt:
+            'Does this image have a product - no animals or humans - just a standalone product? Please respond with only yes or no'*/
+          prompt:
+            'Does this image have a product? Please respond with only yes or no'
+        });
 
-      while (!checkComplete && attempts < maxAttempts) {
-        const output = await axios.get(
-          '/api/captionresults?url=' + productCheck.data.urls.get
-        );
-        console.log('Product check attempt', attempts + 1, ':', output.data);
+        // Poll for result
+        let checkComplete = false;
+        let attempts = 0;
+        const maxAttempts = 10;
 
-        if (output.data.status === 'succeeded') {
-          const result = output.data.output;
-          if (!result || result.length === 0) {
+        while (!checkComplete && attempts < maxAttempts) {
+          const output = await axios.get(
+            '/api/captionresults?url=' + productCheck.data.urls.get
+          );
+          console.log('Product check attempt', attempts + 1, ':', output.data);
+
+          if (output.data.status === 'succeeded') {
+            const result = output.data.output;
+            if (!result || result.length === 0) {
+              alert(
+                'Error checking if image contains product. Please try again.'
+              );
+              setIsVideoLoading(false);
+              return;
+            }
+            const response = result.join('').toLowerCase().trim();
+            console.log('Product check response:', response);
+            if (response === 'no') {
+              alert(
+                'Please upload a product image. The uploaded image does not appear to contain a product.'
+              );
+              setIsVideoLoading(false);
+              return;
+            }
+            checkComplete = true;
+          } else if (output.data.status === 'failed') {
             alert(
               'Error checking if image contains product. Please try again.'
             );
             setIsVideoLoading(false);
             return;
           }
-          const response = result.join('').toLowerCase().trim();
-          console.log('Product check response:', response);
-          if (response === 'no') {
-            alert(
-              'Please upload a product image. The uploaded image does not appear to contain a product.'
-            );
-            setIsVideoLoading(false);
-            return;
+
+          if (!checkComplete) {
+            attempts++;
+            await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds between attempts
           }
-          checkComplete = true;
-        } else if (output.data.status === 'failed') {
-          alert('Error checking if image contains product. Please try again.');
-          setIsVideoLoading(false);
-          return;
         }
 
         if (!checkComplete) {
-          attempts++;
-          await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds between attempts
+          alert(
+            'Timeout checking if image contains product. Please try again.'
+          );
+          setIsVideoLoading(false);
+          return;
         }
-      }
-
-      if (!checkComplete) {
-        alert('Timeout checking if image contains product. Please try again.');
+      } catch (error) {
+        console.error('Error checking if image contains product:', error);
+        alert('Error checking if image contains product. Please try again.');
         setIsVideoLoading(false);
         return;
       }
-    } catch (error) {
-      console.error('Error checking if image contains product:', error);
-      alert('Error checking if image contains product. Please try again.');
-      setIsVideoLoading(false);
-      return;
     }
 
     // Clear previous video state
