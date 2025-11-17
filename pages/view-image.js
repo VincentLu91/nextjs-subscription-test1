@@ -346,6 +346,21 @@ export default function ViewImage() {
               >
                 Animate Product Image to Video
               </button>
+              <div className="mt-6 pt-6 border-t border-[#27272A]">
+                <p className="text-white font-semibold mb-2">
+                  Keep doing this every week?
+                </p>
+                <p className="text-sm text-[#A1A1AA] mb-4">
+                  This flow (image → caption) is included in the{' '}
+                  <span className="text-[#8256FF] font-semibold">Standard</span>{' '}
+                  plan – enough for about 2–3 posts per day.
+                </p>
+                <Link href="/pricing">
+                  <button className="w-full h-12 bg-[#27272A] hover:bg-[#3F3F46] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]">
+                    See Plans
+                  </button>
+                </Link>
+              </div>
             </div>
           </section>
         </div>

@@ -361,7 +361,7 @@ export default function ReplaceBg() {
 
     if (isComplete && backgroundImageList.length > 0) {
       setFinishMessage(
-        'Images are generated and saved to gallery. \n' +
+        'Images are generated and saved to gallery (available in paid plans). \n' +
           'Click thumbnail below to view your image and generate video.'
       );
     }

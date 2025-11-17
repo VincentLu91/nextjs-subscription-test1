@@ -623,7 +623,7 @@ export default function GenerateImages() {
 
         if (completed > 0) {
           setFinishMessage(
-            `${completed} image${completed > 1 ? 's' : ''} generated and saved to gallery.${
+            `${completed} image${completed > 1 ? 's' : ''} generated and saved to gallery (available in paid plans).${
               failed > 0
                 ? `\n${failed} generation${failed > 1 ? 's' : ''} failed.`
                 : ''
@@ -805,6 +805,16 @@ export default function GenerateImages() {
         <p className="text-[#A1A1AA] mb-6">
           Great for: virtual fashion try-ons, showcasing multiple products in
           one photo, products without labels
+        </p>
+        <p className="text-white mb-6 font-bold">
+          If your product has logos or labels, we recommend you to{' '}
+          <Link
+            href="/replace-bg"
+            className="text-blue-500 underline hover:text-blue-400"
+          >
+            replace backgrounds
+          </Link>
+          .
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
