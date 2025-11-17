@@ -22,7 +22,10 @@ export default function ImageToVideo() {
   const [hasNoSubscription, setHasNoSubscription] = useState(false);
   const [visible, setVisible] = useState(5);
   const [showImage, setShowImage] = useState(false);
+  const [isFromOtherPage, setIsFromOtherPage] = useState(false);
+  const [localImageLink, setLocalImageLink] = useState(null); // Local image for this page
   const router = useRouter();
+
   const {
     userLoaded,
     user,
@@ -127,14 +130,20 @@ export default function ImageToVideo() {
 
   const wasLoggedOut = useRef(false);
 
-  // Restore uploadedFilePath from sessionStorage
+  // Restore uploadedFilePath and localImageLink from sessionStorage
   useEffect(() => {
     if (user?.id) {
       const storedFilePath = sessionStorage.getItem(
         `uploadedFilePath_${user.id}`
       );
+      const storedLocalImageLink = sessionStorage.getItem(
+        `localImageLink_${user.id}`
+      );
       if (storedFilePath) {
         setUploadedFilePath(storedFilePath);
+      }
+      if (storedLocalImageLink) {
+        setLocalImageLink(storedLocalImageLink);
       }
     }
   }, [user]);
@@ -143,8 +152,28 @@ export default function ImageToVideo() {
   useEffect(() => {
     if (user?.id) {
       const storedShowImage = sessionStorage.getItem(`showImage_${user.id}`);
+      const storedIsFromOtherPage = sessionStorage.getItem(
+        `isFromOtherPage_${user.id}`
+      );
+
       if (storedShowImage === 'true' || router.query.show === 'true') {
         setShowImage(true);
+      }
+
+      // If coming from other page via URL parameter
+      if (router.query.show === 'true') {
+        setIsFromOtherPage(true);
+        sessionStorage.setItem(`isFromOtherPage_${user.id}`, 'true');
+        // Clear local upload when coming from other page
+        setLocalImageLink(null);
+        setUploadedFilePath('');
+        sessionStorage.removeItem(`localImageLink_${user.id}`);
+        sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
+      } else if (storedIsFromOtherPage === 'true') {
+        setIsFromOtherPage(true);
+      } else {
+        // Clear the isFromOtherPage flag if not set
+        setIsFromOtherPage(false);
       }
     }
   }, [router.query, user]);
@@ -282,11 +311,19 @@ export default function ImageToVideo() {
         .getPublicUrl(filePath);
 
       if (publicUrlData) {
-        setImageLink(publicUrlData.publicUrl);
+        // Store in localImageLink instead of global imageLink
+        setLocalImageLink(publicUrlData.publicUrl);
         setUploadedFilePath(filePath);
         sessionStorage.setItem(`uploadedFilePath_${user.id}`, filePath);
+        sessionStorage.setItem(
+          `localImageLink_${user.id}`,
+          publicUrlData.publicUrl
+        );
         setShowImage(true);
         sessionStorage.setItem(`showImage_${user.id}`, 'true');
+        // Clear isFromOtherPage when uploading locally
+        setIsFromOtherPage(false);
+        sessionStorage.removeItem(`isFromOtherPage_${user.id}`);
       }
     } else {
       console.error('Error uploading file:', error);
@@ -294,7 +331,10 @@ export default function ImageToVideo() {
     }
   }
 
-  const displayContent = showImage && imageLink && (
+  // Use localImageLink if available, otherwise use imageLink from context
+  const activeImageLink = localImageLink || imageLink;
+
+  const displayContent = showImage && activeImageLink && (
     <div className={styles['display-image']} style={{ position: 'relative' }}>
       {/* Close button */}
       <button
@@ -309,13 +349,17 @@ export default function ImageToVideo() {
             }
           }
           // Clear state
+          setLocalImageLink(null);
           setImageLink(null);
           setUploadedFilePath('');
           setShowImage(false);
+          setIsFromOtherPage(false);
           // Clear storage
+          sessionStorage.removeItem(`localImageLink_${user.id}`);
           sessionStorage.removeItem(`imageLink_${user.id}`);
           sessionStorage.removeItem(`showImage_${user.id}`);
           sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
+          sessionStorage.removeItem(`isFromOtherPage_${user.id}`);
         }}
         style={{
           position: 'absolute',
@@ -336,7 +380,7 @@ export default function ImageToVideo() {
         X
       </button>
 
-      <img alt="uploaded" src={imageLink} />
+      <img alt="uploaded" src={activeImageLink} />
       <br />
     </div>
   );
@@ -447,9 +491,8 @@ export default function ImageToVideo() {
       sessionStorage.setItem(`showImage_${user.id}`, 'true');
 
       const videoResp = await axios.post(
-        '/api/img2vid?prompt=' +
+        '/api/img2vid?user_prompt=' +
           prompt +
-          'in the style of a social media caption' +
           '&image=' +
           image +
           `&user=${user.id}` +
@@ -511,8 +554,9 @@ export default function ImageToVideo() {
         setIsVideoLoading(false);
         setFinishMessage(
           <div>
-            Video has been generated and saved to gallery. You can view it below
-            or in the Video Gallery. To view content or generate captions,{' '}
+            Video has been generated and saved to gallery (available in paid
+            plans). You can view them there or below. To view content or
+            generate captions,{' '}
             <Link href={`/view-video?videoLink=${videoUrl}`}>
               <span className="text-[#8256FF] hover:underline cursor-pointer">
                 click here
@@ -785,12 +829,26 @@ export default function ImageToVideo() {
           </div>
         </div>
         <p className="text-[#A1A1AA] mb-6">
-          Animate a product photo that you generated into a TikTok/Reel. Select
-          photo from{' '}
+          Create a short 5-second TikTok/Reel-style clip from a product photo.
+          Great as a quick scroll-stopper, not a high-end cinematic ad.
+        </p>
+        <p className="text-[#A1A1AA] mb-6">
+          Best results with images generated in BrandPix (
+          <Link href="/pix-blender" className="underline hover:text-white">
+            Pix Blender
+          </Link>{' '}
+          or{' '}
+          <Link href="/replace-bg" className="underline hover:text-white">
+            Change Scenery
+          </Link>
+          ).
+        </p>
+        <p className="text-[#A1A1AA] mb-6">
+          Select photo from{' '}
           <Link href="/image-gallery" className="underline hover:text-white">
             image gallery
-          </Link>
-          , or upload a product photo.
+          </Link>{' '}
+          (paid plan), or upload a product photo.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
@@ -799,6 +857,26 @@ export default function ImageToVideo() {
             <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
               Selected Image
             </label>
+            {!localImageLink && isFromOtherPage && showImage && imageLink ? (
+              <p>✅ Using a BrandPix image – best quality for animations.</p>
+            ) : (
+              <p>
+                ℹ️ Using your own photo is fine. For smoother lighting & edges,
+                you'll get best results with images generated in BrandPix first
+                (
+                <Link
+                  href="/pix-blender"
+                  className="underline hover:text-white"
+                >
+                  Pix Blender
+                </Link>{' '}
+                or{' '}
+                <Link href="/replace-bg" className="underline hover:text-white">
+                  Change Scenery
+                </Link>
+                ).
+              </p>
+            )}
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               {displayContent ? (
@@ -814,7 +892,7 @@ export default function ImageToVideo() {
                   onDrop={(e) => !isVideoLoading && handleDrop(e)}
                 >
                   <img
-                    src={imageLink}
+                    src={activeImageLink}
                     alt="Selected image"
                     className="w-full h-auto"
                   />
@@ -900,6 +978,43 @@ export default function ImageToVideo() {
                   <option value="auto">Default</option>
                 </select>
 
+                {/* Prompt suggestion chips */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImg2vidPrompt(
+                        'Show a customer using the product and looking satisfied.'
+                      )
+                    }
+                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
+                  >
+                    Show product in use
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImg2vidPrompt(
+                        'Start with the messy/problem state, then cut to the product solving it.'
+                      )
+                    }
+                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
+                  >
+                    Before/after effect
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImg2vidPrompt(
+                        'Start with a fast close-up of the product, then zoom out to reveal the full scene.'
+                      )
+                    }
+                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
+                  >
+                    Attention-grab hook
+                  </button>
+                </div>
+
                 <textarea
                   value={img2vidPrompt}
                   onChange={handleChange}
@@ -908,9 +1023,9 @@ export default function ImageToVideo() {
                 />
 
                 <button
-                  onClick={() => generateVideo(img2vidPrompt, imageLink)}
+                  onClick={() => generateVideo(img2vidPrompt, activeImageLink)}
                   disabled={
-                    isVideoLoading || !imageLink || !img2vidPrompt?.trim()
+                    isVideoLoading || !activeImageLink || !img2vidPrompt?.trim()
                   }
                   className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none
                     ${
@@ -948,7 +1063,9 @@ export default function ImageToVideo() {
         {/* Results Section */}
         {resultVideo && (
           <>
-            <h1 className="text-2xl font-bold mt-10 mb-6">Generated Video</h1>
+            <h1 className="text-2xl font-bold mt-10 mb-6">
+              Step 1: Your lifestyle/product video
+            </h1>
             <div className="grid grid-cols-1 gap-6">
               <div className="relative rounded-lg overflow-hidden bg-[#181818] p-4">
                 <div
@@ -961,6 +1078,12 @@ export default function ImageToVideo() {
                     className="w-full h-auto rounded-lg"
                   />
                 </div>
+                <div className="mt-4 text-[#A1A1AA]">
+                  <p className="text-sm mb-1">
+                    Step 2: Generate caption/ad copy (recommended)
+                  </p>
+                  <p className="text-sm">Step 3: Download your video</p>
+                </div>
                 <div className="flex gap-3 mt-4">
                   <Button
                     variant="slim"
@@ -972,7 +1095,7 @@ export default function ImageToVideo() {
                   <Button
                     variant="slim"
                     onClick={() => download(resultVideo)}
-                    className="flex-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
+                    className="flex-1 bg-transparent text-[#A1A1AA] hover:text-white border-2 border-[#3F3F46] hover:border-[#52525B] hover:bg-[#1F1F1F]"
                   >
                     Download Video
                   </Button>

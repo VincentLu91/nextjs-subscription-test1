@@ -267,7 +267,7 @@ export default function GenerateApparel() {
       clearInterval(intervalImage.current);
       setIsGeneratingTryOn(false);
       setFinishMessage(
-        'Image is generated and saved to gallery.\n' +
+        'Image is generated and saved to gallery (available in paid plans).\n' +
           'Click thumbnail below to view your image and generate video.'
       );
     }
