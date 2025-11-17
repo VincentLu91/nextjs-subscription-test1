@@ -78,6 +78,13 @@ const faqData = [
     question: 'What types of visual content is the AI capable of making?',
     answer:
       'Currently it generates product images and videos. However as new advancements emerge, we will enable new cases.'
+  },
+  {
+    id: 6,
+    question:
+      'Are these videos like high-end agency / Runway / Kive style ads?',
+    answer:
+      'At the moment, they’re optimized for fast, 5-second product clips you can drop into TikTok/Reels or ads. Think “quick motion to catch attention,” not big-budget cinematic commercials.'
   }
 ];
 

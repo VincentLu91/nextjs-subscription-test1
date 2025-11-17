@@ -168,6 +168,32 @@ export default function Dashboard() {
             product visuals.
           </p>
 
+          {/* Start Here Section */}
+          <div className="max-w-3xl mx-auto mb-16 animate-on-scroll">
+            <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-[20px] p-8 shadow-[0_6px_20px_rgba(0,0,0,0.4)] border border-indigo-500/30">
+              <h2 className="text-[28px] font-semibold text-[#FAFAFA] mb-4 text-center">
+                New here? Start with this 3-step flow
+              </h2>
+              <div className="text-[#E0E0E0] text-center space-y-2 mb-6">
+                <p className="text-lg">1. Upload a product photo</p>
+                <p className="text-lg">2. Turn it into a lifestyle image</p>
+                <p className="text-lg text-[#B0B0B0]">
+                  3. (Optional) Animate it into a 5-sec video + caption
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <Link href="/replace-bg">
+                  <button
+                    className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold
+                    transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_20px_#6366F1] hover:scale-105"
+                  >
+                    Start with a product photo
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </div>
+
           {/* Two-column grid for feature cards */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-10"
@@ -198,7 +224,7 @@ export default function Dashboard() {
                     Pix Blender
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    General Purpose Image Editor for eCommerce
+                    Step 1: General Purpose Image Editor for eCommerce
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
@@ -223,7 +249,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                    Change Scenery for Your Product
+                    Step 1(Alternate): Change Scenery for Your Product
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
                     Use one product image to create lifestyle shots.
@@ -263,7 +289,8 @@ export default function Dashboard() {
                     <span className="text-indigo-400 text-sm">NEW</span>
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Animate your AI product photos into TikToks and Reels
+                    Step 2 (optional): Turn your BrandPix product image into a
+                    short 5-sec TikTok/Reel clip.
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
@@ -274,8 +301,7 @@ export default function Dashboard() {
                 </div>
               </Link>
 
-              <Link
-                href="/view-image"
+              <div
                 className="block bg-[#1A1A1A] rounded-[20px] p-6 shadow-[0_6px_20px_rgba(0,0,0,0.4)]
                   transform transition-all duration-300 hover:scale-[1.02] animate-on-scroll flex flex-col justify-between"
               >
@@ -289,20 +315,32 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                    Write Product Caption
+                    Step 3: Write Product Caption
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
                     Generate engaging captions for your product images and
                     videos.
                   </p>
-                  <button
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
-                    transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
-                  >
-                    Generate Captions
-                  </button>
+                  <div className="flex flex-wrap gap-3">
+                    <Link href="/view-image">
+                      <button
+                        className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
+                        transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
+                      >
+                        Generate Captions for images
+                      </button>
+                    </Link>
+                    <Link href="/view-video">
+                      <button
+                        className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
+                        transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_12px_#6366F1]"
+                      >
+                        Generate Captions for Video
+                      </button>
+                    </Link>
+                  </div>
                 </div>
-              </Link>
+              </div>
             </div>
           </div>
 
