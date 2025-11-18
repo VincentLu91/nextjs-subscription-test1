@@ -16,7 +16,15 @@ export default async function GET(req, res) {
       'https://queue.fal.run/fal-ai/bria/product-shot',
       {
         image_url: image,
-        scene_description: prompt,
+        scene_description: `Ultra-realistic commercial product photo in the following scene: ${prompt}
+The product must stay exactly the same with no changes to any text, logos, labels, colors, or details. Do not redraw or alter the product.
+
+Place the product naturally within the scene using correct perspective, scale, and physical grounding appropriate to the environment. 
+Ensure the product rests on the surface realistically, with accurate contact shadows and natural interaction with the surroundings. 
+Blend the product smoothly into the scene using consistent lighting, color temperature, and tone.
+
+Match the environment lighting to the product's lighting so the result looks like a single real photograph. 
+Use soft bokeh, high-end commercial lighting, and a cohesive visual style.`,
         /*ref_image_url:
           'https://storage.googleapis.com/falserverless/bria/bria_product_bg.jpg',*/
         optimize_description: true,
