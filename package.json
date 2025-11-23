@@ -23,7 +23,7 @@
     "next": "^16.0.3",
     "npm-check-updates": "^19.1.2",
     "posthog-js": "^1.297.2",
-    "raw-body": "^3.0.1",
+    "raw-body": "^3.0.2",
     "react": "^19.2.0",
     "react-aria": "^3.44.0",
     "react-bootstrap": "^2.10.10",
