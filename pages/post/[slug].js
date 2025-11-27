@@ -2,7 +2,7 @@ import styles from '../../styles/Post.module.css';
 import BlockContent from '@sanity/block-content-to-react';
 import Image from 'next/image';
 import Toolbar from '../../components/toolbar';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 import { useState, useEffect } from 'react';
 
 const config = {
@@ -15,7 +15,7 @@ export const Post = ({ title, body, image }) => {
 
   useEffect(() => {
     if (image) {
-      const imgBuilder = imageUrlBuilder(config);
+      const imgBuilder = createImageUrlBuilder(config);
       setImageUrl(imgBuilder.image(image).url());
     }
   }, [image]);
