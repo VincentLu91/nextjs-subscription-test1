@@ -800,13 +800,13 @@ export default function GenerateImages() {
         </div>
 
         <p className="text-[#A1A1AA] mb-6">
-          Combine items, restage scenes, or clean up a single photo.
+          Create social-native photos that look like you shot on your phone
         </p>
         <p className="text-[#A1A1AA] mb-6">
-          Great for: virtual fashion try-ons, showcasing multiple products in
-          one photo, products without labels
+          Great for: virtual fashion try-ons, combining multiple products and
+          people in one photo, creating UGC images
         </p>
-        <p className="text-white mb-6 font-bold">
+        {/*<p className="text-white mb-6 font-bold">
           If your product has logos or labels, we recommend you to{' '}
           <Link
             href="/replace-bg"
@@ -815,7 +815,7 @@ export default function GenerateImages() {
             replace backgrounds
           </Link>
           .
-        </p>
+        </p>*/}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Upload Card */}
@@ -901,12 +901,11 @@ export default function GenerateImages() {
                     onChange={(e) => setSelectedImageSize(e.target.value)}
                     className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                   >
-                    <option value="auto_4K">Default</option>
-                    <option value="square_hd">Square</option>
-                    <option value="landscape_16_9">Landscape 16:9</option>
-                    <option value="portrait_16_9">Portrait 9:16</option>
-                    <option value="landscape_4_3">Landscape 4:3</option>
-                    <option value="portrait_4_3">Portrait 3:4</option>
+                    <option value="auto">Default</option>
+                    <option value="16:9">Landscape 16:9</option>
+                    <option value="9:16">Portrait 9:16</option>
+                    <option value="4:3">Landscape 4:3</option>
+                    <option value="3:4">Portrait 3:4</option>
                   </select>
 
                   <button
