@@ -224,7 +224,7 @@ export default function Dashboard() {
                     Pix Blender
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Step 1: General Purpose Image Editor for eCommerce
+                    Step 1: Create UGC-style product photos without the shoot.
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 

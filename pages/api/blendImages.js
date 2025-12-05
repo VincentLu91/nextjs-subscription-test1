@@ -35,14 +35,15 @@ export default async function handler(req, res) {
     const fullPrompt = `${prompt}\n\n${BRANDPIX_SUFFIX}`;
 
     const resp = await axios.post(
-      'https://queue.fal.run/fal-ai/bytedance/seedream/v4.5/edit',
+      //'https://queue.fal.run/fal-ai/bytedance/seedream/v4.5/edit', // seedream v4.5
+      'https://queue.fal.run/fal-ai/nano-banana-pro/edit', // nano banana pro
       {
         image_urls: images, // Pass the array directly
         prompt: fullPrompt,
         num_images: 1,
         //max_images: 1,
         //enable_safety_checker: true,
-        image_size: image_size // image_size in seedream, aspect_ratio in Nano Banana Pro
+        aspect_ratio: image_size // image_size in seedream, aspect_ratio in Nano Banana Pro
       },
       {
         headers: {
