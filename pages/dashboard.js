@@ -182,7 +182,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className="flex justify-center">
-                <Link href="/replace-bg">
+                <Link href="/pix-blender">
                   <button
                     className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold
                     transition-all duration-200 hover:bg-indigo-700 hover:shadow-[0_0_20px_#6366F1] hover:scale-105"
