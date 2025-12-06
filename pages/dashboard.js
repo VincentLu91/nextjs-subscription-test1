@@ -234,7 +234,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </Link>
-              <Link
+              {/*<Link
                 href="/replace-bg"
                 className="block bg-[#1A1A1A] rounded-[20px] p-6 shadow-[0_6px_20px_rgba(0,0,0,0.4)] 
                   transform transition-all duration-300 hover:scale-[1.02] animate-on-scroll flex flex-col justify-between"
@@ -261,7 +261,7 @@ export default function Dashboard() {
                     Change backgrounds
                   </button>
                 </div>
-              </Link>
+              </Link>*/}
             </div>
 
             {/* Content Generation Tools */}
@@ -285,8 +285,8 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                    Image to Video{' '}
-                    <span className="text-indigo-400 text-sm">NEW</span>
+                    Image to Video
+                    {/*{' '}<span className="text-indigo-400 text-sm">NEW</span>*/}
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
                     Step 2 (optional): Turn your BrandPix product image into a
@@ -374,8 +374,8 @@ export default function Dashboard() {
                   transform transition-all duration-300 hover:scale-[1.02] animate-on-scroll"
               >
                 <h3 className="text-[24px] font-semibold text-[#FAFAFA] mb-2">
-                  Video Gallery{' '}
-                  <span className="text-indigo-400 text-sm">NEW</span>
+                  Video Gallery
+                  {/*{' '}<span className="text-indigo-400 text-sm">NEW</span>*/}
                 </h3>
                 <p className="text-[16px] text-[#B0B0B0]">
                   Access all your generated videos easily.

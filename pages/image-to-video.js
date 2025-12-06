@@ -833,13 +833,9 @@ export default function ImageToVideo() {
           Great as a quick scroll-stopper, not a high-end cinematic ad.
         </p>
         <p className="text-[#A1A1AA] mb-6">
-          Best results with images generated in BrandPix (
+          Best results with images generated in BrandPix (create image{' '}
           <Link href="/pix-blender" className="underline hover:text-white">
-            Pix Blender
-          </Link>{' '}
-          or{' '}
-          <Link href="/replace-bg" className="underline hover:text-white">
-            Change Scenery
+            here
           </Link>
           ).
         </p>
@@ -863,16 +859,12 @@ export default function ImageToVideo() {
               <p>
                 ℹ️ Using your own photo is fine. For smoother lighting & edges,
                 you'll get best results with images generated in BrandPix first
-                (
+                (start{' '}
                 <Link
                   href="/pix-blender"
                   className="underline hover:text-white"
                 >
-                  Pix Blender
-                </Link>{' '}
-                or{' '}
-                <Link href="/replace-bg" className="underline hover:text-white">
-                  Change Scenery
+                  here
                 </Link>
                 ).
               </p>
