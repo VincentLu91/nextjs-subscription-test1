@@ -105,29 +105,29 @@ const Navbar = () => {
                   </button>
                   {isOpen && (
                     <div className="absolute top-full left-0 bg-zinc-900/90 backdrop-blur-md shadow-lg rounded-xl py-2 mt-1 border border-white/5">
-                      <Link
+                      {/*<Link
                         href="/replace-bg"
                         className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Replace Backgrounds
-                      </Link>
+                      </Link>*/}
                       <Link
                         href="/pix-blender"
                         className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Pix Blender
                       </Link>
-                      <Link
+                      {/*<Link
                         href="/generate-apparel"
                         className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
                         Clothes Swapping
-                      </Link>
+                      </Link>*/}
                       <Link
                         href="/image-to-video"
                         className="block px-4 py-2 text-white/80 hover:bg-white/5 transition-colors duration-200"
                       >
-                        Image to Video (NEW)
+                        Image to Video
                       </Link>
                     </div>
                   )}
