@@ -2,14 +2,26 @@ import axios from 'axios';
 import { deductUserImageGenerationToken } from '../../utils/useDatabase';
 
 const BRANDPIX_SUFFIX = `
-Use the exact original product from the input image without changing it.
-Keep all logos, text, labels, patterns, colors, and shapes exactly the same if they are present. Do not redraw, rewrite, or warp anything on the product and do not add or remove any markings.
-Only change the background, environment, and camera view to match the scene described above.
-Create a high-quality commercial product photo: realistic lighting, natural shadows, and sharp focus on the product. Make sure the product is clearly visible and correctly proportioned, resting on a surface or being held in a believable way, with a clear contact shadow so it feels grounded in the scene.
-Avoid distortions, blurring, extra copies of the product, or any objects that cover or hide the product.
-If the product is clothing, shoes, or an accessory: keep the same silhouette and construction (seams, stitching/quilting, zippers, pockets, cuffs/collar). Keep materials and textures consistent.
-If an inner lining is visible: it must remain physically attached to the inside of the garment and only appear on inside-facing surfaces (e.g., the inside edges when the garment is open). Do NOT generate the lining as a separate shirt/vest/sweater or any separate garment layer. The base layer underneath must remain whatever clothing the user described.
-You may change the camera angle and framing for a better lifestyle composition, as long as the product remains the exact same item with no warping, and all branding/text/patterns remain perfectly readable and undistorted.`;
+Edit the provided photo(s).
+
+KEEP EACH INPUT PRODUCT EXACTLY THE SAME (highest priority):
+- For every product shown in the input images, keep that product exactly the same.
+- Do not redraw or alter any bottle or label in any way (no changes to text, fonts, logo, colors, shapes, patterns, materials, or markings).
+- Do not retouch, re-render, “clean up”, enhance, or sharpen the label/text.
+- Do not generate any new text.
+- Do not swap details between products. Each product must keep its own original label/color/design.
+
+ONLY CHANGE:
+- Only change the background, surface, environment, props, and scene lighting to match the requested scene.
+- Keep the products’ perspective/camera angle the same unless the scene explicitly requests tilt/angle.
+
+COMPOSITION:
+- Keep all products fully visible and unobstructed. No covering the labels.
+- No extra products/duplicates.
+
+APPAREL (only if applicable):
+- If the product is clothing/shoes/accessories, keep the same silhouette and construction (seams, stitching, zippers, pockets, cuffs/collar). No added layers.
+`;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
