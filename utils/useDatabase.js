@@ -452,6 +452,51 @@ const deductUserCaptionToken = async (customerId, tokensToDeduct) => {
   }
 };
 
+const addUserTokens = async (customerId, tokenType, tokensToAdd) => {
+  // Validate token type
+  const validTokenTypes = ['image_tokens', 'video_tokens', 'caption_tokens'];
+  if (!validTokenTypes.includes(tokenType)) {
+    console.error(`Invalid token type: ${tokenType}`);
+    return false;
+  }
+
+  const { data: customer, error: noCustomerError } = await supabaseAdmin
+    .from('customers')
+    .select(`id, ${tokenType}`)
+    .eq('id', customerId)
+    .single();
+
+  if (noCustomerError) {
+    console.error('Error fetching customer:', noCustomerError);
+    return false;
+  }
+
+  const currentTokens = customer[tokenType] || 0;
+  const newTokens = currentTokens + tokensToAdd;
+
+  let customerTokenUpdate = {
+    id: customer.id,
+    [tokenType]: newTokens
+  };
+
+  const { data, error } = await supabaseAdmin
+    .from('customers')
+    .upsert(customerTokenUpdate)
+    .select();
+
+  if (error) {
+    console.error('Error updating tokens:', error);
+    return false;
+  }
+
+  return {
+    success: true,
+    data: data,
+    oldBalance: currentTokens,
+    newBalance: newTokens
+  };
+};
+
 export {
   upsertProductRecord,
   upsertPriceRecord,
@@ -462,5 +507,6 @@ export {
   deductUserTrainingToken,
   deductUserCaptionToken,
   getTokens,
-  getTieredTokens
+  getTieredTokens,
+  addUserTokens
 };
