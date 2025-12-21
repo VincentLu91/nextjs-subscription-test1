@@ -2,7 +2,8 @@ import { stripe } from '../../utils/initStripe';
 import {
   upsertProductRecord,
   upsertPriceRecord,
-  manageSubscriptionStatusChange
+  manageSubscriptionStatusChange,
+  addUserTokens
 } from '../../utils/useDatabase';
 import getRawBody from 'raw-body';
 
@@ -147,8 +148,10 @@ const webhookHandler = async (req, res) => {
             console.log('Processing checkout session:', {
               mode: checkoutSession.mode,
               customerId: checkoutSession.customer,
-              subscriptionId: checkoutSession.subscription
+              subscriptionId: checkoutSession.subscription,
+              metadata: checkoutSession.metadata
             });
+
             if (checkoutSession.mode === 'subscription') {
               const subscriptionId = checkoutSession.subscription;
               try {
@@ -166,6 +169,68 @@ const webhookHandler = async (req, res) => {
                   subscriptionId
                 });
                 throw error;
+              }
+            } else if (checkoutSession.mode === 'payment') {
+              // Handle one-time credit purchase
+              console.log('🔍 Payment mode detected - credit purchase');
+
+              if (
+                !checkoutSession.metadata?.token_type ||
+                !checkoutSession.metadata?.token_amount
+              ) {
+                console.error(
+                  '❌ Missing metadata! token_type or token_amount not found'
+                );
+                console.log('Available metadata:', checkoutSession.metadata);
+                break;
+              }
+
+              const userId = checkoutSession.client_reference_id;
+              const tokenType = checkoutSession.metadata.token_type;
+              const tokenAmount = parseInt(
+                checkoutSession.metadata.token_amount
+              );
+
+              console.log('🎯 Processing credit purchase:', {
+                userId,
+                tokenType,
+                tokenAmount,
+                paymentStatus: checkoutSession.payment_status
+              });
+
+              if (!userId) {
+                console.error(
+                  '❌ No client_reference_id (user ID) found in session'
+                );
+                break;
+              }
+
+              // Only add tokens if payment is successful
+              if (checkoutSession.payment_status === 'paid') {
+                console.log(
+                  `💰 Adding ${tokenAmount} ${tokenType} to user ${userId}`
+                );
+                const result = await addUserTokens(
+                  userId,
+                  tokenType,
+                  tokenAmount
+                );
+
+                if (!result) {
+                  console.error(
+                    '❌ Failed to add tokens - customer not found or database error'
+                  );
+                } else {
+                  console.log(
+                    `✅ SUCCESS! Added ${tokenAmount} ${tokenType} to user ${userId}.`,
+                    `Old balance: ${result.oldBalance}, New balance: ${result.newBalance}`
+                  );
+                }
+              } else {
+                console.log(
+                  '⚠️ Payment not completed, status:',
+                  checkoutSession.payment_status
+                );
               }
             }
             break;
