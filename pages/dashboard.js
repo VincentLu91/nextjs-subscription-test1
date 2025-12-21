@@ -168,6 +168,18 @@ export default function Dashboard() {
             product visuals.
           </p>
 
+          {/* Buy Credits Button */}
+          <div className="flex justify-center mb-12">
+            <Link href="/buy-credits">
+              <button
+                className="px-8 py-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-white font-semibold
+                transition-all duration-200 hover:from-indigo-600 hover:to-purple-600 hover:shadow-lg hover:shadow-indigo-500/40 hover:scale-105"
+              >
+                💳 Buy Additional Credits
+              </button>
+            </Link>
+          </div>
+
           {/* Start Here Section */}
           <div className="max-w-3xl mx-auto mb-16 animate-on-scroll">
             <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-[20px] p-8 shadow-[0_6px_20px_rgba(0,0,0,0.4)] border border-indigo-500/30">
