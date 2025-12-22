@@ -88,6 +88,8 @@ export default function GenerateImages() {
       sessionStorage.removeItem(`pixblenderImages_${user.id}`);
       sessionStorage.removeItem(`uploadedFilePath_${user.id}`);
       sessionStorage.removeItem(`imageLink_${user.id}`);
+      sessionStorage.removeItem(`pixBlenderPredictions_${user.id}`);
+      sessionStorage.removeItem(`resultImages_${user.id}`);
     }
   };
 
@@ -116,6 +118,35 @@ export default function GenerateImages() {
       setPixBlenderImageList(photos.map((url) => ({ url, text: '' })));
     } else {
       setPixBlenderImageList([]);
+    }
+
+    // ✅ Restore pixBlenderPredictions from sessionStorage
+    const savedPredictions = sessionStorage.getItem(
+      `pixBlenderPredictions_${user.id}`
+    );
+    const savedResultImages = sessionStorage.getItem(`resultImages_${user.id}`);
+
+    if (savedPredictions) {
+      const predictions = JSON.parse(savedPredictions);
+      setPixBlenderPredictions(predictions);
+
+      // ✅ Only resume loading if we *don't* already have finished results
+      if (!savedResultImages) {
+        const list = Object.values(predictions);
+        const isFinished =
+          list.length > 0 &&
+          list.every(
+            (item) => item.status === 'COMPLETED' || item.status === 'ERROR'
+          );
+
+        if (!isFinished) {
+          setIsGeneratingBlenderImg(true);
+          setIsBlenderImgLoading(true);
+        }
+      } else {
+        setIsGeneratingBlenderImg(false);
+        setIsBlenderImgLoading(false);
+      }
     }
 
     /*const savedFilePath = sessionStorage.getItem(`uploadedFilePath_${user.id}`);
@@ -238,10 +269,20 @@ export default function GenerateImages() {
         image_size: selectedImageSize
       });
 
-      setPixBlenderPredictions((state) => ({
-        ...state,
-        [attempt]: resp.data
-      }));
+      setPixBlenderPredictions((state) => {
+        const newState = {
+          ...state,
+          [attempt]: resp.data
+        };
+        // ✅ Store predictions in sessionStorage
+        if (user?.id) {
+          sessionStorage.setItem(
+            `pixBlenderPredictions_${user.id}`,
+            JSON.stringify(newState)
+          );
+        }
+        return newState;
+      });
       console.log('setIsGeneratingBlenderImg set TRUE 240---');
       setIsGeneratingBlenderImg(true);
       return resp.data;
@@ -298,17 +339,34 @@ export default function GenerateImages() {
             // Update results using functional update to ensure we have latest state
             setResultImages((prevImages) => {
               const newImages = [...result.data.images];
+              // ✅ Store result images in sessionStorage
+              if (user?.id) {
+                sessionStorage.setItem(
+                  `resultImages_${user.id}`,
+                  JSON.stringify(newImages)
+                );
+              }
               return newImages;
             });
 
-            setPixBlenderPredictions((state) => ({
-              ...state,
-              [attempt]: {
-                ...state[attempt],
-                status: 'COMPLETED',
-                images: result.data.images
+            setPixBlenderPredictions((state) => {
+              const newState = {
+                ...state,
+                [attempt]: {
+                  ...state[attempt],
+                  status: 'COMPLETED',
+                  images: result.data.images
+                }
+              };
+              // ✅ Store predictions in sessionStorage
+              if (user?.id) {
+                sessionStorage.setItem(
+                  `pixBlenderPredictions_${user.id}`,
+                  JSON.stringify(newState)
+                );
               }
-            }));
+              return newState;
+            });
 
             return result.data.images;
           } else {
@@ -316,14 +374,24 @@ export default function GenerateImages() {
           }
         } catch (resultError) {
           console.error('Error fetching result images:', resultError);
-          setPixBlenderPredictions((state) => ({
-            ...state,
-            [attempt]: {
-              ...state[attempt],
-              status: 'ERROR',
-              error: resultError.message
+          setPixBlenderPredictions((state) => {
+            const newState = {
+              ...state,
+              [attempt]: {
+                ...state[attempt],
+                status: 'ERROR',
+                error: resultError.message
+              }
+            };
+            // ✅ Store predictions in sessionStorage even on error
+            if (user?.id) {
+              sessionStorage.setItem(
+                `pixBlenderPredictions_${user.id}`,
+                JSON.stringify(newState)
+              );
             }
-          }));
+            return newState;
+          });
         }
       } else if (output.data.status === 'ERROR') {
         throw new Error(output.data.error || 'Image generation failed');
@@ -332,14 +400,24 @@ export default function GenerateImages() {
       return [];
     } catch (error) {
       console.error('Error in getImageResults:', error.message);
-      setPixBlenderPredictions((state) => ({
-        ...state,
-        [attempt]: {
-          ...state[attempt],
-          status: 'ERROR',
-          error: error.message
+      setPixBlenderPredictions((state) => {
+        const newState = {
+          ...state,
+          [attempt]: {
+            ...state[attempt],
+            status: 'ERROR',
+            error: error.message
+          }
+        };
+        // ✅ Store predictions in sessionStorage even on error
+        if (user?.id) {
+          sessionStorage.setItem(
+            `pixBlenderPredictions_${user.id}`,
+            JSON.stringify(newState)
+          );
         }
-      }));
+        return newState;
+      });
       return [];
     }
   };
@@ -646,12 +724,19 @@ export default function GenerateImages() {
   }, [resultImages]);
 
   useEffect(() => {
+    let mounted = true;
+
     const predictionAry = Object.entries(pixBlenderPredictions).filter(
       ([attempt, item]) =>
         item.status !== 'COMPLETED' && item.status !== 'ERROR'
     );
 
-    if (predictionAry.length > 0) {
+    // ✅ Only start polling if we have pending predictions AND no results yet AND we're generating
+    if (
+      predictionAry.length > 0 &&
+      isGeneratingBlenderImg &&
+      resultImages.length === 0
+    ) {
       // Clear any existing interval
       if (intervalImage.current) {
         clearInterval(intervalImage.current);
@@ -662,6 +747,8 @@ export default function GenerateImages() {
       const MAX_POLLING_DURATION = 5 * 60 * 1000;
 
       intervalImage.current = setInterval(() => {
+        if (!mounted) return;
+
         // Check if we've exceeded maximum polling duration
         if (Date.now() - startTime > MAX_POLLING_DURATION) {
           clearInterval(intervalImage.current);
@@ -680,11 +767,13 @@ export default function GenerateImages() {
     }
 
     return () => {
+      mounted = false;
       if (intervalImage.current) {
         clearInterval(intervalImage.current);
       }
     };
-  }, [pixBlenderPredictions]);
+    // ✅ Add resultImages.length to deps to stop polling when results arrive
+  }, [pixBlenderPredictions, isGeneratingBlenderImg, resultImages.length]);
 
   useEffect(() => {
     const initializeAndCheckStatus = async () => {
@@ -1034,6 +1123,10 @@ export default function GenerateImages() {
 
                         // Clear all relevant session storage
                         sessionStorage.removeItem(userKey);
+                        sessionStorage.removeItem(
+                          `pixBlenderPredictions_${user.id}`
+                        );
+                        sessionStorage.removeItem(`resultImages_${user.id}`);
                         photos.forEach((url) => {
                           const imageKey = `imageLink_${user.id}_${url}`;
                           sessionStorage.removeItem(imageKey);
