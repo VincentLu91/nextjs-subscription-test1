@@ -11,25 +11,25 @@ const CREDIT_PACKAGES = {
       name: 'Starter Pack',
       amount: 30,
       price: 4.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_30
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_START
     },
     {
       name: 'Standard Pack',
       amount: 60,
       price: 8.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_60
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_STANDARD
     },
     {
       name: 'Pro Pack',
       amount: 120,
       price: 15.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_120
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_PRO
     },
     {
       name: 'Business Pack',
       amount: 300,
       price: 34.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_300
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_IMAGE_BIZ
     }
   ],
   video_tokens: [
@@ -37,25 +37,25 @@ const CREDIT_PACKAGES = {
       name: 'Starter Pack',
       amount: 10,
       price: 4.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_10
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_START
     },
     {
       name: 'Standard Pack',
       amount: 20,
       price: 8.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_20
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_STANDARD
     },
     {
       name: 'Pro Pack',
       amount: 40,
       price: 15.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_40
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_PRO
     },
     {
       name: 'Business Pack',
       amount: 100,
       price: 34.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_100
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_VIDEO_BIZ
     }
   ],
   caption_tokens: [
@@ -63,25 +63,25 @@ const CREDIT_PACKAGES = {
       name: 'Starter Pack',
       amount: 30,
       price: 4.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_30
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_START
     },
     {
       name: 'Standard Pack',
       amount: 60,
       price: 8.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_60
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_STANDARD
     },
     {
       name: 'Pro Pack',
       amount: 120,
       price: 15.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_120
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_PRO
     },
     {
       name: 'Business Pack',
       amount: 300,
       price: 34.99,
-      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_300
+      stripe_price_id: process.env.NEXT_PUBLIC_PRICE_CAPTION_BIZ
     }
   ]
 };
