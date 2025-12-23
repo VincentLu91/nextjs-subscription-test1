@@ -237,6 +237,17 @@ export default function ViewImage() {
           />
         </div>
 
+        {/* Buy Credits Button - Show when tokens <= 5 and user has active subscription */}
+        {(numTokens <= 5 || numTieredTokens <= 5) && !hasNoSubscription && (
+          <div className="flex justify-center mb-8">
+            <Link href="/buy-credits">
+              <button className="px-8 py-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-white font-semibold transition-all duration-200 hover:from-indigo-600 hover:to-purple-600 hover:shadow-lg hover:shadow-indigo-500/40 hover:scale-105">
+                Buy Additional Credits
+              </button>
+            </Link>
+          </div>
+        )}
+
         {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           {/* Left Column - Image Preview */}
