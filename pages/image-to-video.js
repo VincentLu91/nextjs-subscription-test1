@@ -979,7 +979,7 @@ export default function ImageToVideo() {
                   <option value="1:1">1:1</option>
                   <option value="3:4">3:4</option>
                   <option value="9:16">9:16</option>
-                  <option value="auto">Default</option>
+                  {/*<option value="auto">Default</option>*/}
                 </select>
 
                 {/* Prompt suggestion chips */}
