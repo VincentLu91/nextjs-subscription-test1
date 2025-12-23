@@ -828,6 +828,18 @@ export default function ImageToVideo() {
             />
           </div>
         </div>
+
+        {/* Buy Credits Button - Show when tokens <= 5 and user has active subscription */}
+        {(numTokens <= 5 || numTieredTokens <= 5) && !hasNoSubscription && (
+          <div className="flex justify-center mb-8">
+            <Link href="/buy-credits">
+              <button className="px-8 py-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-white font-semibold transition-all duration-200 hover:from-indigo-600 hover:to-purple-600 hover:shadow-lg hover:shadow-indigo-500/40 hover:scale-105">
+                Buy Additional Credits
+              </button>
+            </Link>
+          </div>
+        )}
+
         <p className="text-[#A1A1AA] mb-6">
           Create a short 5-second TikTok/Reel-style clip from a product photo.
           Great as a quick scroll-stopper, not a high-end cinematic ad.

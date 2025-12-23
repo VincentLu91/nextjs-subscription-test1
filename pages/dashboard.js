@@ -169,6 +169,7 @@ export default function Dashboard() {
           </p>
 
           {/* Buy Credits Button */}
+          {/* Commented out - moved to individual tool pages
           <div className="flex justify-center mb-12">
             <Link href="/buy-credits">
               <button
@@ -179,6 +180,7 @@ export default function Dashboard() {
               </button>
             </Link>
           </div>
+          */}
 
           {/* Start Here Section */}
           <div className="max-w-3xl mx-auto mb-16 animate-on-scroll">
