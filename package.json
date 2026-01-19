@@ -11,7 +11,7 @@
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^2.0.3",
-    "@stripe/stripe-js": "^8.6.1",
+    "@stripe/stripe-js": "^8.6.3",
     "@supabase/supabase-js": "^2.90.1",
     "@swc/helpers": "^0.5.18",
     "@tailwindcss/postcss": "^4.1.18",
@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^16.1.3",
     "npm-check-updates": "^19.3.1",
-    "posthog-js": "^1.328.0",
+    "posthog-js": "^1.330.0",
     "raw-body": "^3.0.2",
     "react": "^19.2.3",
     "react-aria": "^3.45.0",
