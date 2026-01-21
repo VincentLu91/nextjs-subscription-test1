@@ -54,7 +54,7 @@ export default function ImageToVideo() {
   const [finishMessage, setFinishMessage] = useState(null);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState('auto');
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState('21:9'); // has to be set to allowed value
 
   const interval = useRef();
 
