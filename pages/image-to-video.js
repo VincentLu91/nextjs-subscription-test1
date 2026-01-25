@@ -752,7 +752,7 @@ export default function ImageToVideo() {
 
     // 3) Insert row
     const { error: insertErr } = await supabase.from('videos').insert({
-      customer_id: user.identities?.[0]?.id ?? user.id,
+      customer_id: user.id,
       video_url: publicUrl
       // Optional but recommended if your API returns it:
       // request_id: videoRespObj?.data?.request_id
