@@ -657,10 +657,21 @@ export default function GenerateImages() {
           continue;
         }
 
-        await supabase.from('photos').insert({
-          customer_id: user.identities[0].id,
-          photo_url: data.publicUrl
-        });
+        // Use user.id for consistency with OAuth and Supabase auth
+        const { data: insertData, error: insertError } = await supabase
+          .from('photos')
+          .insert({
+            customer_id: user.id,
+            photo_url: data.publicUrl
+          });
+
+        if (insertError) {
+          console.error('Error inserting photo to database:', insertError);
+          alert(`Failed to save photo to gallery: ${insertError.message}`);
+          continue;
+        } else {
+          console.log('Successfully inserted photo:', insertData);
+        }
 
         const userKey = `pixblenderImages_${user.id}`;
         const localPhotos = sessionStorage.getItem(userKey);
