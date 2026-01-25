@@ -182,14 +182,28 @@ export default function ImageGallery() {
   }, []);
 
   const getPhotos = async () => {
-    if (!user?.identities[0]?.id) {
+    if (!user?.id) {
       return [];
     }
-    const photosInfo = await supabase
-      .from('photos')
-      .select('*')
-      .eq('customer_id', user.identities[0].id);
-    const listOfPhotos = photosInfo.data.map((item) => item.photo_url);
+
+    // Query for photos with BOTH user.id and user.identities[0].id (backwards compatible)
+    const queries = [
+      supabase.from('photos').select('*').eq('customer_id', user.id)
+    ];
+
+    // Also check for old photos saved with identities[0].id if it exists and differs
+    if (user.identities?.[0]?.id && user.identities[0].id !== user.id) {
+      queries.push(
+        supabase
+          .from('photos')
+          .select('*')
+          .eq('customer_id', user.identities[0].id)
+      );
+    }
+
+    const results = await Promise.all(queries);
+    const allPhotos = results.flatMap((result) => result.data || []);
+    const listOfPhotos = allPhotos.map((item) => item.photo_url);
     console.log('listOfPhotos: ', listOfPhotos);
     return listOfPhotos;
   };
@@ -212,24 +226,21 @@ export default function ImageGallery() {
   };
 
   useEffect(() => {
-    fetchAndStorePhotos(true);
-  }, []);
+    if (user) {
+      // Don't force sync - let it use localStorage first for faster load
+      fetchAndStorePhotos(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleRouteChange = () => {
       localStorage.removeItem('generatedPhotos');
     };
 
-    const handleBeforeUnload = () => {
-      localStorage.removeItem('generatedPhotos');
-    };
-
     router.events.on('routeChangeStart', handleRouteChange);
-    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [router]);
 
@@ -251,12 +262,27 @@ export default function ImageGallery() {
       localStorage.setItem('generatedPhotos', JSON.stringify(storedPhotosUrl));
     }
     console.log('deleting photo_url: ', photo_url);
-    console.log('photo_url delete.....');
-    await supabase
-      .from('photos')
-      .delete()
-      .eq('customer_id', user?.identities[0]?.id)
-      .eq('photo_url', photo_url);
+
+    // Delete from both possible customer_id values (backwards compatible)
+    const deletePromises = [
+      supabase
+        .from('photos')
+        .delete()
+        .eq('customer_id', user?.id)
+        .eq('photo_url', photo_url)
+    ];
+
+    if (user?.identities?.[0]?.id && user.identities[0].id !== user.id) {
+      deletePromises.push(
+        supabase
+          .from('photos')
+          .delete()
+          .eq('customer_id', user.identities[0].id)
+          .eq('photo_url', photo_url)
+      );
+    }
+
+    await Promise.all(deletePromises);
   }
 
   const renderCard = (imageUrl, index) => {
