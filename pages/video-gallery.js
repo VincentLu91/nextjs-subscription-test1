@@ -61,7 +61,7 @@ export default function VideoGallery() {
         '/api/imageresults?url=' + output.data.response_url
       );
       await supabase.from('videos').insert({
-        customer_id: user.identities[0].id,
+        customer_id: user.id,
         video_url: result.data.videos[0].url // I think it's wrong
       });
 
@@ -115,14 +115,28 @@ export default function VideoGallery() {
   }, [user]);
 
   const getVideos = async () => {
-    if (!user?.identities[0]?.id) {
-      return []; // i.e., if user hasn't trained anything yet.
+    if (!user?.id) {
+      return [];
     }
-    const videosInfo = await supabase
-      .from('videos')
-      .select('*')
-      .eq('customer_id', user.identities[0].id);
-    const listOfVideos = videosInfo.data.map((item) => item.video_url);
+
+    // Query for videos with BOTH user.id and user.identities[0].id (backwards compatible)
+    const queries = [
+      supabase.from('videos').select('*').eq('customer_id', user.id)
+    ];
+
+    // Also check for old videos saved with identities[0].id if it exists and differs
+    if (user.identities?.[0]?.id && user.identities[0].id !== user.id) {
+      queries.push(
+        supabase
+          .from('videos')
+          .select('*')
+          .eq('customer_id', user.identities[0].id)
+      );
+    }
+
+    const results = await Promise.all(queries);
+    const allVideos = results.flatMap((result) => result.data || []);
+    const listOfVideos = allVideos.map((item) => item.video_url);
     console.log('listOfVideos: ', listOfVideos);
     return listOfVideos;
   };
@@ -229,13 +243,28 @@ export default function VideoGallery() {
       setGeneratedVideos(storedVideosUrl);
       localStorage.setItem('generatedVideos', JSON.stringify(storedVideosUrl));
     }
-    console.log('deleting photo_url: ', video_url);
-    console.log('video_url delete.....');
-    await supabase
-      .from('videos')
-      .delete()
-      .eq('customer_id', user?.identities[0]?.id)
-      .eq('video_url', video_url);
+    console.log('deleting video_url: ', video_url);
+
+    // Delete from both possible customer_id values (backwards compatible)
+    const deletePromises = [
+      supabase
+        .from('videos')
+        .delete()
+        .eq('customer_id', user?.id)
+        .eq('video_url', video_url)
+    ];
+
+    if (user?.identities?.[0]?.id && user.identities[0].id !== user.id) {
+      deletePromises.push(
+        supabase
+          .from('videos')
+          .delete()
+          .eq('customer_id', user.identities[0].id)
+          .eq('video_url', video_url)
+      );
+    }
+
+    await Promise.all(deletePromises);
   }
 
   return (

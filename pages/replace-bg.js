@@ -285,7 +285,7 @@ export default function ReplaceBg() {
         }
 
         await supabase.from('photos').insert({
-          customer_id: user.identities[0].id,
+          customer_id: user.id,
           photo_url: data.publicUrl
         });
 

@@ -171,7 +171,7 @@ export default function AIStudio() {
 
         // Save the uploaded URL to the database
         await supabase.from('photos').insert({
-          customer_id: user.identities[0].id,
+          customer_id: user.id,
           photo_url: data.publicUrl
         });
 
