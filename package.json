@@ -11,8 +11,8 @@
   "dependencies": {
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^2.0.3",
-    "@stripe/stripe-js": "^8.6.4",
-    "@supabase/supabase-js": "^2.91.3",
+    "@stripe/stripe-js": "^8.7.0",
+    "@supabase/supabase-js": "^2.93.3",
     "@swc/helpers": "^0.5.18",
     "@tailwindcss/postcss": "^4.1.18",
     "axios": "^1.13.4",
@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^16.1.6",
     "npm-check-updates": "^19.3.2",
-    "posthog-js": "^1.335.4",
+    "posthog-js": "^1.336.2",
     "raw-body": "^3.0.2",
     "react": "^19.2.4",
     "react-aria": "^3.45.0",
@@ -31,7 +31,7 @@
     "react-hot-toast": "^2.6.0",
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.2",
-    "stripe": "^20.2.0",
+    "stripe": "^20.3.0",
     "swr": "2.3.8",
     "tailwindcss": "^4.1.18",
     "uuid": "^13.0.0"
