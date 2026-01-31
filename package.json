@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^16.1.6",
     "npm-check-updates": "^19.3.2",
-    "posthog-js": "^1.336.2",
+    "posthog-js": "^1.336.4",
     "raw-body": "^3.0.2",
     "react": "^19.2.4",
     "react-aria": "^3.45.0",
@@ -37,7 +37,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.23",
+    "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.1",
