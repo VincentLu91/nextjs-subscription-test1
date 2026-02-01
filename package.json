@@ -32,7 +32,7 @@
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.2",
     "stripe": "^20.3.0",
-    "swr": "2.3.8",
+    "swr": "2.4.0",
     "tailwindcss": "^4.1.18",
     "uuid": "^13.0.0"
   },
