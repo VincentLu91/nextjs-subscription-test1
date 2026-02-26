@@ -1012,7 +1012,7 @@ export default function GenerateImages() {
                     onChange={(e) => setSelectedImageSize(e.target.value)}
                     className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                   >
-                    <option value="auto">Default</option>
+                    <option value="auto_2K">Default</option>
                     <option value="landscape_16_9">Landscape 16:9</option>
                     <option value="portrait_16_9">Portrait 9:16</option>
                     <option value="landscape_4_3">Landscape 4:3</option>
