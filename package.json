@@ -31,7 +31,7 @@
     "react-hot-toast": "^2.6.0",
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.2",
-    "stripe": "^20.4.0",
+    "stripe": "^20.4.1",
     "swr": "2.4.1",
     "tailwindcss": "^4.2.1",
     "uuid": "^13.0.0"
