@@ -67,12 +67,17 @@ export const UserContextProvider = (props) => {
   const [generatedPhotos, setGeneratedPhotos] = useState([]);
   const [generatedVideos, setGeneratedVideos] = useState([]);
 
-  useEffect(async () => {
-    const {
-      data: { session }
-    } = await supabase.auth.getSession();
-    setSession(session);
-    setUser(session?.user ?? null);
+  useEffect(() => {
+    async function getInitialSession() {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
+      setSession(session);
+      setUser(session?.user ?? null);
+    }
+
+    getInitialSession();
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
