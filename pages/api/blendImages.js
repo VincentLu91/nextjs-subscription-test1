@@ -47,8 +47,8 @@ export default async function handler(req, res) {
     const fullPrompt = `${prompt}\n\n${BRANDPIX_SUFFIX}`;
 
     const resp = await axios.post(
-      'https://queue.fal.run/fal-ai/bytedance/seedream/v5/lite/edit', // seedream v5 lite
-      //'https://queue.fal.run/fal-ai/nano-banana-pro/edit', // nano banana pro
+      //'https://queue.fal.run/fal-ai/bytedance/seedream/v5/lite/edit', // seedream v5 lite
+      'https://queue.fal.run/fal-ai/nano-banana-2/edit', // nano banana pro
       {
         image_urls: images, // Pass the array directly
         prompt: fullPrompt,
