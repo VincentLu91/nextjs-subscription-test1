@@ -54,7 +54,7 @@ export default function ImageToVideo() {
   const [finishMessage, setFinishMessage] = useState(null);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState('21:9'); // has to be set to allowed value
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState('auto'); // has to be set to allowed value
 
   const interval = useRef();
 
@@ -973,11 +973,8 @@ export default function ImageToVideo() {
                   onChange={(e) => setSelectedAspectRatio(e.target.value)}
                   className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                 >
-                  <option value="21:9">21:9</option>
+                  <option value="auto">auto</option>
                   <option value="16:9">16:9</option>
-                  <option value="4:3">4:3</option>
-                  <option value="1:1">1:1</option>
-                  <option value="3:4">3:4</option>
                   <option value="9:16">9:16</option>
                   {/*<option value="auto">Default</option>*/}
                 </select>
