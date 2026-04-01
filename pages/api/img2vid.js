@@ -23,7 +23,7 @@ Use smooth camera motion (no chaotic movement).
 Match this scene description: ${user_prompt}.
 Avoid adding any text, logos, or watermarks in the video.`,
         aspect_ratio: aspect_ratio,
-        duration: '6s' // veo 3.1
+        duration: '6s' // veo 3.1, other options include '4s' and '8s'
       },
       {
         headers: {
