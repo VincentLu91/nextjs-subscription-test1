@@ -14,7 +14,7 @@ export default async function POST(req, res) {
 
     const resp = await axios.post(
       // send prediction to dashboard but it takes time to generate image
-      'https://queue.fal.run/fal-ai/ltx-2.3/image-to-video/fast',
+      'https://queue.fal.run/fal-ai/veo3.1/lite/image-to-video',
       {
         image_url: image,
         prompt: `Create a 5-second vertical TikTok/Reel-style product clip.
@@ -22,7 +22,8 @@ Keep the product clearly visible and centered most of the time.
 Use smooth camera motion (no chaotic movement).
 Match this scene description: ${user_prompt}.
 Avoid adding any text, logos, or watermarks in the video.`,
-        aspect_ratio: aspect_ratio
+        aspect_ratio: aspect_ratio,
+        duration: '6s' // veo 3.1
       },
       {
         headers: {
