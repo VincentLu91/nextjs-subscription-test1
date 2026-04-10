@@ -21,7 +21,7 @@
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "next": "^16.2.3",
-    "npm-check-updates": "^20.0.0",
+    "npm-check-updates": "^20.0.1",
     "posthog-js": "^1.367.0",
     "raw-body": "^3.0.2",
     "react": "^19.2.5",
@@ -43,7 +43,7 @@
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^14.0.0",
     "postcss-preset-env": "^11.2.0",
-    "prettier": "^3.8.1"
+    "prettier": "^3.8.2"
   },
   "prettier": {
     "arrowParens": "always",
