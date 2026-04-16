@@ -23,12 +23,21 @@ APPAREL (only if applicable):
 - If the product is clothing/shoes/accessories, keep the same silhouette and construction (seams, stitching, zippers, pockets, cuffs/collar). No added layers.
 `;
 
+const REFERENCE_HANDLING = `
+Reference handling:
+- The main product image is the source of truth for the product.
+- Preserve the product exactly.
+- If no scene/style/composition reference images are provided, follow the style preset strongly.
+- If scene/style/composition reference images are provided, use them as primary visual guidance and use the style preset only as secondary guidance.
+- If additional images are product or person references, use them only for subject/content guidance, not to override the overall preset unless explicitly requested.
+`;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { prompt, images, user, image_size } = req.body; // Expect 'images' to be an array
+  const { prompt, images, user, image_size, stylePrompt } = req.body; // Expect 'images' to be an array
 
   if (!Array.isArray(images)) {
     return res.status(400).json({ error: 'images must be an array of URLs' });
@@ -44,7 +53,8 @@ export default async function handler(req, res) {
       });
 
     // Append brandpix_suffix to the user's prompt
-    const fullPrompt = `${prompt}\n\n${BRANDPIX_SUFFIX}`;
+    //const fullPrompt = `${prompt}\n\n${BRANDPIX_SUFFIX}`;
+    const fullPrompt = `User request: ${prompt}\n\n${stylePrompt}\n\n${REFERENCE_HANDLING}`;
 
     const resp = await axios.post(
       //'https://queue.fal.run/fal-ai/bytedance/seedream/v5/lite/edit', // seedream v5 lite
