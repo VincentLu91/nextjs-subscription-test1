@@ -9,6 +9,7 @@ import axios from 'axios';
 import { supabase } from '../utils/initSupabase';
 import { v4 as uuidv4 } from 'uuid';
 import { saveAs } from 'file-saver';
+import { STYLE_PRESET_PROMPTS } from '../lib/stylePresetPrompts';
 
 const ATTEMPTS = 1;
 const CDNURL = process.env.NEXT_PUBLIC_CDNURL;
@@ -27,6 +28,8 @@ export default function GenerateImages() {
   const [promptStatus, setPromptStatus] = useState(null);
   const [hasAttemptedGenerate, setHasAttemptedGenerate] = useState(false);
   const [selectedImageSize, setSelectedImageSize] = useState('square_hd');
+  const [stylePreset, setStylePreset] = useState('None');
+  const [stylePrompt, setStylePrompt] = useState('None');
 
   const router = useRouter();
   const {
@@ -266,7 +269,8 @@ export default function GenerateImages() {
         prompt: pixBlenderPrompt,
         images: urls,
         user: user.id,
-        image_size: selectedImageSize
+        image_size: selectedImageSize,
+        stylePrompt: stylePrompt
       });
 
       setPixBlenderPredictions((state) => {
@@ -885,7 +889,7 @@ export default function GenerateImages() {
     <main className="bg-[#0C0C0C] text-white min-h-screen font-['Inter'] text-base leading-6">
       <div className="max-w-[960px] mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-          <h1 className="text-5xl font-bold">Pix Blender</h1>
+          <h1 className="text-5xl font-bold">Generate Images</h1>
 
           {/* Credits Badge with Tooltip */}
           <div className="relative">
@@ -911,11 +915,16 @@ export default function GenerateImages() {
         )}
 
         <p className="text-[#A1A1AA] mb-6">
-          Create social-native photos that look like you shot on your phone
+          Upload your product photo (at least one) and reference images
+          (optional).
         </p>
         <p className="text-[#A1A1AA] mb-6">
-          Great for: virtual fashion try-ons, combining multiple products and
-          people in one photo, creating UGC images
+          Reference photos include scenes, styles, compositions, humans, or
+          other visual elements.
+        </p>
+        <p className="text-[#A1A1AA] mb-6">
+          No reference images? That’s okay — you can still generate with a
+          preset look.
         </p>
         {/*<p className="text-white mb-6 font-bold">
           If your product has logos or labels, we recommend you to{' '}
@@ -932,7 +941,7 @@ export default function GenerateImages() {
           {/* Upload Card */}
           <section>
             <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
-              Upload Images
+              Upload Images & Choose Style
             </label>
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
@@ -969,7 +978,7 @@ export default function GenerateImages() {
                 <p className="text-sm text-[#A1A1AA]">
                   {isDragging
                     ? 'Drop files here'
-                    : 'Drag and drop your images here, or click to select'}
+                    : 'Add your product photo and (optional) reference images'}
                 </p>
               </div>
 
@@ -995,18 +1004,43 @@ export default function GenerateImages() {
                   ))}
                 </div>
               )}
+              <br />
+              <div className="space-y-4">
+                <p>Choose a look:</p>
+                <select
+                  value={stylePreset}
+                  onChange={(e) => {
+                    const selectedKey = e.target.value;
+                    setStylePreset(selectedKey);
+                    setStylePrompt(
+                      selectedKey === 'None'
+                        ? 'None'
+                        : STYLE_PRESET_PROMPTS[selectedKey]
+                    );
+                  }}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="None">None</option>
+                  {Object.keys(STYLE_PRESET_PROMPTS).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </section>
 
           {/* Prompt Card */}
           <section>
             <label className="text-sm font-semibold uppercase tracking-wider text-[#737373] mb-4 block">
-              Image Description
+              DESCRIBE & GENERATE
             </label>
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="space-y-4">
                 <div className="space-y-4">
+                  <p>Select Aspect Ratio</p>
                   <select
                     value={selectedImageSize}
                     onChange={(e) => setSelectedImageSize(e.target.value)}
@@ -1018,7 +1052,6 @@ export default function GenerateImages() {
                     <option value="4:3">4:3</option>
                     <option value="3:4">3:4</option>
                   </select>
-
                   <button
                     onClick={suggestPromptMultiImages}
                     className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1026,13 +1059,12 @@ export default function GenerateImages() {
                       uploadedImages.length === 0 || isGeneratingBlenderImg
                     }
                   >
-                    Generate Prompt
+                    Need Help? Generate Prompt
                   </button>
-
                   <textarea
                     value={pixBlenderPrompt || ''}
                     onChange={handleChange}
-                    placeholder="Describe how you want to combine your images..."
+                    placeholder="Describe the scene or style you want..."
                     className="w-full min-h-[160px] p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                   />
                 </div>
