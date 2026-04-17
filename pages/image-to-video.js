@@ -16,6 +16,9 @@ import { v4 as uuidv4 } from 'uuid';
 // import trainML's config code
 import contentTypes from './api/contentTypes';
 import { saveAs } from 'file-saver';
+import { VIDEO_TYPE_PHRASES } from '../lib/videoTypePhrases';
+import { VIDEO_MOTION_TYPES } from '../lib/videoMotionTypes';
+import { VIDEO_LOCATION_SETTINGS } from '../lib/videoLocationSettings';
 
 export default function ImageToVideo() {
   const [loading, setLoading] = useState(false);
@@ -58,8 +61,12 @@ export default function ImageToVideo() {
   const [dragActive, setDragActive] = useState(false);
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('auto');
   const [videoType, setVideoType] = useState('None');
+  const [videoTypePrompt, setVideoTypePrompt] = useState('None');
   const [videoLocationSetting, setVideoLocationSetting] = useState('None');
+  const [videoLocationSettingPrompt, setVideoLocationSettingPrompt] =
+    useState('None');
   const [videoMotionType, setVideoMotionType] = useState('None');
+  const [videoMotionTypePrompt, setVideoMotionTypePrompt] = useState('None');
 
   const interval = useRef();
 
@@ -514,7 +521,10 @@ export default function ImageToVideo() {
           `&user=${user.id}` +
           `&aspect_ratio=${selectedAspectRatio}` +
           `&duration=${duration}` +
-          `&durationValue=${durationValue}`
+          `&durationValue=${durationValue}` +
+          `&videoTypePrompt=${videoTypePrompt}` +
+          `&videoLocationSettingPrompt=${videoLocationSettingPrompt}` +
+          `&videoMotionTypePrompt=${videoMotionTypePrompt}`
       );
 
       if (!videoResp?.data) {
@@ -1125,46 +1135,67 @@ export default function ImageToVideo() {
                 <p>What kind of video do you want?</p>
                 <select
                   value={videoType}
-                  onChange={(e) => setVideoType(e.target.value)}
+                  onChange={(e) => {
+                    const selectedKey = e.target.value;
+                    setVideoType(selectedKey);
+                    setVideoTypePrompt(
+                      selectedKey === 'None'
+                        ? 'None'
+                        : VIDEO_TYPE_PHRASES[selectedKey]
+                    );
+                  }}
                   className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                 >
                   <option value="None">None</option>
-                  <option value="Product showcase">Product showcase</option>
-                  <option value="in use">in use</option>
-                  <option value="before-after transformation">
-                    before-after transformation
-                  </option>
-                  {/*<option value="auto">Default</option>*/}
+                  {Object.keys(VIDEO_TYPE_PHRASES).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
                 </select>
 
                 <p>Where should it happen?</p>
                 <select
                   value={videoLocationSetting}
-                  onChange={(e) => setVideoLocationSetting(e.target.value)}
+                  onChange={(e) => {
+                    const selectedKey = e.target.value;
+                    setVideoLocationSetting(selectedKey);
+                    setVideoLocationSettingPrompt(
+                      selectedKey === 'None'
+                        ? 'None'
+                        : VIDEO_LOCATION_SETTINGS[selectedKey]
+                    );
+                  }}
                   className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                 >
                   <option value="None">None</option>
-                  <option value="studio">studio</option>
-                  <option value="home">home</option>
-                  <option value="outdoor">outdoor</option>
-                  <option value="cafe">cafe</option>
-                  <option value="gym">gym</option>
-                  {/*<option value="auto">Default</option>*/}
+                  {Object.keys(VIDEO_LOCATION_SETTINGS).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
                 </select>
 
                 <p>What should the motion feel like?</p>
                 <select
                   value={videoMotionType}
-                  onChange={(e) => setVideoMotionType(e.target.value)}
+                  onChange={(e) => {
+                    const selectedKey = e.target.value;
+                    setVideoMotionType(selectedKey);
+                    setVideoMotionTypePrompt(
+                      selectedKey === 'None'
+                        ? 'None'
+                        : VIDEO_MOTION_TYPES[selectedKey]
+                    );
+                  }}
                   className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                 >
                   <option value="None">None</option>
-                  <option value="slow">slow</option>
-                  <option value="smooth">smooth</option>
-                  <option value="dramatic">dramatic</option>
-                  <option value="handheld">handheld</option>
-                  <option value="close-up">close-up</option>
-                  {/*<option value="auto">Default</option>*/}
+                  {Object.keys(VIDEO_MOTION_TYPES).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
                 </select>
 
                 <button
