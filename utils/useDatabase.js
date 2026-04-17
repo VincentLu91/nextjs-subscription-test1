@@ -303,6 +303,8 @@ const deductUserImageGenerationToken = async (customerId, tokensToDeduct) => {
 
 const deductUserVideoGenerationToken = async (customerId, tokensToDeduct) => {
   // Get customer's UUID from mapping table.
+  // pivot from deducting number of videos generated to deducting based on duration of video,
+  // e.g. 1 token for 5s, 2 tokens for 10s, etc.
   const {
     data: { id: uuid, video_tokens },
     error: noCustomerError
