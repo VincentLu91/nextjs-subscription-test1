@@ -24,7 +24,7 @@ export default function ImageToVideo() {
   const [showImage, setShowImage] = useState(false);
   const [isFromOtherPage, setIsFromOtherPage] = useState(false);
   const [localImageLink, setLocalImageLink] = useState(null); // Local image for this page
-  const [duration, setDuration] = useState(4); // Local image for this page
+  const [duration, setDuration] = useState('4s'); // Local image for this page
 
   const router = useRouter();
 
@@ -388,8 +388,19 @@ export default function ImageToVideo() {
   );
 
   const generateVideo = async (prompt, image) => {
+    // Extract numeric value from duration (e.g., "4s" -> 4, "6s" -> 6)
+    const durationValue = parseInt(duration);
+
+    // Check if available tokens are sufficient
+    if (numTokens < durationValue) {
+      alert(
+        `Not enough credits! You need at least ${durationValue} credits to generate a ${duration} video, but you only have ${numTokens} credits available. Please purchase more credits or choose a shorter duration.`
+      );
+      return;
+    }
+
     if (prompt == null || prompt.trim() == '' || !image) {
-      setCaption("You haven't entered anything!");
+      alert("You haven't entered anything!");
       return;
     }
 
@@ -499,7 +510,8 @@ export default function ImageToVideo() {
           image +
           `&user=${user.id}` +
           `&aspect_ratio=${selectedAspectRatio}` +
-          `&duration=${duration}`
+          `&duration=${duration}` +
+          `&durationValue=${durationValue}`
       );
 
       if (!videoResp?.data) {
@@ -516,7 +528,7 @@ export default function ImageToVideo() {
     } catch (error) {
       console.error('Error generating video:', error);
       alert(
-        'There was an error generating your video. Please try using proper image and prompt'
+        `There was an error generating your video:\n\n\n\nPlease check:\n- Image URL is valid and accessible\n- Prompt is not empty\n- You have sufficient credits`
       );
       setIsVideoLoading(false);
     }
@@ -959,8 +971,8 @@ export default function ImageToVideo() {
                 onChange={(e) => setDuration(e.target.value)}
                 className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
               >
-                <option value="4s">4</option>
-                <option value="6s">6</option>
+                <option value="4s">4s</option>
+                <option value="6s">6s</option>
               </select>
             </div>
           </section>
@@ -1043,9 +1055,7 @@ export default function ImageToVideo() {
 
                 <button
                   onClick={() => generateVideo(img2vidPrompt, activeImageLink)}
-                  disabled={
-                    isVideoLoading || !activeImageLink || !img2vidPrompt?.trim()
-                  }
+                  disabled={isVideoLoading}
                   className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none
                     ${
                       isVideoLoading
