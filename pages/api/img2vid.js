@@ -3,9 +3,10 @@ import { deductUserVideoGenerationToken } from '../../utils/useDatabase';
 
 export default async function POST(req, res) {
   // it's a POST request...
-  const { user_prompt, image, user, aspect_ratio, duration } = req.query;
+  const { user_prompt, image, user, aspect_ratio, duration, durationValue } =
+    req.query;
   try {
-    let result = await deductUserVideoGenerationToken(user, duration);
+    let result = await deductUserVideoGenerationToken(user, durationValue);
 
     if (!result)
       return res.status(403).json({
