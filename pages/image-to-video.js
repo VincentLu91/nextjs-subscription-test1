@@ -56,7 +56,10 @@ export default function ImageToVideo() {
   const [finishMessage, setFinishMessage] = useState(null);
   const [uploadedFilePath, setUploadedFilePath] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState('auto'); // has to be set to allowed value
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState('auto');
+  const [videoType, setVideoType] = useState('None');
+  const [videoLocationSetting, setVideoLocationSetting] = useState('None');
+  const [videoMotionType, setVideoMotionType] = useState('None');
 
   const interval = useRef();
 
@@ -678,6 +681,129 @@ export default function ImageToVideo() {
     router.push('/view-video'); // Navigate to the content page
   };
 
+  const suggestPromptSingleImage = async () => {
+    if (!activeImageLink) {
+      alert('Please select or upload an image first!');
+      return;
+    }
+
+    try {
+      // Use the active image link directly (it's already uploaded to Supabase)
+      const imageUrl = activeImageLink;
+
+      console.log('Processing image:', imageUrl);
+
+      // Call extractSubject API to get the subject from the image
+      const rawPrompt = await axios.post('/api/extractSubject', null, {
+        params: {
+          imageLink: imageUrl,
+          user: user.id
+        }
+      });
+      console.log('Raw prompt response:', rawPrompt.data);
+
+      if (!rawPrompt.data.status_url) {
+        console.error('No status URL received from extractSubject API');
+        alert('Error generating prompt. Please try again.');
+        return;
+      }
+
+      // Poll until we get the result
+      let attempts = 0;
+      let output;
+      while (attempts < 10) {
+        // Maximum 10 attempts
+        output = await axios.get(
+          '/api/imageresults?url=' + rawPrompt.data.status_url
+        );
+        console.log(
+          'Image processing results (attempt ' + (attempts + 1) + '):',
+          output.data
+        );
+
+        if (output.data.status === 'COMPLETED' && output.data.response_url) {
+          const result = await axios.get(
+            '/api/imageresults?url=' + output.data.response_url
+          );
+          console.log('Final image processing result:', result.data);
+
+          if (result.data.output) {
+            let subjectText;
+            if (Array.isArray(result.data.output)) {
+              subjectText = result.data.output.join('');
+              // Only remove quotes if they exist at start and end
+              if (subjectText.startsWith('"') && subjectText.endsWith('"')) {
+                subjectText = subjectText.slice(1, -1);
+              }
+            } else {
+              subjectText = result.data.output;
+            }
+            console.log('Generated subject text:', subjectText);
+
+            // Now create a video prompt using anyLlm
+            const promptInstruction = `I have this subject: ${subjectText}\n\nCreate a detailed video prompt that describes how this subject should be animated in a video. The prompt should specify the motion, camera movement, and visual effects that would make an engaging product video. Focus on describing the animation and movement.`;
+
+            const llmResponse = await axios.post('/api/anyLlm', null, {
+              params: {
+                promptArray: promptInstruction,
+                user: user.id
+              }
+            });
+            console.log('Initial AnyLlm API Response:', llmResponse.data);
+
+            // Poll until we get the final result
+            let llmAttempts = 0;
+            let llmOutput;
+            while (llmAttempts < 10) {
+              // Maximum 10 attempts
+              llmOutput = await axios.get(
+                '/api/imageresults?url=' + llmResponse.data.status_url
+              );
+              console.log(
+                'AnyLlm poll attempt ' + (llmAttempts + 1) + ':',
+                llmOutput.data
+              );
+
+              if (llmOutput.data.status === 'COMPLETED') {
+                const finalResult = await axios.get(
+                  '/api/imageresults?url=' + llmOutput.data.response_url
+                );
+                console.log('Final AnyLlm result:', finalResult.data);
+                setImg2vidPrompt(finalResult.data.output);
+                return;
+              }
+
+              // Wait 3 seconds before next attempt
+              await new Promise((resolve) => setTimeout(resolve, 3000));
+              llmAttempts++;
+            }
+
+            console.log('Failed to get AnyLlm result after all attempts');
+            // Fall back to using the subject text directly
+            setImg2vidPrompt(
+              `Animate ${subjectText} with smooth camera movement`
+            );
+            return;
+          } else {
+            throw new Error('No output received from image processing');
+          }
+        }
+
+        // Wait 3 seconds before next attempt
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        attempts++;
+      }
+
+      if (!output?.data?.status === 'COMPLETED') {
+        console.error('Failed to process image after all attempts');
+        alert('Failed to generate prompt. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error generating prompt:', error);
+      alert('Error generating prompt. Please try again.');
+    }
+  };
+
   const download = (url) => {
     saveAs(url, 'video');
   };
@@ -996,55 +1122,58 @@ export default function ImageToVideo() {
                   <option value="9:16">9:16</option>
                   {/*<option value="auto">Default</option>*/}
                 </select>
+                <p>What kind of video do you want?</p>
+                <select
+                  value={videoType}
+                  onChange={(e) => setVideoType(e.target.value)}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="None">None</option>
+                  <option value="Product showcase">Product showcase</option>
+                  <option value="in use">in use</option>
+                  <option value="before-after transformation">
+                    before-after transformation
+                  </option>
+                  {/*<option value="auto">Default</option>*/}
+                </select>
 
-                <div className="flex flex-wrap gap-2">
-                  <p>Prompt Ideas</p>
-                </div>
-                {/* Prompt suggestion chips */}
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setImg2vidPrompt(
-                        'Show a customer using the product and looking satisfied.'
-                      )
-                    }
-                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
-                  >
-                    Show product in use
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setImg2vidPrompt(
-                        'Start with the messy/problem state, then cut to the product solving it.'
-                      )
-                    }
-                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
-                  >
-                    Before/after effect
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setImg2vidPrompt(
-                        'Start with a fast close-up of the product, then zoom out to reveal the full scene.'
-                      )
-                    }
-                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
-                  >
-                    Attention-grab hook
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setImg2vidPrompt('Camera is fixed timelapse.')
-                    }
-                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
-                  >
-                    Timelapse effect
-                  </button>
-                </div>
+                <p>Where should it happen?</p>
+                <select
+                  value={videoLocationSetting}
+                  onChange={(e) => setVideoLocationSetting(e.target.value)}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="None">None</option>
+                  <option value="studio">studio</option>
+                  <option value="home">home</option>
+                  <option value="outdoor">outdoor</option>
+                  <option value="cafe">cafe</option>
+                  <option value="gym">gym</option>
+                  {/*<option value="auto">Default</option>*/}
+                </select>
+
+                <p>What should the motion feel like?</p>
+                <select
+                  value={videoMotionType}
+                  onChange={(e) => setVideoMotionType(e.target.value)}
+                  className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+                >
+                  <option value="None">None</option>
+                  <option value="slow">slow</option>
+                  <option value="smooth">smooth</option>
+                  <option value="dramatic">dramatic</option>
+                  <option value="handheld">handheld</option>
+                  <option value="close-up">close-up</option>
+                  {/*<option value="auto">Default</option>*/}
+                </select>
+
+                <button
+                  onClick={suggestPromptSingleImage}
+                  className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!activeImageLink || isVideoLoading}
+                >
+                  Need Help? Generate Prompt
+                </button>
 
                 <textarea
                   value={img2vidPrompt}
