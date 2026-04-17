@@ -24,6 +24,8 @@ export default function ImageToVideo() {
   const [showImage, setShowImage] = useState(false);
   const [isFromOtherPage, setIsFromOtherPage] = useState(false);
   const [localImageLink, setLocalImageLink] = useState(null); // Local image for this page
+  const [duration, setDuration] = useState(4); // Local image for this page
+
   const router = useRouter();
 
   const {
@@ -496,7 +498,8 @@ export default function ImageToVideo() {
           '&image=' +
           image +
           `&user=${user.id}` +
-          `&aspect_ratio=${selectedAspectRatio}`
+          `&aspect_ratio=${selectedAspectRatio}` +
+          `&duration=${duration}`
       );
 
       if (!videoResp?.data) {
@@ -840,23 +843,17 @@ export default function ImageToVideo() {
           </div>
         )}
 
+        <p className="text-[#A1A1AA] mb-6">Choose an image to animate.</p>
         <p className="text-[#A1A1AA] mb-6">
-          Create a short 5-second TikTok/Reel-style clip from a product photo.
-          Great as a quick scroll-stopper, not a high-end cinematic ad.
-        </p>
-        <p className="text-[#A1A1AA] mb-6">
-          Best results with images generated in BrandPix (create image{' '}
+          Use a BrandPix-generated image (create one{' '}
           <Link href="/pix-blender" className="underline hover:text-white">
             here
           </Link>
-          ).
-        </p>
-        <p className="text-[#A1A1AA] mb-6">
-          Select photo from{' '}
+          ) or select one from your{' '}
           <Link href="/image-gallery" className="underline hover:text-white">
             image gallery
           </Link>{' '}
-          (paid plan), or upload a product photo.
+          (paid plan).
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
@@ -869,9 +866,8 @@ export default function ImageToVideo() {
               <p>✅ Using a BrandPix image – best quality for animations.</p>
             ) : (
               <p>
-                ℹ️ Using your own photo is fine. For smoother lighting & edges,
-                you'll get best results with images generated in BrandPix first
-                (start{' '}
+                ℹ️ Your own photo works too. For smoother lighting and edges,
+                BrandPix-generated images usually animate best (start{' '}
                 <Link
                   href="/pix-blender"
                   className="underline hover:text-white"
@@ -953,10 +949,19 @@ export default function ImageToVideo() {
                   <p className="text-sm text-[#A1A1AA]">
                     {isVideoLoading
                       ? 'Cannot upload image while generating video'
-                      : 'Drag and drop your image here, or click to select'}
+                      : 'Choose from generated images, gallery, or upload one here'}
                   </p>
                 </div>
               )}
+              <p>Select Duration</p>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
+              >
+                <option value="4s">4</option>
+                <option value="6s">6</option>
+              </select>
             </div>
           </section>
 
@@ -968,17 +973,21 @@ export default function ImageToVideo() {
 
             <div className="bg-[#181818] rounded-2xl p-8 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
               <div className="space-y-4">
+                <p>Select Aspect Ratio</p>
                 <select
                   value={selectedAspectRatio}
                   onChange={(e) => setSelectedAspectRatio(e.target.value)}
                   className="w-full p-3 bg-[#0F0F0F] border border-[#27272A] rounded-lg text-white focus:outline-none focus:border-[#8256FF] transition-colors duration-200 motion-reduce:transition-none"
                 >
-                  <option value="auto">auto</option>
+                  <option value="auto">Default</option>
                   <option value="16:9">16:9</option>
                   <option value="9:16">9:16</option>
                   {/*<option value="auto">Default</option>*/}
                 </select>
 
+                <div className="flex flex-wrap gap-2">
+                  <p>Prompt Ideas</p>
+                </div>
                 {/* Prompt suggestion chips */}
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -1013,6 +1022,15 @@ export default function ImageToVideo() {
                     className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
                   >
                     Attention-grab hook
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImg2vidPrompt('Camera is fixed timelapse.')
+                    }
+                    className="px-3 py-1.5 text-xs font-medium bg-[#27272A] text-[#E4E4E7] rounded-full hover:bg-[#3F3F46] transition-colors duration-200 motion-reduce:transition-none border border-[#3F3F46] hover:border-[#52525B]"
+                  >
+                    Timelapse effect
                   </button>
                 </div>
 

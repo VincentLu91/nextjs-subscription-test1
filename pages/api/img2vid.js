@@ -3,9 +3,9 @@ import { deductUserVideoGenerationToken } from '../../utils/useDatabase';
 
 export default async function POST(req, res) {
   // it's a POST request...
-  const { user_prompt, image, user, aspect_ratio } = req.query;
+  const { user_prompt, image, user, aspect_ratio, duration } = req.query;
   try {
-    let result = await deductUserVideoGenerationToken(user, 1);
+    let result = await deductUserVideoGenerationToken(user, duration);
 
     if (!result)
       return res.status(403).json({
@@ -23,7 +23,7 @@ Use smooth camera motion (no chaotic movement).
 Match this scene description: ${user_prompt}.
 Avoid adding any text, logos, or watermarks in the video.`,
         aspect_ratio: aspect_ratio,
-        duration: '6s' // veo 3.1, other options include '4s' and '8s'
+        duration: duration
       },
       {
         headers: {
