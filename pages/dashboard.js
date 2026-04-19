@@ -146,11 +146,11 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 relative">
           <div className="sm:flex sm:flex-col sm:align-center mb-16">
             <h1 className="text-4xl font-extrabold text-[#FAFAFA] sm:text-center sm:text-6xl animate-on-scroll">
-              Your Social Media Suite for eCommerce
+              Get Social Media Posts. Fast.
             </h1>
             <p className="mt-4 text-[#B0B0B0] sm:text-center text-xl animate-on-scroll">
-              Tools to create photos, videos, and captions of your product for
-              TikTok and Instagram
+              Create product content for TikTok and Instagram with a faster,
+              simpler workflow.
             </p>
             {/* A/B test:
             1. Headline: From Idea to Reel in Seconds
@@ -192,7 +192,7 @@ export default function Dashboard() {
                 <p className="text-lg">1. Upload a product photo</p>
                 <p className="text-lg">2. Turn it into a lifestyle image</p>
                 <p className="text-lg text-[#B0B0B0]">
-                  3. (Optional) Animate it into a 5-sec video + caption
+                  3. (Optional) Animate it into a quick Reels/TikTok + caption
                 </p>
               </div>
               <div className="flex justify-center">
@@ -304,7 +304,7 @@ export default function Dashboard() {
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
                     Step 2 (optional): Turn your BrandPix product image into a
-                    short 5-sec TikTok/Reel clip.
+                    short TikTok/Reel clip.
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 
