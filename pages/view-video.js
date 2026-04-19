@@ -363,7 +363,7 @@ export default function ViewVideo() {
                     Keep doing this every week?
                   </p>
                   <p className="text-sm text-[#A1A1AA] mb-4">
-                    This flow (image → 5-sec video → caption) is included in the{' '}
+                    This flow (image → short video → caption) is included in the{' '}
                     <span className="text-[#8256FF] font-semibold">
                       Standard
                     </span>{' '}
