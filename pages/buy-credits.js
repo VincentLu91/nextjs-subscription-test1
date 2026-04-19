@@ -96,6 +96,8 @@ export default function BuyCredits() {
   const [loading, setLoading] = useState(false);
   const [customer, setCustomer] = useState(null);
   const [tokenType, setTokenType] = useState('image_tokens');
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
   const router = useRouter();
   const { user, isLoadingUser } = useUser();
 
@@ -106,17 +108,29 @@ export default function BuyCredits() {
   }, [user, isLoadingUser, router]);
 
   useEffect(() => {
-    const fetchCustomer = async () => {
+    const fetchCustomerAndSubscription = async () => {
       if (user) {
-        const { data } = await supabase
+        // Fetch customer data
+        const { data: customerData } = await supabase
           .from('customers')
           .select('*')
           .eq('id', user.id)
           .single();
-        setCustomer(data);
+        setCustomer(customerData);
+
+        // Check subscription status
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .single();
+
+        setHasActiveSubscription(!!subscription);
+        setIsCheckingSubscription(false);
       }
     };
-    fetchCustomer();
+    fetchCustomerAndSubscription();
   }, [user]);
 
   const purchaseCredits = async (pkg) => {
@@ -219,6 +233,49 @@ export default function BuyCredits() {
           </div>
         )}
 
+        {/* Subscription Required Warning for Video/Caption Tokens */}
+        {!hasActiveSubscription &&
+          !isCheckingSubscription &&
+          (tokenType === 'video_tokens' || tokenType === 'caption_tokens') && (
+            <div className="max-w-3xl mx-auto mb-8 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="w-6 h-6 text-yellow-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-yellow-500 mb-2">
+                    Active Subscription Required
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    {tokenType === 'video_tokens'
+                      ? 'Video tokens'
+                      : 'Caption tokens'}{' '}
+                    are only available to users with an active subscription.
+                    Please subscribe to a plan first before purchasing
+                    additional credits.
+                  </p>
+                  <Link href="/pricing">
+                    <button className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-indigo-500/40 transition-all">
+                      View Subscription Plans
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
         {/* Token Type Tabs */}
         <div className="flex justify-center gap-4 mb-12">
           <button
@@ -240,6 +297,9 @@ export default function BuyCredits() {
             }`}
           >
             Video Tokens
+            {!hasActiveSubscription && !isCheckingSubscription && (
+              <span className="ml-2 text-xs">🔒</span>
+            )}
           </button>
           <button
             onClick={() => setTokenType('caption_tokens')}
@@ -250,6 +310,9 @@ export default function BuyCredits() {
             }`}
           >
             Caption Tokens
+            {!hasActiveSubscription && !isCheckingSubscription && (
+              <span className="ml-2 text-xs">🔒</span>
+            )}
           </button>
         </div>
 
@@ -273,15 +336,25 @@ export default function BuyCredits() {
               </div>
               <button
                 onClick={() => purchaseCredits(pkg)}
-                disabled={loading || !pkg.stripe_price_id}
+                disabled={
+                  loading ||
+                  !pkg.stripe_price_id ||
+                  ((tokenType === 'video_tokens' ||
+                    tokenType === 'caption_tokens') &&
+                    !hasActiveSubscription)
+                }
                 className="w-full mt-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-medium
                   transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading
                   ? 'Processing...'
-                  : pkg.stripe_price_id
-                    ? 'Purchase'
-                    : 'Coming Soon'}
+                  : !pkg.stripe_price_id
+                    ? 'Coming Soon'
+                    : (tokenType === 'video_tokens' ||
+                          tokenType === 'caption_tokens') &&
+                        !hasActiveSubscription
+                      ? 'Subscription Required'
+                      : 'Purchase'}
               </button>
             </div>
           ))}
