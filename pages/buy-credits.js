@@ -218,7 +218,9 @@ export default function BuyCredits() {
                 </div>
               </div>
               <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-xl p-6 border border-blue-500/30">
-                <div className="text-sm text-gray-400 mb-2">Video Tokens</div>
+                <div className="text-sm text-gray-400 mb-2">
+                  Video Seconds Tokens
+                </div>
                 <div className="text-3xl font-bold text-blue-400">
                   {customer.video_tokens || 0}
                 </div>
@@ -260,7 +262,7 @@ export default function BuyCredits() {
                   </h3>
                   <p className="text-gray-300 mb-4">
                     {tokenType === 'video_tokens'
-                      ? 'Video tokens'
+                      ? 'Video seconds tokens'
                       : 'Caption tokens'}{' '}
                     are only available to users with an active subscription.
                     Please subscribe to a plan first before purchasing
@@ -296,7 +298,7 @@ export default function BuyCredits() {
                 : 'bg-white/5 text-white/85 hover:bg-white/10'
             }`}
           >
-            Video Tokens
+            Video Seconds Tokens
             {!hasActiveSubscription && !isCheckingSubscription && (
               <span className="ml-2 text-xs">🔒</span>
             )}

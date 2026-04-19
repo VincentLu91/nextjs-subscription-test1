@@ -262,7 +262,7 @@ export default function Pricing({ products }) {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      {videoTokens} short product videos (5 sec)
+                      {videoTokens} seconds of video generation
                     </li>
                     {/*<li className="flex items-center text-[rgba(255,255,255,0.55)]">
                       <svg
@@ -297,11 +297,6 @@ export default function Pricing({ products }) {
                       {captionTokens} caption creation credits
                     </li>
                   </ul>
-
-                  <p className="mt-6 text-xs font-bold text-[rgba(255,255,255,0.7)] leading-relaxed">
-                    Videos are short 5-second TikTok/Reel clips – great for
-                    quick scroll-stoppers, not high-end cinematic brand films.
-                  </p>
 
                   <button
                     disabled={session && !userLoaded}
