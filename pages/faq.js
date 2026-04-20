@@ -50,41 +50,42 @@ const FAQItem = ({ question, answer, id }) => {
 const faqData = [
   {
     id: 1,
-    question: 'Can Brandpix.ai be used for ads?',
+    question: 'How is BrandPix different from other AI creative tools?',
     answer:
-      'Absolutely. We generate ad-ready visuals and copy that you can use across Meta, TikTok, Google, and more. The focus is on strong creative - use the same assets for organic posting while you build presence, and for paid campaigns when you scale. Brandpix.ai is designed to be flexible for your marketing and creative needs. Just treat captions as "copy".'
+      'BrandPix is built to help you turn product photos into a simple weekly content pack. Instead of bouncing between lots of controls, models, and workflows, you can generate images, short videos, and captions in one place with less trial and error.'
   },
   {
     id: 2,
-    question: 'How do I turn images into short videos?',
+    question:
+      'Do I need to know prompting or photography terms to use BrandPix?',
     answer:
-      'When you generate an image, you use that image to animate into a short video clip. Simple describe what you want the video to look like and it will created for you.'
+      'No. You can describe your scene idea in plain language, use a preset, or upload reference images. BrandPix is designed so you do not need to learn complex prompt tricks or camera jargon just to get usable content.'
   },
   {
     id: 3,
-    question:
-      'Can the AI write captions from my images/videos and brand voice?',
+    question: 'Why use BrandPix if I already have access to other AI tools?',
     answer:
-      "Yes! Our AI's capable of generating captions from reading both your instruction and the AI image or video."
+      'If you already know other tools, BrandPix may still save you time. It is designed for people who are tired of spending too long tweaking prompts, testing workflows, and chasing one usable post. The goal is a simpler path from product photo to finished content. For small physical product and solo ecomm businesses, this drastically puts them on even playing field with bigger brands. '
   },
   {
     id: 4,
-    question: 'Where do I use the AI generated assets?',
+    question: 'What kind of content can I make with one product photo?',
     answer:
-      'The assets are yours. Everything you generate belongs to you. You are free to use them for your organic social media pages, or even for making ads.'
+      'You can turn one product photo into a small content pack that may include styled product images, short videos, and captions for platforms like TikTok and Instagram. It is meant to help you build a buffer of content for busy weeks.'
   },
   {
     id: 5,
-    question: 'What types of visual content is the AI capable of making?',
+    question:
+      'Is BrandPix for beginners or people already familiar with AI tools?',
     answer:
-      'Currently it generates product images and videos. However as new advancements emerge, we will enable new cases.'
+      'Both can use it, but it is especially helpful for people who already know AI creative tools and want a simpler workflow. If you are tired of bloated interfaces, too much trial and error, or overthinking every prompt, BrandPix is built with that in mind.'
   },
   {
     id: 6,
     question:
-      'Are these videos like high-end agency / Runway / Kive style ads?',
+      'Which models does BrandPix use to generate content, and can I choose which ones to use?',
     answer:
-      'At the moment, they’re optimized for fast, 5-second product clips you can drop into TikTok/Reels or ads. Think “quick motion to catch attention,” not big-budget cinematic commercials.'
+      'BrandPix uses a curated mix of models behind the scenes for images, videos, and captions. Rather than exposing lots of bloated controls, we keep the workflow simple so you can focus on creating content instead of comparing models. As the technology improves, we’ll continue updating the models inside BrandPix.'
   }
 ];
 
