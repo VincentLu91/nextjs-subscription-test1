@@ -117,8 +117,8 @@ export default function ViewImage() {
     try {
       const rawCaption = await axios.post(
         '/api/imageCaption?prompt=' +
+          'Please provide a concise and engaging social media-style caption that could be used for TikTok and Instagram: ' +
           prompt +
-          'in the style of a social media caption' +
           '&imageLink=' +
           imageLink +
           `&user=${user.id}`
