@@ -127,8 +127,8 @@ export default function ViewVideo() {
     } else {
       const rawCaption = await axios.post(
         '/api/videoCaption?prompt=' +
+          'Please provide a concise and engaging social media-style caption that could be used for TikTok and Instagram: ' +
           prompt +
-          'in the style of a social media caption' +
           '&videoLink=' +
           videoLink +
           `&user=${user.id}`

@@ -1109,6 +1109,7 @@ export default function ImageToVideo() {
               >
                 <option value="4s">4s</option>
                 <option value="6s">6s</option>
+                <option value="8s">8s</option>
               </select>
             </div>
           </section>
