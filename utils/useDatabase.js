@@ -77,10 +77,10 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
         id: uuid,
         stripe_customer_id: customer.id,
         // Preserve existing token values or default to 0
-        image_tokens: existingCustomer?.image_tokens || 0, // || instead of &&, 3 instead of 0
+        image_tokens: existingCustomer?.image_tokens || 3, // || instead of &&, 3 instead of 0
         training_tokens: existingCustomer?.training_tokens || 0,
-        caption_tokens: existingCustomer?.caption_tokens || 0,
-        video_tokens: existingCustomer?.video_tokens || 0
+        caption_tokens: existingCustomer?.caption_tokens || 4,
+        video_tokens: existingCustomer?.video_tokens || 1
       });
 
     if (supabaseError) {
