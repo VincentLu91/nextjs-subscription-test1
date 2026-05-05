@@ -22,6 +22,7 @@ export default function GenerateImages() {
   const [photoData, setPhotoData] = useState(null);
   const [resultImages, setResultImages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [productImageIndex, setProductImageIndex] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [promptObject, setPromptObject] = useState(null);
@@ -76,6 +77,7 @@ export default function GenerateImages() {
   const clearUserData = () => {
     // Clear state
     setUploadedImages([]);
+    setProductImageIndex(null);
     setImageForBg(null);
     setPixBlenderImageList([]);
     setPixBlenderPredictions({});
@@ -191,7 +193,21 @@ export default function GenerateImages() {
 
   function deleteImage(index) {
     const newImages = uploadedImages.filter((_, i) => i !== index);
+
     setUploadedImages(newImages);
+
+    setProductImageIndex((currentIndex) => {
+      if (currentIndex === null) return null;
+
+      // If the deleted image was the selected product, clear the selection.
+      if (currentIndex === index) return null;
+
+      // If an image before the selected product was deleted, shift index left.
+      if (currentIndex > index) return currentIndex - 1;
+
+      return currentIndex;
+    });
+
     // Reset the generate attempt state to allow fresh generation
     setHasAttemptedGenerate(false);
 
@@ -199,6 +215,11 @@ export default function GenerateImages() {
     if (newImages.length === 0) {
       sessionStorage.removeItem('pixBlenderUploadedImages');
     }
+  }
+
+  function selectProductImage(index) {
+    setProductImageIndex(index);
+    setHasAttemptedGenerate(false);
   }
 
   function onDragOver(event) {
@@ -264,10 +285,16 @@ export default function GenerateImages() {
         throw new Error('No images were successfully uploaded');
       }
 
+      // First URL is the selected Product image; the rest are references
+      const productImageUrl = urls[0];
+      const referenceImageUrls = urls.slice(1);
+
       // Send images to API
       const resp = await axios.post('/api/blendImages', {
         prompt: pixBlenderPrompt,
-        images: urls,
+        images: urls, // keep for backwards compatibility
+        productImageUrl,
+        referenceImageUrls,
         user: user.id,
         image_size: selectedImageSize,
         stylePrompt: stylePrompt
@@ -434,7 +461,9 @@ export default function GenerateImages() {
 
     const prompts = [];
 
-    for (const image of uploadedImages) {
+    const selectedProductImage = uploadedImages[productImageIndex];
+
+    for (const image of [selectedProductImage]) {
       console.log('Processing image:', image.url);
       try {
         // Upload image to Supabase first
@@ -980,7 +1009,7 @@ export default function GenerateImages() {
                 <p className="text-sm text-[#A1A1AA]">
                   {isDragging
                     ? 'Drop files here'
-                    : 'Add your product photo and (optional) reference images'}
+                    : 'Add your product photo first. Then add optional style references.'}
                 </p>
               </div>
 
@@ -996,6 +1025,19 @@ export default function GenerateImages() {
                         className="absolute top-2 right-2 w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-opacity-70"
                       >
                         &times;
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => selectProductImage(index)}
+                        className={`absolute bottom-2 left-2 z-10 rounded-full px-2 py-1 text-xs font-semibold ${
+                          productImageIndex === index
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-black bg-opacity-60 text-white hover:bg-opacity-80'
+                        }`}
+                      >
+                        {productImageIndex === index
+                          ? 'Product'
+                          : 'Set as product'}
                       </button>
                       <img
                         src={image.url}
@@ -1092,7 +1134,7 @@ export default function GenerateImages() {
                         return;
                       }
 
-                      // Check if any of the images contain a product
+                      // Check if the selected product image actually contains a product
                       try {
                         let hasProduct = false;
                         for (const image of uploadedImages) {
@@ -1154,7 +1196,7 @@ export default function GenerateImages() {
 
                         if (!hasProduct) {
                           alert(
-                            'Please upload at least one product image. None of the uploaded images appear to contain a product.'
+                            'The image marked as Product does not look like a standalone product. Please choose the product image before generating.'
                           );
                           return;
                         }
@@ -1192,19 +1234,43 @@ export default function GenerateImages() {
                           'setIsGeneratingBlenderImg set TRUE 920---'
                         );
                         setIsGeneratingBlenderImg(true);
+                        if (
+                          uploadedImages.length > 0 &&
+                          productImageIndex === null
+                        ) {
+                          alert(
+                            'Please choose which uploaded image is the product first.'
+                          );
+                          return;
+                        }
+                        // Put the selected product image first, then treat the rest as references
+                        // Upload order does not matter.
+                        // The user-selected Product image is moved first only for the generation payload.
+                        if (productImageIndex === null) {
+                          alert('Select which image is the product first.');
+                          return;
+                        }
+
+                        const imagesForGeneration = [
+                          uploadedImages[productImageIndex],
+                          ...uploadedImages.filter(
+                            (_, index) => index !== productImageIndex
+                          )
+                        ];
 
                         // Process all images at once
                         for (let i = 0; i < ATTEMPTS; i++) {
                           const result = await getImage(
                             i,
                             pixBlenderPrompt,
-                            uploadedImages
+                            imagesForGeneration
                           );
                           if (!result) return; // Stop if there was an error
                         }
 
                         // Clear uploaded images after successful generation
                         setUploadedImages([]);
+                        setProductImageIndex(null);
                         setHasAttemptedGenerate(false); // Reset since we're starting fresh
                         await fetchCredits('post-gen', { silent: true });
                       } catch (error) {
@@ -1217,9 +1283,16 @@ export default function GenerateImages() {
                     disabled={
                       isGeneratingBlenderImg ||
                       !pixBlenderPrompt?.trim() ||
-                      uploadedImages.length === 0
+                      uploadedImages.length === 0 ||
+                      productImageIndex === null
                     }
-                    className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${uploadedImages.length === 0 ? 'bg-[#4A4A4A] cursor-not-allowed' : ''} ${isGeneratingBlenderImg ? 'bg-[#4A4A4A] cursor-not-allowed' : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'}`}
+                    className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${
+                      isGeneratingBlenderImg ||
+                      uploadedImages.length === 0 ||
+                      productImageIndex === null
+                        ? 'bg-[#4A4A4A] cursor-not-allowed'
+                        : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'
+                    }`}
                   >
                     {isGeneratingBlenderImg ? (
                       <span className="flex items-center justify-center">

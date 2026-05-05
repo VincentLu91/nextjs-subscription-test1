@@ -37,10 +37,30 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { prompt, images, user, image_size, stylePrompt } = req.body; // Expect 'images' to be an array
+  const {
+    prompt,
+    images,
+    productImageUrl,
+    referenceImageUrls = [],
+    user,
+    image_size,
+    stylePrompt
+  } = req.body;
 
-  if (!Array.isArray(images)) {
-    return res.status(400).json({ error: 'images must be an array of URLs' });
+  const imageUrlsForEdit = productImageUrl
+    ? [productImageUrl, ...referenceImageUrls]
+    : images;
+
+  console.log('BrandPix image roles:', {
+    hasProductImageUrl: Boolean(productImageUrl),
+    referenceImageCount: referenceImageUrls.length,
+    totalImageUrlsForEdit: imageUrlsForEdit?.length || 0
+  });
+
+  if (!Array.isArray(imageUrlsForEdit) || imageUrlsForEdit.length === 0) {
+    return res
+      .status(400)
+      .json({ error: 'imageUrlsForEdit must be an array of URLs' });
   }
 
   try {
@@ -60,7 +80,7 @@ export default async function handler(req, res) {
       //'https://queue.fal.run/fal-ai/bytedance/seedream/v5/lite/edit', // seedream v5 lite
       'https://queue.fal.run/fal-ai/nano-banana-2/edit', // nano banana pro
       {
-        image_urls: images, // Pass the array directly
+        image_urls: imageUrlsForEdit, // Pass the array directly
         prompt: fullPrompt,
         num_images: 1,
         //max_images: 1,
