@@ -1166,7 +1166,7 @@ export default function GenerateImages() {
                       );
 
                       try {
-                        let hasProduct = false;
+                        const invalidProductImageNames = [];
 
                         for (const image of selectedProductImages) {
                           const response = await fetch(image.url);
@@ -1181,13 +1181,19 @@ export default function GenerateImages() {
                             .from('images')
                             .upload(filePath, blob);
 
-                          if (error) continue;
+                          if (error) {
+                            invalidProductImageNames.push(image.name);
+                            continue;
+                          }
 
                           const { data: publicUrlData } = supabase.storage
                             .from('images')
                             .getPublicUrl(filePath);
 
-                          if (!publicUrlData) continue;
+                          if (!publicUrlData?.publicUrl) {
+                            invalidProductImageNames.push(image.name);
+                            continue;
+                          }
 
                           const productCheck = await axios.post(
                             '/api/isProduct',
@@ -1200,34 +1206,45 @@ export default function GenerateImages() {
                           );
 
                           let attempts = 0;
+                          let isProduct = false;
+
                           while (attempts < 10) {
                             const output = await axios.get(
                               '/api/captionresults?url=' +
                                 productCheck.data.urls.get
                             );
+
                             if (output.data.status === 'succeeded') {
                               const result = output.data.output;
+
                               if (result && result.length > 0) {
-                                const response = result
+                                const checkResponse = result
                                   .join('')
                                   .toLowerCase()
                                   .trim();
-                                if (response === 'yes') {
-                                  hasProduct = true;
-                                }
+
+                                isProduct = checkResponse === 'yes';
                               }
+
                               break;
                             }
+
                             attempts++;
                             await new Promise((resolve) =>
                               setTimeout(resolve, 2000)
                             );
                           }
+
+                          if (!isProduct) {
+                            invalidProductImageNames.push(image.name);
+                          }
                         }
 
-                        if (!hasProduct) {
+                        if (invalidProductImageNames.length > 0) {
                           alert(
-                            'The image marked as Product does not look like a standalone product. Please choose the product image before generating.'
+                            `These Product-marked images do not look like standalone products:\n\n${invalidProductImageNames.join(
+                              '\n'
+                            )}\n\nPlease unmark them or choose different product images before generating.`
                           );
                           return;
                         }
