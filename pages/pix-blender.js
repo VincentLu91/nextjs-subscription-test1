@@ -27,6 +27,7 @@ export default function GenerateImages() {
   const fileInputRef = useRef(null);
   const [promptObject, setPromptObject] = useState(null);
   const [promptStatus, setPromptStatus] = useState(null);
+  const [isPromptGenerating, setIsPromptGenerating] = useState(false);
   const [hasAttemptedGenerate, setHasAttemptedGenerate] = useState(false);
   const [selectedImageSize, setSelectedImageSize] = useState('square_hd');
   const [stylePreset, setStylePreset] = useState('None');
@@ -472,6 +473,8 @@ export default function GenerateImages() {
   };
 
   const suggestPromptMultiImages = async () => {
+    if (isPromptGenerating) return [];
+
     if (uploadedImages.length === 0) {
       alert('Please add some images first!');
       return [];
@@ -482,116 +485,122 @@ export default function GenerateImages() {
       return [];
     }
 
-    const prompts = [];
+    setIsPromptGenerating(true);
 
-    const productImagesForPrompt = uploadedImages.filter((_, index) =>
-      productImageIndices.includes(index)
-    );
-
-    for (const image of productImagesForPrompt) {
-      console.log('Processing image:', image.url);
-      try {
-        // Upload image to Supabase first
-        const response = await fetch(image.url);
-        const blob = await response.blob();
-        const fileExt = image.name.split('.').pop().toLowerCase();
-        const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
-
-        const { data, error } = await supabase.storage
-          .from('images')
-          .upload(filePath, blob);
-
-        if (error) {
-          console.error('Failed to upload image:', error.message);
-          continue;
-        }
-
-        const { data: publicUrlData } = supabase.storage
-          .from('images')
-          .getPublicUrl(filePath);
-
-        if (!publicUrlData) {
-          console.error('Failed to get public URL for image');
-          continue;
-        }
-
-        const rawPrompt = await axios.post('/api/extractSubject', null, {
-          params: {
-            imageLink: publicUrlData.publicUrl,
-            user: user.id
-          }
-        });
-        console.log('Raw prompt response:', rawPrompt.data);
-
-        if (!rawPrompt.data.status_url) {
-          console.error('No status URL received from extractSubject API');
-          continue;
-        }
-
-        // Poll until we get the result
-        let attempts = 0;
-        let output;
-        while (attempts < 10) {
-          // Maximum 10 attempts
-          output = await axios.get(
-            '/api/imageresults?url=' + rawPrompt.data.status_url
-          );
-          console.log(
-            'Image processing results (attempt ' + (attempts + 1) + '):',
-            output.data
-          );
-
-          if (output.data.status === 'COMPLETED' && output.data.response_url) {
-            const result = await axios.get(
-              '/api/imageresults?url=' + output.data.response_url
-            );
-            console.log('Final image processing result:', result.data);
-
-            if (result.data.output) {
-              let promptText;
-              if (Array.isArray(result.data.output)) {
-                promptText = result.data.output.join('');
-                // Only remove quotes if they exist at start and end
-                if (promptText.startsWith('"') && promptText.endsWith('"')) {
-                  promptText = promptText.slice(1, -1);
-                }
-              } else {
-                promptText = result.data.output;
-              }
-              console.log('Generated prompt text:', promptText);
-              prompts.push(promptText);
-            }
-            break;
-          }
-
-          // Wait 3 seconds before next attempt
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-          attempts++;
-        }
-
-        if (!output?.data?.status === 'COMPLETED') {
-          console.error(
-            'Failed to process image after all attempts for image:',
-            image.url
-          );
-        }
-      } catch (error) {
-        console.error('Error processing image:', image.url, error);
-      }
-    }
-
-    // Send prompts to anyLlm API and poll for result
     try {
-      // Format prompts into a descriptive list
+      const prompts = [];
+      const productImagesForPrompt = uploadedImages.filter((_, index) =>
+        productImageIndices.includes(index)
+      );
+
+      for (const image of productImagesForPrompt) {
+        console.log('Processing image:', image.url);
+
+        try {
+          const response = await fetch(image.url);
+          const blob = await response.blob();
+          const fileExt = image.name.split('.').pop().toLowerCase();
+          const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
+
+          const { data, error } = await supabase.storage
+            .from('images')
+            .upload(filePath, blob);
+
+          if (error) {
+            console.error('Failed to upload image:', error.message);
+            continue;
+          }
+
+          const { data: publicUrlData } = supabase.storage
+            .from('images')
+            .getPublicUrl(filePath);
+
+          if (!publicUrlData) {
+            console.error('Failed to get public URL for image');
+            continue;
+          }
+
+          const rawPrompt = await axios.post('/api/extractSubject', null, {
+            params: {
+              imageLink: publicUrlData.publicUrl,
+              user: user.id
+            }
+          });
+
+          console.log('Raw prompt response:', rawPrompt.data);
+
+          if (!rawPrompt.data.status_url) {
+            console.error('No status URL received from extractSubject API');
+            continue;
+          }
+
+          let attempts = 0;
+          let output;
+
+          while (attempts < 10) {
+            output = await axios.get(
+              '/api/imageresults?url=' + rawPrompt.data.status_url
+            );
+
+            console.log(
+              'Image processing results (attempt ' + (attempts + 1) + '):',
+              output.data
+            );
+
+            if (
+              output.data.status === 'COMPLETED' &&
+              output.data.response_url
+            ) {
+              const result = await axios.get(
+                '/api/imageresults?url=' + output.data.response_url
+              );
+
+              console.log('Final image processing result:', result.data);
+
+              if (result.data.output) {
+                let promptText;
+
+                if (Array.isArray(result.data.output)) {
+                  promptText = result.data.output.join('');
+                  if (promptText.startsWith('"') && promptText.endsWith('"')) {
+                    promptText = promptText.slice(1, -1);
+                  }
+                } else {
+                  promptText = result.data.output;
+                }
+
+                console.log('Generated prompt text:', promptText);
+                prompts.push(promptText);
+              }
+
+              break;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            attempts++;
+          }
+
+          if (!output?.data?.status === 'COMPLETED') {
+            console.error(
+              'Failed to process image after all attempts for image:',
+              image.url
+            );
+          }
+        } catch (error) {
+          console.error('Error processing image:', image.url, error);
+        }
+      }
+
       const validPrompts = prompts.map((p) => p.trim()).filter(Boolean);
+
       if (validPrompts.length === 0) {
         throw new Error('No valid prompts generated from images');
       }
 
-      // Create a descriptive list of subjects
       const subjectsList = validPrompts
         .map((p, i) => `${i + 1}. ${p}`)
         .join('\n');
+
       const promptInstruction = `I have the following subjects:\n${subjectsList}\n\nCreate a detailed prompt that describes how to combine all of these subjects into a single image. The prompt should specify how the subjects should be arranged and interact with each other in the scene. Focus on their spatial relationship and visual composition.`;
 
       const response = await axios.post('/api/anyLlm', null, {
@@ -600,28 +609,29 @@ export default function GenerateImages() {
           user: user.id
         }
       });
+
       console.log('Initial AnyLlm API Response:', response.data);
 
-      // Poll until we get the final result
       let attempts = 0;
       let output;
+
       while (attempts < 10) {
-        // Maximum 10 attempts
         output = await axios.get(
           '/api/imageresults?url=' + response.data.status_url
         );
+
         console.log('AnyLlm poll attempt ' + (attempts + 1) + ':', output.data);
 
         if (output.data.status === 'COMPLETED') {
           const result = await axios.get(
             '/api/imageresults?url=' + output.data.response_url
           );
+
           console.log('Final AnyLlm result:', result.data);
           setPixBlenderPrompt(result.data.output);
           return result.data;
         }
 
-        // Wait 3 seconds before next attempt
         await new Promise((resolve) => setTimeout(resolve, 3000));
         attempts++;
       }
@@ -630,7 +640,9 @@ export default function GenerateImages() {
       return prompts;
     } catch (error) {
       console.error('Error with AnyLlm API:', error);
-      return prompts;
+      return [];
+    } finally {
+      setIsPromptGenerating(false);
     }
   };
 
@@ -1125,10 +1137,19 @@ export default function GenerateImages() {
                     onClick={suggestPromptMultiImages}
                     className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={
-                      uploadedImages.length === 0 || isGeneratingBlenderImg
+                      uploadedImages.length === 0 ||
+                      isPromptGenerating ||
+                      isGeneratingBlenderImg
                     }
                   >
-                    Need Help? Generate Prompt
+                    {isPromptGenerating ? (
+                      <span className="flex items-center justify-center gap-2">
+                        Generating Prompt
+                        <LoadingDots />
+                      </span>
+                    ) : (
+                      'Need Help? Generate Prompt'
+                    )}
                   </button>
                   <textarea
                     value={pixBlenderPrompt || ''}
