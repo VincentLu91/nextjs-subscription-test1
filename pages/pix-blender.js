@@ -22,7 +22,7 @@ export default function GenerateImages() {
   const [photoData, setPhotoData] = useState(null);
   const [resultImages, setResultImages] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
-  const [productImageIndex, setProductImageIndex] = useState(null);
+  const [productImageIndices, setProductImageIndices] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [promptObject, setPromptObject] = useState(null);
@@ -77,7 +77,7 @@ export default function GenerateImages() {
   const clearUserData = () => {
     // Clear state
     setUploadedImages([]);
-    setProductImageIndex(null);
+    setProductImageIndices([]);
     setImageForBg(null);
     setPixBlenderImageList([]);
     setPixBlenderPredictions({});
@@ -196,17 +196,15 @@ export default function GenerateImages() {
 
     setUploadedImages(newImages);
 
-    setProductImageIndex((currentIndex) => {
-      if (currentIndex === null) return null;
-
-      // If the deleted image was the selected product, clear the selection.
-      if (currentIndex === index) return null;
-
-      // If an image before the selected product was deleted, shift index left.
-      if (currentIndex > index) return currentIndex - 1;
-
-      return currentIndex;
-    });
+    setProductImageIndices((currentIndices) =>
+      currentIndices
+        // If the deleted image was marked Product, remove it from selection.
+        .filter((selectedIndex) => selectedIndex !== index)
+        // If an image before a selected product was deleted, shift index left.
+        .map((selectedIndex) =>
+          selectedIndex > index ? selectedIndex - 1 : selectedIndex
+        )
+    );
 
     // Reset the generate attempt state to allow fresh generation
     setHasAttemptedGenerate(false);
@@ -218,7 +216,14 @@ export default function GenerateImages() {
   }
 
   function selectProductImage(index) {
-    setProductImageIndex(index);
+    setProductImageIndices((currentIndices) => {
+      if (currentIndices.includes(index)) {
+        return currentIndices.filter((i) => i !== index);
+      }
+
+      return [...currentIndices, index];
+    });
+
     setHasAttemptedGenerate(false);
   }
 
@@ -1030,12 +1035,12 @@ export default function GenerateImages() {
                         type="button"
                         onClick={() => selectProductImage(index)}
                         className={`absolute bottom-2 left-2 z-10 rounded-full px-2 py-1 text-xs font-semibold ${
-                          productImageIndex === index
+                          productImageIndices.includes(index)
                             ? 'bg-purple-600 text-white'
                             : 'bg-black bg-opacity-60 text-white hover:bg-opacity-80'
                         }`}
                       >
-                        {productImageIndex === index
+                        {productImageIndices.includes(index)
                           ? 'Product'
                           : 'Set as product'}
                       </button>
@@ -1236,7 +1241,7 @@ export default function GenerateImages() {
                         setIsGeneratingBlenderImg(true);
                         if (
                           uploadedImages.length > 0 &&
-                          productImageIndex === null
+                          productImageIndices.length === 0
                         ) {
                           alert(
                             'Please choose which uploaded image is the product first.'
@@ -1246,7 +1251,7 @@ export default function GenerateImages() {
                         // Put the selected product image first, then treat the rest as references
                         // Upload order does not matter.
                         // The user-selected Product image is moved first only for the generation payload.
-                        if (productImageIndex === null) {
+                        if (productImageIndices.length === 0) {
                           alert('Select which image is the product first.');
                           return;
                         }
@@ -1284,12 +1289,12 @@ export default function GenerateImages() {
                       isGeneratingBlenderImg ||
                       !pixBlenderPrompt?.trim() ||
                       uploadedImages.length === 0 ||
-                      productImageIndex === null
+                      productImageIndices.length === 0
                     }
                     className={`w-full h-12 rounded-lg font-semibold text-white transition-all duration-200 motion-reduce:transition-none motion-reduce:animation-none ${
                       isGeneratingBlenderImg ||
                       uploadedImages.length === 0 ||
-                      productImageIndex === null
+                      productImageIndices.length === 0
                         ? 'bg-[#4A4A4A] cursor-not-allowed'
                         : 'bg-[#8256FF] hover:bg-[#6F48DB] animate-button-shadow'
                     }`}
