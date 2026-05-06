@@ -260,12 +260,16 @@ export default function GenerateImages() {
   const getImage = async (attempt, pixBlenderPrompt, imagesToProcess) => {
     try {
       setResultImages([]);
+
       const urls = [];
 
-      // Upload all images to Supabase
+      // Upload all ordered images to Supabase.
+      // imagesToProcess should already be ordered as:
+      // selected Product images first, then Reference images.
       for (const image of imagesToProcess) {
         const response = await fetch(image.url);
         const blob = await response.blob();
+
         const fileExt = image.name.split('.').pop().toLowerCase();
         const filePath = `${user.id}/${uuidv4()}.${fileExt}`;
 
@@ -273,16 +277,18 @@ export default function GenerateImages() {
           .from('images')
           .upload(filePath, blob);
 
+        if (error) {
+          throw new Error(`Failed to upload image: ${error.message}`);
+        }
+
         if (data) {
           const { data: publicUrlData } = supabase.storage
             .from('images')
             .getPublicUrl(filePath);
 
-          if (publicUrlData) {
+          if (publicUrlData?.publicUrl) {
             urls.push(publicUrlData.publicUrl);
           }
-        } else {
-          throw new Error(`Failed to upload image: ${error.message}`);
         }
       }
 
@@ -290,14 +296,18 @@ export default function GenerateImages() {
         throw new Error('No images were successfully uploaded');
       }
 
-      // First URL is the selected Product image; the rest are references
-      const productImageUrl = urls[0];
-      const referenceImageUrls = urls.slice(1);
+      const productImageCount = productImageIndices.length;
 
-      // Send images to API
+      const productImageUrls = urls.slice(0, productImageCount);
+      const referenceImageUrls = urls.slice(productImageCount);
+
+      // Keep the first product URL for backwards compatibility with the API.
+      const productImageUrl = productImageUrls[0];
+
       const resp = await axios.post('/api/blendImages', {
         prompt: pixBlenderPrompt,
-        images: urls, // keep for backwards compatibility
+        images: urls,
+        productImageUrls,
         productImageUrl,
         referenceImageUrls,
         user: user.id,
@@ -310,17 +320,20 @@ export default function GenerateImages() {
           ...state,
           [attempt]: resp.data
         };
-        // ✅ Store predictions in sessionStorage
+
         if (user?.id) {
           sessionStorage.setItem(
             `pixBlenderPredictions_${user.id}`,
             JSON.stringify(newState)
           );
         }
+
         return newState;
       });
+
       console.log('setIsGeneratingBlenderImg set TRUE 240---');
       setIsGeneratingBlenderImg(true);
+
       return resp.data;
     } catch (error) {
       console.error('Error in getImage:', error);
@@ -464,11 +477,18 @@ export default function GenerateImages() {
       return [];
     }
 
+    if (productImageIndices.length === 0) {
+      alert('Mark at least one image as Product first.');
+      return [];
+    }
+
     const prompts = [];
 
-    const selectedProductImage = uploadedImages[productImageIndex];
+    const productImagesForPrompt = uploadedImages.filter((_, index) =>
+      productImageIndices.includes(index)
+    );
 
-    for (const image of [selectedProductImage]) {
+    for (const image of productImagesForPrompt) {
       console.log('Processing image:', image.url);
       try {
         // Upload image to Supabase first
@@ -1140,9 +1160,15 @@ export default function GenerateImages() {
                       }
 
                       // Check if the selected product image actually contains a product
+                      // Check if the selected Product images actually contain products
+                      const selectedProductImages = uploadedImages.filter(
+                        (_, index) => productImageIndices.includes(index)
+                      );
+
                       try {
                         let hasProduct = false;
-                        for (const image of uploadedImages) {
+
+                        for (const image of selectedProductImages) {
                           const response = await fetch(image.url);
                           const blob = await response.blob();
                           const fileExt = image.name
@@ -1252,15 +1278,33 @@ export default function GenerateImages() {
                         // Upload order does not matter.
                         // The user-selected Product image is moved first only for the generation payload.
                         if (productImageIndices.length === 0) {
-                          alert('Select which image is the product first.');
+                          alert('Mark at least one image as Product first.');
                           return;
                         }
 
+                        const productImagesForGeneration =
+                          uploadedImages.filter((_, index) =>
+                            productImageIndices.includes(index)
+                          );
+
+                        const referenceImagesForGeneration =
+                          uploadedImages.filter(
+                            (_, index) => !productImageIndices.includes(index)
+                          );
+
+                        const productImagesForGeneration =
+                          productImageIndices.map(
+                            (index) => uploadedImages[index]
+                          );
+
+                        const referenceImagesForGeneration =
+                          uploadedImages.filter(
+                            (_, index) => !productImageIndices.includes(index)
+                          );
+
                         const imagesForGeneration = [
-                          uploadedImages[productImageIndex],
-                          ...uploadedImages.filter(
-                            (_, index) => index !== productImageIndex
-                          )
+                          ...productImagesForGeneration,
+                          ...referenceImagesForGeneration
                         ];
 
                         // Process all images at once
@@ -1275,7 +1319,7 @@ export default function GenerateImages() {
 
                         // Clear uploaded images after successful generation
                         setUploadedImages([]);
-                        setProductImageIndex(null);
+                        setProductImageIndices([]);
                         setHasAttemptedGenerate(false); // Reset since we're starting fresh
                         await fetchCredits('post-gen', { silent: true });
                       } catch (error) {
