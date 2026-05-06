@@ -28,6 +28,7 @@ export default function ImageToVideo() {
   const [isFromOtherPage, setIsFromOtherPage] = useState(false);
   const [localImageLink, setLocalImageLink] = useState(null); // Local image for this page
   const [duration, setDuration] = useState('4s'); // Local image for this page
+  const [isPromptGenerating, setIsPromptGenerating] = useState(false);
 
   const router = useRouter();
 
@@ -692,10 +693,14 @@ export default function ImageToVideo() {
   };
 
   const suggestPromptSingleImage = async () => {
+    if (isPromptGenerating) return;
+
     if (!activeImageLink) {
       alert('Please select or upload an image first!');
       return;
     }
+
+    setIsPromptGenerating(true);
 
     try {
       // Use the active image link directly (it's already uploaded to Supabase)
@@ -811,6 +816,8 @@ export default function ImageToVideo() {
     } catch (error) {
       console.error('Error generating prompt:', error);
       alert('Error generating prompt. Please try again.');
+    } finally {
+      setIsPromptGenerating(false);
     }
   };
 
@@ -1202,9 +1209,18 @@ export default function ImageToVideo() {
                 <button
                   onClick={suggestPromptSingleImage}
                   className="w-full h-12 bg-[#8256FF] hover:bg-[#6F48DB] rounded-lg font-semibold text-white transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!activeImageLink || isVideoLoading}
+                  disabled={
+                    !activeImageLink || isPromptGenerating || isVideoLoading
+                  }
                 >
-                  Need Help? Generate Prompt
+                  {isPromptGenerating ? (
+                    <span className="flex items-center justify-center gap-2">
+                      Generating Prompt
+                      <LoadingDots />
+                    </span>
+                  ) : (
+                    'Generate Prompt'
+                  )}
                 </button>
 
                 <textarea
