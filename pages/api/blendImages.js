@@ -40,6 +40,7 @@ export default async function handler(req, res) {
   const {
     prompt,
     images,
+    productImageUrls = [],
     productImageUrl,
     referenceImageUrls = [],
     user,
@@ -47,12 +48,21 @@ export default async function handler(req, res) {
     stylePrompt
   } = req.body;
 
-  const imageUrlsForEdit = productImageUrl
-    ? [productImageUrl, ...referenceImageUrls]
-    : images;
+  const hasMultiProductUrls =
+    Array.isArray(productImageUrls) && productImageUrls.length > 0;
+
+  const imageUrlsForEdit = hasMultiProductUrls
+    ? [...productImageUrls, ...referenceImageUrls]
+    : productImageUrl
+      ? [productImageUrl, ...referenceImageUrls]
+      : images;
 
   console.log('BrandPix image roles:', {
-    hasProductImageUrl: Boolean(productImageUrl),
+    productImageCount: hasMultiProductUrls
+      ? productImageUrls.length
+      : productImageUrl
+        ? 1
+        : 0,
     referenceImageCount: referenceImageUrls.length,
     totalImageUrlsForEdit: imageUrlsForEdit?.length || 0
   });
