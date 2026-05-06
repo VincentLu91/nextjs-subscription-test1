@@ -1283,16 +1283,6 @@ export default function GenerateImages() {
                         }
 
                         const productImagesForGeneration =
-                          uploadedImages.filter((_, index) =>
-                            productImageIndices.includes(index)
-                          );
-
-                        const referenceImagesForGeneration =
-                          uploadedImages.filter(
-                            (_, index) => !productImageIndices.includes(index)
-                          );
-
-                        const productImagesForGeneration =
                           productImageIndices.map(
                             (index) => uploadedImages[index]
                           );
