@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^2.1.1",
     "@stripe/stripe-js": "^9.8.0",
-    "@supabase/supabase-js": "^2.108.0",
+    "@supabase/supabase-js": "^2.108.1",
     "@swc/helpers": "^0.5.23",
     "@tailwindcss/postcss": "^4.3.0",
     "axios": "^1.17.0",
@@ -20,9 +20,9 @@
     "cohere-ai": "^8.0.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "next": "^16.2.7",
+    "next": "^16.2.8",
     "npm-check-updates": "^22.2.3",
-    "posthog-js": "^1.383.1",
+    "posthog-js": "^1.383.3",
     "raw-body": "^3.0.2",
     "react": "^19.2.7",
     "react-aria": "^3.49.0",
@@ -43,7 +43,7 @@
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^14.0.0",
     "postcss-preset-env": "^11.3.0",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.4"
   },
   "prettier": {
     "arrowParens": "always",
