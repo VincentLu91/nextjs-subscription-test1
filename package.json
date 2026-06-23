@@ -37,7 +37,7 @@
     "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "^10.5.0",
+    "autoprefixer": "^10.5.1",
     "postcss": "^8.5.15",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.1",
