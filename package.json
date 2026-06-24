@@ -31,13 +31,13 @@
     "react-hot-toast": "^2.6.0",
     "react-merge-refs": "^3.0.2",
     "react-select": "^5.10.2",
-    "stripe": "^22.2.3",
+    "stripe": "^22.3.0",
     "swr": "2.4.2",
     "tailwindcss": "^4.3.1",
     "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "^10.5.1",
+    "autoprefixer": "^10.5.2",
     "postcss": "^8.5.15",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.1",
