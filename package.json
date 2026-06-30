@@ -12,7 +12,7 @@
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^2.1.1",
     "@stripe/stripe-js": "^9.8.0",
-    "@supabase/supabase-js": "^2.108.2",
+    "@supabase/supabase-js": "^2.110.0",
     "@swc/helpers": "^0.5.23",
     "@tailwindcss/postcss": "^4.3.2",
     "axios": "^1.18.1",
@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^16.2.9",
     "npm-check-updates": "^22.2.9",
-    "posthog-js": "^1.396.2",
+    "posthog-js": "^1.396.3",
     "raw-body": "^3.0.2",
     "react": "^19.2.7",
     "react-aria": "^3.50.0",
@@ -43,7 +43,7 @@
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^14.0.0",
     "postcss-preset-env": "^11.3.2",
-    "prettier": "^3.9.3"
+    "prettier": "^3.9.4"
   },
   "prettier": {
     "arrowParens": "always",
