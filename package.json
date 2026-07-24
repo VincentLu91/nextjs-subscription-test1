@@ -22,7 +22,7 @@
     "jszip": "^3.10.1",
     "next": "^16.2.11",
     "npm-check-updates": "^22.2.9",
-    "posthog-js": "^1.407.0",
+    "posthog-js": "^1.407.2",
     "raw-body": "^4.0.0",
     "react": "^19.2.8",
     "react-aria": "^3.50.0",
@@ -41,7 +41,7 @@
     "postcss": "^8.5.22",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.1",
-    "postcss-nesting": "^14.0.0",
+    "postcss-nesting": "^14.0.1",
     "postcss-preset-env": "^11.3.2",
     "prettier": "^3.9.6"
   },
