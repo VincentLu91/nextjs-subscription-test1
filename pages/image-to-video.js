@@ -1000,7 +1000,7 @@ export default function ImageToVideo() {
 
         <p className="text-[#A1A1AA] mb-6">Choose an image to animate.</p>
         <p className="text-[#A1A1AA] mb-6">
-          Use a BrandPix-generated image (create one{' '}
+          Use a generated image (create one{' '}
           <Link href="/pix-blender" className="underline hover:text-white">
             here
           </Link>
@@ -1018,11 +1018,11 @@ export default function ImageToVideo() {
               Selected Image
             </label>
             {!localImageLink && isFromOtherPage && showImage && imageLink ? (
-              <p>✅ Using a BrandPix image – best quality for animations.</p>
+              <p>✅ Using an image – best quality for animations.</p>
             ) : (
               <p>
                 ℹ️ Your own photo works too. For smoother lighting and edges,
-                BrandPix-generated images usually animate best (start{' '}
+                generated images usually animate best (start{' '}
                 <Link
                   href="/pix-blender"
                   className="underline hover:text-white"

@@ -303,8 +303,8 @@ export default function Dashboard() {
                     {/*{' '}<span className="text-indigo-400 text-sm">NEW</span>*/}
                   </h3>
                   <p className="text-[16px] text-[#B0B0B0] mb-4">
-                    Step 2 (optional): Turn your BrandPix product image into a
-                    short TikTok/Reel clip.
+                    Step 2 (optional): Turn your product image into a short
+                    TikTok/Reel clip.
                   </p>
                   <button
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg 

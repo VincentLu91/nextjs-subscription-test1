@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { deductUserImageGenerationToken } from '../../utils/useDatabase';
 
-const BRANDPIX_SUFFIX = `
+const SUFFIX = `
 Edit the provided photo(s).
 
 KEEP EACH INPUT PRODUCT EXACTLY THE SAME (highest priority):
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
       ? [productImageUrl, ...referenceImageUrls]
       : images;
 
-  console.log('BrandPix image roles:', {
+  console.log('Image roles:', {
     productImageCount: hasMultiProductUrls
       ? productImageUrls.length
       : productImageUrl
@@ -82,8 +82,6 @@ export default async function handler(req, res) {
         error: 'User doesnothave permission'
       });
 
-    // Append brandpix_suffix to the user's prompt
-    //const fullPrompt = `${prompt}\n\n${BRANDPIX_SUFFIX}`;
     const fullPrompt = `User request: ${prompt}\n\n${stylePrompt}\n\n${REFERENCE_HANDLING}`;
 
     const resp = await axios.post(
