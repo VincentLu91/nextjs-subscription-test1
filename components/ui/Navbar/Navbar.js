@@ -75,14 +75,6 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link
-                  href="https://discord.gg/RMVcfz6Q"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center"
-                >
-                  Discord
-                </Link>
-                <Link
                   href="/dashboard"
                   className={`text-white/80 tracking-wide px-4 py-2 hover:underline hover:underline-offset-4 hover:decoration-purple-400 transition-all duration-200 flex items-center ${
                     router.pathname === '/dashboard'

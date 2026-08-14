@@ -6,8 +6,6 @@ import LoadingDots from '../components/ui/LoadingDots';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Logo from '../components/icons/Logo';
-import GitHub from '../components/icons/GitHub';
-import Google from '../components/icons/Google';
 import { supabase } from '../utils/initSupabase';
 
 const SignIn = () => {
@@ -34,18 +32,6 @@ const SignIn = () => {
         type: 'note',
         content: 'Check your email for the magic link.'
       });
-    }
-    setLoading(false);
-  };
-
-  const handleOAuthSignIn = async (provider) => {
-    setLoading(true);
-    //const { error } = await signIn({ provider });
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google'
-    });
-    if (error) {
-      setMessage({ type: 'error', content: error.message });
     }
     setLoading(false);
   };
@@ -162,28 +148,6 @@ const SignIn = () => {
             </Link>
           </span>
         </div>
-
-        <div className="flex items-center my-6">
-          <div
-            className="border-t border-blue-200 flex-grow mr-3"
-            aria-hidden="true"
-          ></div>
-          <div className="text-gray-600 italic">Or</div>
-          <div
-            className="border-t border-blue-200 flex-grow ml-3"
-            aria-hidden="true"
-          ></div>
-        </div>
-        <Button
-          className="bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-          variant="slim"
-          type="submit"
-          disabled={loading}
-          onClick={() => handleOAuthSignIn('google')}
-        >
-          <Google />
-          <span className="ml-2">Continue with Google</span>
-        </Button>
       </div>
     );
 

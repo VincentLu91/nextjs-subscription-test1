@@ -6,7 +6,6 @@ import { useUser } from '../components/UserContext';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Logo from '../components/icons/Logo';
-import Google from '../components/icons/Google';
 
 const SignUp = () => {
   const [user, setUser] = useState(null);
@@ -48,18 +47,6 @@ const SignUp = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleOAuthSignIn = async (provider) => {
-    setLoading(true);
-    //const { error } = await signIn({ provider });
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google'
-    });
-    if (error) {
-      setMessage({ type: 'error', content: error.message });
-    }
-    setLoading(false);
   };
 
   return (
@@ -107,27 +94,6 @@ const SignUp = () => {
             Sign in.
           </Link>
         </span>
-        <div className="flex items-center my-6">
-          <div
-            className="border-t border-blue-200 flex-grow mr-3"
-            aria-hidden="true"
-          ></div>
-          <div className="text-red-400 italic">Or</div>
-          <div
-            className="border-t border-blue-200 flex-grow ml-3"
-            aria-hidden="true"
-          ></div>
-        </div>
-        <Button
-          className="mt-1 bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90"
-          variant="slim"
-          type="submit"
-          disabled={loading}
-          onClick={() => handleOAuthSignIn('google')}
-        >
-          <Google />
-          <span className="ml-2">Sign up with Google</span>
-        </Button>
       </div>
     </form>
   );
